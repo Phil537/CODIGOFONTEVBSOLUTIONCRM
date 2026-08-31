@@ -1,14 +1,13 @@
 import defaultBrandLogoLight from "../assets/logo-evoluti-crm-light.png";
 import defaultBrandLogoDark from "../assets/logo-evoluti-crm-dark.png";
 import defaultBrandLogoCollapsed from "../assets/logo evoluti reduzida.png";
-import defaultBrandFavicon from "../assets/favicon-evoluti.png";
 
 export const APP_BRAND_NAME = "Evoluti CRM";
 
 export const DEFAULT_BRAND_LOGO_LIGHT = defaultBrandLogoLight;
 export const DEFAULT_BRAND_LOGO_DARK = defaultBrandLogoDark;
 export const DEFAULT_BRAND_LOGO_COLLAPSED = defaultBrandLogoCollapsed;
-export const DEFAULT_BRAND_FAVICON = defaultBrandFavicon;
+export const DEFAULT_BRAND_FAVICON = defaultBrandLogoCollapsed;
 /** @deprecated use DEFAULT_BRAND_LOGO_DARK */
 export const DEFAULT_BRAND_LOGO = defaultBrandLogoDark;
 

@@ -88,15 +88,6 @@ import {
 
 const backendUrl = getBackendUrl();
 const drawerWidth = 210;
-
-const isDefaultEvolutiExpandedLogo = (src) => {
-  if (!src) return false;
-  const normalized = String(src);
-  return (
-    normalized === DEFAULT_BRAND_LOGO_DARK ||
-    normalized.includes("logo-evoluti-crm-dark")
-  );
-};
 const appBarHeight = 32;
 
 const useStyles = makeStyles((theme) => {
@@ -249,8 +240,8 @@ const useStyles = makeStyles((theme) => {
     alignItems: "center",
     justifyContent: "center",
     padding: "8px 8px",
-    height: "118px",
-    minHeight: "118px",
+    height: "126px",
+    minHeight: "126px",
     backgroundColor:
       theme.palette.sidebarMenuBackground || theme.palette.background.paper,
     transition: "all 0.3s ease",
@@ -539,51 +530,10 @@ const useStyles = makeStyles((theme) => {
     paddingBottom: "2px !important",
   },
 
-  logoBrandWrap: {
-    display: "flex",
-    flexDirection: "column",
-    alignItems: "flex-end",
-    justifyContent: "center",
-    width: "100%",
-    maxWidth: "100%",
-    cursor: "pointer",
-    paddingRight: 4,
-    boxSizing: "border-box",
-  },
-
   logo: {
     width: "auto",
-    height: "100px",
-    maxHeight: "100px",
-    maxWidth: "100%",
-    objectFit: "contain",
-    objectPosition: "left center",
-    alignSelf: "flex-start",
-    clipPath: "inset(0 0 11% 0)",
-    transition: "opacity 0.15s ease",
-    "&:hover": {
-      opacity: 0.9,
-    },
-  },
-
-  logoCrmTag: {
-    fontFamily:
-      '"Inter", "Plus Jakarta Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif',
-    fontSize: 13,
-    fontWeight: 600,
-    letterSpacing: "0.12em",
-    color: "#ffffff",
-    lineHeight: 1,
-    marginTop: -5,
-    marginRight: 6,
-    userSelect: "none",
-    opacity: 0.95,
-  },
-
-  logoFull: {
-    width: "auto",
-    height: "112px",
-    maxHeight: "112px",
+    height: "116px",
+    maxHeight: "116px",
     maxWidth: "calc(100% - 4px)",
     objectFit: "contain",
     objectPosition: "center",
@@ -1219,47 +1169,18 @@ const LoggedInLayout = ({ children, themeToggle, hideMenu = false }) => {
           open={drawerOpen}
         >
           <div className={clsx(classes.toolbarIcon, !drawerOpen && classes.toolbarIconCollapsed)}>
-            {drawerOpen ? (() => {
-              const expandedLogoSrc = theme.palette.sidebarMenuIsDarkLogo
-                ? theme.calculatedLogoDark()
-                : theme.calculatedLogoLight();
-              const toggleDrawer = () => setDrawerOpen(!drawerOpen);
-              if (isDefaultEvolutiExpandedLogo(expandedLogoSrc)) {
-                return (
-                  <div
-                    className={classes.logoBrandWrap}
-                    onClick={toggleDrawer}
-                    role="button"
-                    tabIndex={0}
-                    onKeyDown={(e) => {
-                      if (e.key === "Enter" || e.key === " ") toggleDrawer();
-                    }}
-                  >
-                    <img
-                      src={expandedLogoSrc}
-                      alt="Evoluti CRM"
-                      className={classes.logo}
-                    />
-                    <span className={classes.logoCrmTag}>CRM</span>
-                  </div>
-                );
+            <img
+              src={
+                drawerOpen
+                  ? theme.palette.sidebarMenuIsDarkLogo
+                    ? theme.calculatedLogoDark()
+                    : theme.calculatedLogoLight()
+                  : DEFAULT_BRAND_LOGO_COLLAPSED
               }
-              return (
-                <img
-                  src={expandedLogoSrc}
-                  alt="Evoluti CRM"
-                  className={classes.logoFull}
-                  onClick={toggleDrawer}
-                />
-              );
-            })() : (
-              <img
-                src={DEFAULT_BRAND_LOGO_COLLAPSED}
-                alt="Evoluti CRM"
-                className={classes.logoCollapsed}
-                onClick={() => setDrawerOpen(!drawerOpen)}
-              />
-            )}
+              alt="Evoluti CRM"
+              className={drawerOpen ? classes.logo : classes.logoCollapsed}
+              onClick={() => setDrawerOpen(!drawerOpen)}
+            />
             {drawerOpen && (
               <IconButton onClick={() => setDrawerOpen(!drawerOpen)} className={classes.chevronButton}>
                 <MenuIcon />

@@ -36,7 +36,7 @@ import {
   DEFAULT_BRAND_FAVICON,
   APP_BRAND_NAME,
 } from "../../constants/brand";
-import defaultLogoFavicon from "../../assets/favicon-evoluti.png";
+import defaultLogoFavicon from "../../assets/logo evoluti reduzida.png";
 import ColorBoxModal from "../ColorBoxModal/index.js";
 import Checkbox from "@material-ui/core/Checkbox";
 import { i18n } from "../../translate/i18n";
