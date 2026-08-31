@@ -239,9 +239,11 @@ const useStyles = makeStyles((theme) => {
     display: "flex",
     alignItems: "center",
     justifyContent: "center",
-    padding: "8px 8px",
+    padding: "1px 2px",
     height: "126px",
     minHeight: "126px",
+    boxSizing: "border-box",
+    overflow: "hidden",
     backgroundColor:
       theme.palette.sidebarMenuBackground || theme.palette.background.paper,
     transition: "all 0.3s ease",
@@ -531,12 +533,13 @@ const useStyles = makeStyles((theme) => {
   },
 
   logo: {
-    width: "auto",
-    height: "116px",
-    maxHeight: "116px",
-    maxWidth: "calc(100% - 4px)",
+    display: "block",
+    width: "100%",
+    height: "124px",
+    maxHeight: "124px",
+    maxWidth: "100%",
     objectFit: "contain",
-    objectPosition: "center",
+    objectPosition: "center center",
     transition: "opacity 0.15s ease",
     cursor: "pointer",
     "&:hover": {
