@@ -238,9 +238,9 @@ const useStyles = makeStyles((theme) => {
     display: "flex",
     alignItems: "center",
     justifyContent: "center",
-    padding: "8px 10px",
-    height: "68px",
-    minHeight: "68px",
+    padding: "10px 12px",
+    height: "80px",
+    minHeight: "80px",
     backgroundColor:
       theme.palette.sidebarMenuBackground || theme.palette.background.paper,
     transition: "all 0.3s ease",
@@ -527,8 +527,8 @@ const useStyles = makeStyles((theme) => {
   logo: {
     width: "auto",
     height: "auto",
-    maxHeight: "72px",
-    maxWidth: "min(100%, 200px)",
+    maxHeight: "88px",
+    maxWidth: "min(100%, 220px)",
     objectFit: "contain",
     objectPosition: "center",
     transition: "opacity 0.15s ease",
@@ -540,9 +540,9 @@ const useStyles = makeStyles((theme) => {
 
 
   hideLogo: {
-    width: "36px",
-    maxWidth: "36px",
-    maxHeight: "36px",
+    width: "42px",
+    maxWidth: "42px",
+    maxHeight: "42px",
     margin: "0 auto",
   },
 
