@@ -29,6 +29,7 @@ describe("V2 runtime directives in aggregated prompt", () => {
     expect(V2_RUNTIME_DIRECTIVES_PT).toContain("REGRAS GERAIS");
     expect(V2_RUNTIME_DIRECTIVES_PT).toContain("ROTEIRO");
     expect(V2_RUNTIME_DIRECTIVES_PT).toMatch(/Ordem|gatilhos|condições/i);
+    expect(V2_RUNTIME_DIRECTIVES_PT).toMatch(/INTERRUPÇÕES|INTERRUPCOES/i);
   });
 
   it("exports aggregated document bridge for handleOpenAi", () => {

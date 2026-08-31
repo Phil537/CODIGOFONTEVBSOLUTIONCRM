@@ -335,6 +335,19 @@ export async function tryHandleAttendanceFlowTurnV2(params: {
   });
   logTimelineEvent(timelineEvent);
 
+  /** Interrupção humana: delegar à LLM sem consumir turno nem persistir estado. */
+  if (decision.action === "defer_to_llm") {
+    return {
+      handled: false,
+      consumedReply: false,
+      sentCount: 0,
+      actionCount: 0,
+      allowLlmFallback: true,
+      source: "v2",
+      reason: "defer_to_llm"
+    };
+  }
+
   /** 6) persistir memory parcial ANTES de IO. */
   if (Object.keys(decision.memoryPatch).length || decision.action !== "noop") {
     const patch = {

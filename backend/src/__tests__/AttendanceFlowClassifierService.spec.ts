@@ -161,13 +161,12 @@ describe("applyHeuristic — fallback determinístico", () => {
   it("does not advance date step when client asks for price instead", () => {
     const r = applyHeuristic(inputForStep("quero saber valores primeiro", 1));
     expect(r.intent).toBe("off_topic");
-    expect(r.reasoning).toMatch(/preço|valor/i);
+    expect(r.reasoning).toMatch(/preço|valor|fora da etapa/i);
   });
 
-  it("low confidence when answer to date step is plain text without date hints", () => {
+  it("off_topic when client evades date step with thinking phrase", () => {
     const r = applyHeuristic(inputForStep("preciso pensar ainda", 1));
-    expect(r.intent).toBe("advance");
-    expect(r.confidence).toBeLessThan(0.7);
+    expect(r.intent).toBe("off_topic");
   });
 });
 

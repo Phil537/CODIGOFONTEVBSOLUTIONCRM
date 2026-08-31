@@ -293,6 +293,274 @@ export function looksLikePricingOrOffTopicVersusDateQuestion(body: string): bool
   );
 }
 
+/** Remove cumprimento inicial para analisar o restante ("tudo bem, quanto custa?" → "quanto custa?"). */
+export function stripLeadingGreeting(body: string): string {
+  let t = String(body || "")
+    .replace(/\u200e/g, "")
+    .trim();
+  if (!t) return t;
+  const greetingPrefix =
+    /^(oi|olá|ola|opa|hey|salve|fala|e\s*a[ií]|bom\s*dia|boa\s*tarde|boa\s*noite)[\s,!?.🙂😊👋🙏]*(tudo\s*bem|td\s*bem|beleza|blz|como\s*vai)?[\s,!?.🙂😊👋🙏]*/i;
+  const stripped = t.replace(greetingPrefix, "").trim();
+  if (stripped) return stripped;
+  const tudoPrefix = /^(tudo\s*bem|td\s*bem|beleza|blz)[\s,!?.🙂😊👋🙏]+/i;
+  const stripped2 = t.replace(tudoPrefix, "").trim();
+  return stripped2 || t;
+}
+
+/** Detecta pergunta/FAQ do cliente (com ou sem `?`). */
+export function looksLikeCustomerQuestion(body: string): boolean {
+  const raw = String(body || "")
+    .replace(/\u200e/g, "")
+    .trim();
+  if (!raw) return false;
+  const core = stripLeadingGreeting(raw);
+  if (/\?\s*$/.test(core)) return true;
+  const t = core
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/\p{M}/gu, "");
+  if (
+    /^(quanto|qual|quais|quando|onde|como|por\s*que|porque|pode\s*me|me\s*(fala|diz|explica)|tem\s|voces|vocês|vcs)\b/.test(
+      t
+    )
+  ) {
+    return true;
+  }
+  if (
+    /\b(quanto\s*custa|quanto\s*fica|quanto\s*é|qual\s*(o\s*)?(valor|preco|preço|horario|horário)|voces\s+atendem|vocês\s+atendem|trabalham\s+(no|aos|a)|funciona\s+(no|aos|a)|aceita|parcela|formas?\s+de\s+pagamento)\b/.test(
+      t
+    )
+  ) {
+    return true;
+  }
+  return looksLikePricingOrOffTopicVersusDateQuestion(core);
+}
+
+/** Pergunta ou preço fora do contexto da etapa visível — interrupção humana. */
+export function looksLikeCustomerInterruption(body: string): boolean {
+  if (!String(body || "").trim()) return false;
+  if (looksLikeCustomerQuestion(body)) return true;
+  return looksLikePricingOrOffTopicVersusDateQuestion(body);
+}
+
+export type ScriptInboundTurnKind =
+  | "greeting_reply"
+  | "date_reply"
+  | "quantity_reply"
+  | "menu_choice"
+  | "free_reply"
+  | "interruption"
+  | "mixed_interruption"
+  | "noise"
+  | "empty";
+
+export type ScriptInboundTurnDecision = {
+  shouldCannedAdvance: boolean;
+  deferToLlm: boolean;
+  kind: ScriptInboundTurnKind;
+  reason: string;
+};
+
+/**
+ * Classifica se a mensagem inbound deve avançar etapa canned ou ser delegada à LLM.
+ */
+export function classifyScriptInboundTurn(
+  visibleCustomerText: string,
+  body: string
+): ScriptInboundTurnDecision {
+  const visible = stripAgentFlowScriptTrainingMarkers(String(visibleCustomerText || ""));
+  const raw = String(body || "")
+    .replace(/\u200e/g, "")
+    .trim();
+  if (!raw) {
+    return {
+      shouldCannedAdvance: false,
+      deferToLlm: false,
+      kind: "empty",
+      reason: "mensagem vazia"
+    };
+  }
+
+  const stripped = stripLeadingGreeting(raw);
+  const mixedGreetingAndQuestion =
+    stripped !== raw && stripped.length >= 3 && looksLikeCustomerQuestion(stripped);
+  if (mixedGreetingAndQuestion) {
+    return {
+      shouldCannedAdvance: false,
+      deferToLlm: true,
+      kind: "mixed_interruption",
+      reason: "cumprimento + pergunta na mesma mensagem"
+    };
+  }
+
+  if (isTrivialFlowInboundNoise(raw) && !isGreetingStyleStep(visible)) {
+    return {
+      shouldCannedAdvance: false,
+      deferToLlm: false,
+      kind: "noise",
+      reason: "ruído trivial"
+    };
+  }
+
+  if (looksLikeCustomerInterruption(raw)) {
+    const visLow = visible.toLowerCase();
+    const asksPrice =
+      /\b(valor|preço|preco|quanto|custa)\b/i.test(visLow);
+    if (!asksPrice || looksLikePricingOrOffTopicVersusDateQuestion(raw)) {
+      return {
+        shouldCannedAdvance: false,
+        deferToLlm: true,
+        kind: "interruption",
+        reason: "pergunta ou assunto fora da etapa atual"
+      };
+    }
+  }
+
+  if (isGreetingStyleStep(visible)) {
+    if (looksLikeCustomerQuestion(raw)) {
+      return {
+        shouldCannedAdvance: false,
+        deferToLlm: true,
+        kind: "interruption",
+        reason: "pergunta na etapa de saudação"
+      };
+    }
+    if (isGreetingStepAcceptableReply(raw)) {
+      return {
+        shouldCannedAdvance: true,
+        deferToLlm: false,
+        kind: "greeting_reply",
+        reason: "resposta recíproca à saudação"
+      };
+    }
+    return {
+      shouldCannedAdvance: false,
+      deferToLlm: false,
+      kind: "noise",
+      reason: "saudação sem resposta aceitável"
+    };
+  }
+
+  const visLow = visible.toLowerCase();
+  const asksDateOrPeriod =
+    /\b(data|viaj|período|periodo|quando|feriad|reserv|hosped|hósped|qual dia|em qual|pretende viajar)\b/i.test(
+      visLow
+    ) || (/\?\s*$/.test(visLow) && /\b(data|viajar|quando|per[ií]odo)\b/i.test(visLow));
+  if (asksDateOrPeriod) {
+    if (looksLikePricingOrOffTopicVersusDateQuestion(raw) || looksLikeCustomerQuestion(raw)) {
+      return {
+        shouldCannedAdvance: false,
+        deferToLlm: true,
+        kind: "interruption",
+        reason: "pergunta de preço/FAQ em etapa de data"
+      };
+    }
+    if (bodyLooksLikeDateOrPeriodReply(raw)) {
+      return {
+        shouldCannedAdvance: true,
+        deferToLlm: false,
+        kind: "date_reply",
+        reason: "data ou período informado"
+      };
+    }
+    return {
+      shouldCannedAdvance: false,
+      deferToLlm: looksLikeCustomerQuestion(raw),
+      kind: looksLikeCustomerQuestion(raw) ? "interruption" : "noise",
+      reason: looksLikeCustomerQuestion(raw)
+        ? "pergunta em vez de data"
+        : "resposta não parece data/período"
+    };
+  }
+
+  const asksQuantity =
+    /\b(quantas|quantos|quant|pessoas|hóspede|hospede|acompanh|acomoda|viajam)\b/i.test(visLow);
+  if (asksQuantity) {
+    if (looksLikeCustomerQuestion(raw) && !/\d/.test(raw)) {
+      return {
+        shouldCannedAdvance: false,
+        deferToLlm: true,
+        kind: "interruption",
+        reason: "pergunta sem quantidade em etapa de hóspedes"
+      };
+    }
+    if (plausibleFreeReplyAdvancesStep(visible, raw)) {
+      return {
+        shouldCannedAdvance: true,
+        deferToLlm: false,
+        kind: "quantity_reply",
+        reason: "quantidade informada"
+      };
+    }
+    return {
+      shouldCannedAdvance: false,
+      deferToLlm: looksLikeCustomerQuestion(raw),
+      kind: looksLikeCustomerQuestion(raw) ? "interruption" : "noise",
+      reason: "resposta não parece quantidade"
+    };
+  }
+
+  const looksLikeMenuChoice =
+    visibleStepContainsNumberedChoiceMenu(visible) ||
+    /\b(op(ç|c)(ã|a)o|opcao)\s*[1-9]\b/i.test(visLow);
+  if (looksLikeMenuChoice) {
+    const b = raw.toLowerCase().trim();
+    if (/^[1-9]\s*[\).]?$/.test(b) || /^(op(ç|c)(ã|a)o|opcao)\s*[1-9]\b/i.test(b)) {
+      return {
+        shouldCannedAdvance: true,
+        deferToLlm: false,
+        kind: "menu_choice",
+        reason: "opção numérica do menu"
+      };
+    }
+    if (looksLikeCustomerQuestion(raw)) {
+      return {
+        shouldCannedAdvance: false,
+        deferToLlm: true,
+        kind: "interruption",
+        reason: "pergunta sobre opções do menu"
+      };
+    }
+    if (plausibleFreeReplyAdvancesStep(visible, raw)) {
+      return {
+        shouldCannedAdvance: true,
+        deferToLlm: false,
+        kind: "menu_choice",
+        reason: "escolha textual do menu"
+      };
+    }
+    return {
+      shouldCannedAdvance: false,
+      deferToLlm: false,
+      kind: "noise",
+      reason: "menu sem escolha reconhecida"
+    };
+  }
+
+  if (looksLikeCustomerQuestion(raw)) {
+    return {
+      shouldCannedAdvance: false,
+      deferToLlm: true,
+      kind: "interruption",
+      reason: "pergunta do cliente"
+    };
+  }
+
+  const canAdvance = plausibleFreeReplyAdvancesStep(visible, raw);
+  return {
+    shouldCannedAdvance: canAdvance,
+    deferToLlm: false,
+    kind: canAdvance ? "free_reply" : "noise",
+    reason: canAdvance ? "resposta livre plausível" : "resposta não plausível para a etapa"
+  };
+}
+
+/** Atalho para `classifyScriptInboundTurn(...).shouldCannedAdvance`. */
+export function shouldCannedAdvanceOnFreeReply(visibleCustomerText: string, body: string): boolean {
+  return classifyScriptInboundTurn(visibleCustomerText, body).shouldCannedAdvance;
+}
+
 /**
  * Mensagem parece tentar informar data/período (para ramo de agendamento), não cumprimento genérico.
  */
@@ -362,6 +630,7 @@ export function looksLikePeriodWithoutExactDate(body: string): PeriodHint | null
 export function plausibleFreeReplyAdvancesStep(visibleCustomerText: string, body: string): boolean {
   if (!shouldAdvanceOnFreeReply(body)) return false;
   if (isTrivialFlowInboundNoise(body)) return false;
+  if (looksLikeCustomerQuestion(body)) return false;
 
   const vis = String(visibleCustomerText || "").toLowerCase();
   const b = String(body || "").toLowerCase();
@@ -487,6 +756,10 @@ ${step >= 1 ? "- **Anti-repetição:** A etapa 1 (saudação inicial) já foi en
 - Marcação textual de etapas no script (--- ou # ETAPA / # PASSO / # próxima etapa / # 1. Título, etc.) não aparece para o cliente. Condições no texto podem ser exemplos de fala do lead, sim/não ou cenários — interprete o significado, sem exigir IF/ELSE formal. Linhas em branco não mudam etapa no sistema.
 
 Prioridade: (1) dados já registrados nas respostas por etapa; (2) continuidade a partir da etapa atual e do preview acima; (3) alinhamento com regras gerais se houver conflito com um trecho literal do roteiro. Responda como atendente, sem aspas envolvendo a mensagem inteira.
+
+INTERRUPÇÃO (pergunta do cliente no meio do roteiro):
+- Se a mensagem atual for PERGUNTA, FAQ, preço, horário ou assunto lateral: RESPONDA PRIMEIRO com Regras gerais + FAQ + Base de conhecimento (file_search se necessário). Depois retome a etapa pendente com UMA pergunta curta — não avance etapa canned sem responder o que ele perguntou.
+- Não ignore interrupções para empurrar o próximo bloco do roteiro.
 --- Fim estado do roteiro ---
 `.trim();
   } catch {

@@ -201,14 +201,15 @@ describe("E2E: NO REPEAT", () => {
 });
 
 describe("E2E: off_topic não avança", () => {
-  it("cliente pergunta algo no meio do fluxo → send_hint, etapa preservada", async () => {
+  it("cliente pergunta algo no meio do fluxo → defer_to_llm, etapa preservada", async () => {
     const { memory, trail } = await runConversation([
       "oi",
       "quero agendar agora",
       "vocês trabalham aos domingos?"
     ]);
     expect(trail[2].intent).toBe("off_topic");
-    expect(trail[2].decision.action).toBe("send_hint");
+    expect(trail[2].decision.action).toBe("defer_to_llm");
+    expect(trail[2].decision.consumedReply).toBe(false);
     expect(memory.lastPresentedStep).toBe(2);
   });
 });

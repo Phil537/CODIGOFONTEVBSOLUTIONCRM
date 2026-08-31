@@ -178,6 +178,11 @@ Regras ≠ roteiro: regras = comportamento global; roteiro = o que deve ocorrer 
 
 Fallback: não use "não entendi" ou pedido vago de reformulação sem antes tentar encaixar a mensagem no contexto, na etapa provável e nas regras.
 --- FIM DAS DIRETRIZES ---
+
+INTERRUPÇÕES (roteiro ativo):
+- Se o cliente fizer uma pergunta, pedir preço, horário ou outro assunto no meio do fluxo: responda PRIMEIRO com Regras gerais + FAQ + Base de conhecimento (file_search quando necessário).
+- Só depois retome a etapa pendente com UMA pergunta curta — não avance etapa canned ignorando a dúvida.
+--- FIM INTERRUPÇÕES ---
 `.trim();
 
 export function buildV2StructuredPromptText(v2: PromptV2Body, promptId: number | null): string {

@@ -27,15 +27,17 @@ describe("matchAttendanceFlowResponseOption (fluxo visual)", () => {
     expect(matchAttendanceFlowResponseOption("B", options)).toBeNull();
   });
 
-  it("modo open ignora cumprimento trivial (não avança etapa como se fosse resposta)", () => {
+  it("modo open ignora cumprimento trivial e FAQ", () => {
     const options = [{ text: "", matchMode: "open", nextStep: 2 }];
     expect(matchAttendanceFlowResponseOption("Oi", options)).toBeNull();
+    expect(matchAttendanceFlowResponseOption("quanto custa?", options)).toBeNull();
     expect(matchAttendanceFlowResponseOption("20 de agosto", options)?.nextStep).toBe(2);
   });
 
-  it("modo any ignora cumprimento trivial", () => {
+  it("modo any ignora cumprimento trivial e FAQ", () => {
     const options = [{ text: "-", matchMode: "any", nextStep: 3 }];
     expect(matchAttendanceFlowResponseOption("Olá!", options)).toBeNull();
+    expect(matchAttendanceFlowResponseOption("qual o valor?", options)).toBeNull();
     expect(matchAttendanceFlowResponseOption("Preciso de ajuda com reserva", options)?.nextStep).toBe(3);
   });
 });

@@ -24,6 +24,10 @@ import {
   buildAttendanceFlowLlmAnchor,
   normalizeAttendanceFlowMemory
 } from "../../helpers/agentAttendanceFlowMemory";
+import {
+  AGENT_CONSULTIVE_MODE_DIRECTIVE_PT,
+  isAgentRoteiroRuntimeActive
+} from "../../helpers/agentRoteiroRuntime";
 import { normalizeTicketDataWebhook } from "../AgentProactiveServices/agentProactiveTicketState";
 import { normalizeAgentConversationalMemory } from "../../helpers/agentConversationalMemory";
 import { buildWhereForConnectionAgentHistory } from "../../helpers/connectionAiMessageHistory";
@@ -800,19 +804,33 @@ function buildOrchestratorSystemPrompt(params: {
   const flowSteps = Array.isArray((params.prompt as any).attendanceFlowSteps)
     ? (params.prompt as any).attendanceFlowSteps
     : [];
+  const roteiroActive = isAgentRoteiroRuntimeActive(params.prompt);
   const scope = buildWhatsappPromptScopePreamble(params.prompt);
-  const flowAnchor = buildAttendanceFlowLlmAnchor(params.ticket, params.prompt.id);
-  const roteiroCursor = buildRoteiroCursorHint(params.ticket, params.prompt, flowSteps);
-  const firstHint = buildFirstTurnOrchestratorHint(params.ticket, params.prompt, params.recentMessages, flowSteps);
+  const flowAnchor = roteiroActive
+    ? buildAttendanceFlowLlmAnchor(params.ticket, params.prompt.id)
+    : "";
+  const roteiroCursor = roteiroActive
+    ? buildRoteiroCursorHint(params.ticket, params.prompt, flowSteps)
+    : "";
+  const firstHint = roteiroActive
+    ? buildFirstTurnOrchestratorHint(params.ticket, params.prompt, params.recentMessages, flowSteps)
+    : "";
 
   return [
     scope.trimEnd(),
+    roteiroActive ? "" : `\n${AGENT_CONSULTIVE_MODE_DIRECTIVE_PT}\n`,
     flowAnchor ? `\n${flowAnchor.trim()}\n` : "",
     roteiroCursor ? `${roteiroCursor}\n` : "",
     firstHint ? `${firstHint}\n` : "",
-    "Voce e o ORQUESTRADOR LLM-FIRST do agente de WhatsApp.",
-    "Leia na ordem: escopo acima, estado do roteiro no ticket, cursor do roteiro, Regras Gerais, script longo, etapas JSON, memoria e historico. Depois decida a proxima resposta.",
-    "As ETAPAS (JSON) e o attendanceScript definem o roteiro: ordem semantica, textos ao cliente e objetivos. Nao e menu de chatbot; siga o conteudo e a ordem sem empilhar varias etapas na mesma mensagem.",
+    roteiroActive
+      ? "Voce e o ORQUESTRADOR LLM-FIRST do agente de WhatsApp."
+      : "Voce e o ORQUESTRADOR LLM-FIRST do agente de WhatsApp em MODO CONSULTIVO (sem roteiro visual ativo).",
+    roteiroActive
+      ? "Leia na ordem: escopo acima, estado do roteiro no ticket, cursor do roteiro, Regras Gerais, script longo, etapas JSON, memoria e historico. Depois decida a proxima resposta."
+      : "Leia na ordem: escopo acima, Regras Gerais, FAQ, base de conhecimento, acoes e historico. Responda o que o cliente perguntou sem forcar sequencia de etapas.",
+    roteiroActive
+      ? "As ETAPAS (JSON) e o attendanceScript definem o roteiro: ordem semantica, textos ao cliente e objetivos. Nao e menu de chatbot; siga o conteudo e a ordem sem empilhar varias etapas na mesma mensagem."
+      : "Nao inclua cursor de roteiro nem etapas JSON — conduza de forma natural e consultiva.",
     "Use o historico recente e a memoria como fonte principal de continuidade. A mensagem atual nunca pode ser interpretada isoladamente.",
     "Antes de responder, consolide mentalmente: o que ja foi perguntado, o que ja foi respondido, qual objetivo esta pendente e qual unica pergunta ajuda a avancar.",
     "Respostas curtas do cliente (ex.: '5', '5 semanas', 'sim', 'não', nome, telefone) devem ser vinculadas à última pergunta feita no ticket antes de qualquer nova pergunta.",
@@ -828,6 +846,9 @@ function buildOrchestratorSystemPrompt(params: {
     "- Nunca envie duas perguntas principais de coleta na mesma resposta. A resposta final pode ter no maximo um ponto de interrogacao.",
     "- Se houver varios dados faltantes, escolha o mais importante agora e deixe os outros para turnos futuros.",
     "- Se a ultima mensagem tinha duas perguntas e o cliente respondeu uma, use a parte respondida e pergunte somente a pendente.",
+    roteiroActive
+      ? "- INTERRUPCAO: se o cliente fizer pergunta lateral (preco, FAQ, horario), responda com Regras + FAQ + conhecimento ANTES de retomar a etapa pendente com uma pergunta curta."
+      : "- Modo consultivo: priorize Regras gerais, FAQ, base de conhecimento e acoes; nao force sequencia de etapas.",
     "- Se uma action for necessaria, escolha actionSlug e actionVariables; nao simule execucao no texto.",
     "- Linhas do roteiro com /comando (ex /agendamento, /transferirchamado) correspondem ao slug no catalogo de ACTIONS: quando o historico cumprir os pre-requisitos (data/hora para agendamento, confirmacao para transferencia), use execute_action ou reply_and_execute_action com actionSlug exatamente como no catalogo (ex agendamento).",
     "- Nao envie marcadores internos como # ETAPA, RESPOSTA, Mensagem, EXEMPLO ou /slug.",
@@ -881,24 +902,28 @@ function buildOrchestratorSystemPrompt(params: {
     "REGRAS GERAIS (campo Regras do painel — vinculante; nao contradizer nem ignorar; nada fora daqui + roteiro + cerebro):",
     promptText || "(vazio — use só roteiro/script e blocos JSON.)",
     "",
-    attendanceScript
+    roteiroActive && attendanceScript
       ? `SCRIPT / ROTEIRO LONGO (attendanceScript — seguir sentido; na fala ao cliente omita blocos de treino/EXEMPLO):\n${attendanceScript}`
       : "",
     "",
-    "ETAPAS DO ROTEIRO VISUAL (JSON; ordem por stepNumber; alinhar com CURSOR DO ROTEIRO e estado do ticket):",
-    JSON.stringify(
-      flowSteps.slice(0, 30).map((step: any) => ({
-        stepNumber: step.stepNumber,
-        title: step.title,
-        objective: step.objective,
-        expectedReply: step.expectedReply,
-        slotName: step.slotName,
-        customerVisibleText: step.customerVisibleText || step.agentPrompt,
-        branchesIR: step.branchesIR
-      })),
-      null,
-      2
-    ).slice(0, 18000),
+    roteiroActive
+      ? [
+          "ETAPAS DO ROTEIRO VISUAL (JSON; ordem por stepNumber; alinhar com CURSOR DO ROTEIRO e estado do ticket):",
+          JSON.stringify(
+            flowSteps.slice(0, 30).map((step: any) => ({
+              stepNumber: step.stepNumber,
+              title: step.title,
+              objective: step.objective,
+              expectedReply: step.expectedReply,
+              slotName: step.slotName,
+              customerVisibleText: step.customerVisibleText || step.agentPrompt,
+              branchesIR: step.branchesIR
+            })),
+            null,
+            2
+          ).slice(0, 18000)
+        ].join("\n")
+      : "",
     "",
     params.systemPrompt
       ? ["PROMPT SISTEMA ADICIONAL (runtime):", String(params.systemPrompt).slice(0, 50000)].join("\n")

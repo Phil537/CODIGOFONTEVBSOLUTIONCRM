@@ -121,6 +121,10 @@ import {
   normalizeAttendanceFlowMemory,
   isTrivialFlowInboundNoise
 } from "../../helpers/agentAttendanceFlowMemory";
+import {
+  AGENT_CONSULTIVE_MODE_DIRECTIVE_PT,
+  isAgentRoteiroRuntimeActive
+} from "../../helpers/agentRoteiroRuntime";
 import { stripAgentFlowScriptTrainingMarkers } from "../../helpers/stripAgentFlowScriptTrainingMarkers";
 import { sanitizeAgentCustomerVisibleText } from "../../helpers/sanitizeAgentCustomerVisibleText";
 import { buildConversationContextDigest } from "../../helpers/conversationContextDigest";
@@ -4200,13 +4204,7 @@ const handleOpenAi = async (
        * mensagem chega antes do worker processar a 1ª e o agente “trava” sem responder.
        * Nunca enfileirar quando há roteiro visual — resposta deve ser síncrona etapa a etapa.
        */
-      const scriptBlob = `${String((prompt as any).attendanceScript || "")}\n${String((prompt as any).prompt || "")}`;
-      const promptHasFlowScript =
-        (Array.isArray((prompt as any).attendanceFlowSteps) &&
-          (prompt as any).attendanceFlowSteps.length > 0) ||
-        /(?:^|\r?\n)\s*#?\s*(?:ETAPA|PASSO)\s*\d+|#\s*ETAPA\b|#\s*PASSO\b|(^|\r?\n)\s*---\s*(\r?\n|$)/im.test(
-          scriptBlob
-        );
+      const promptHasFlowScript = isAgentRoteiroRuntimeActive(prompt);
       if (
         isAgentInboundQueueEnabled() &&
         agentInboundQueue &&
@@ -4375,8 +4373,7 @@ const handleOpenAi = async (
             cargo = {};
           }
         }
-        const fluxoOff = (cargo as any)?.sectionFlags?.fluxoEnabled === false;
-        if (flowSteps.length > 0 && !fluxoOff) {
+        if (isAgentRoteiroRuntimeActive(prompt)) {
           const base = normalizeTicketDataWebhook(ticket.dataWebhook) as Record<string, unknown>;
           const afPrev = normalizeAttendanceFlowMemory(base.attendanceFlow, prompt.id);
           const stepNums = flowSteps
@@ -4523,6 +4520,7 @@ const handleOpenAi = async (
       }
       const afGate = normalizeAttendanceFlowMemory(dwAf.attendanceFlow, prompt.id);
       if (
+        isAgentRoteiroRuntimeActive(prompt) &&
         afGate.awaitingUserReply === true &&
         afGate.flowPhase !== "completed" &&
         Number(afGate.lastPresentedStep) > 0 &&
@@ -4668,20 +4666,16 @@ const handleOpenAi = async (
   };
 
   const scopePreamble = buildWhatsappPromptScopePreamble(prompt);
-  const attendanceFlowAnchor = buildAttendanceFlowLlmAnchor(ticket, prompt.id);
-  const hasVisualFlowSteps =
-    Array.isArray((prompt as any).attendanceFlowSteps) && (prompt as any).attendanceFlowSteps.length > 0;
-  const scriptBlobForStepHint = `${String((prompt as any).attendanceScript || "")}\n${String((prompt as any).prompt || "")}`;
-  const hasMultiStepScriptMarkers =
-    /(?:^|\r?\n)\s*#?\s*(?:ETAPA|PASSO)\s*\d+|#\s*ETAPA\b|#\s*PASSO\b|(^|\r?\n)\s*---\s*(\r?\n|$)/im.test(
-      scriptBlobForStepHint
-    );
-  const strictRoteiroDiscipline =
-    Boolean(attendanceFlowAnchor) || hasVisualFlowSteps || hasMultiStepScriptMarkers;
+  const roteiroRuntimeActive = isAgentRoteiroRuntimeActive(prompt);
+  const attendanceFlowAnchor = roteiroRuntimeActive
+    ? buildAttendanceFlowLlmAnchor(ticket, prompt.id)
+    : "";
+  const strictRoteiroDiscipline = roteiroRuntimeActive && Boolean(attendanceFlowAnchor);
+  const consultiveDirective = roteiroRuntimeActive ? "" : `\n${AGENT_CONSULTIVE_MODE_DIRECTIVE_PT}\n`;
   const blockFormatRule = strictRoteiroDiscipline
-    ? "Responda de forma natural e objetiva (no máximo 3–4 frases, ou uma pergunta objetiva). Não avance etapas do roteiro na mesma mensagem: interprete a etapa lógica atual pelo histórico e pelo texto do roteiro, responda só a essa etapa e aguarde o cliente. **Faça no máximo uma pergunta principal** e, se fizer pergunta, termine a resposta nessa pergunta — não acrescente frases que pressuponham que ele já respondeu."
-    : "Responda de forma natural em frases curtas. Evite textões; o runtime separa mensagens grandes em blocos sem cortar frases.";
-  const promptSystemUnexpanded = `${scopePreamble}Nas respostas utilize o nome ${sanitizeName(
+    ? "Responda de forma natural e objetiva (no máximo 3–4 frases, ou uma pergunta objetiva). Se o cliente fez outra pergunta (preço, FAQ, horário), responda-a primeiro com Regras/FAQ/conhecimento e só depois retome a etapa pendente com uma pergunta curta. Não avance etapas do roteiro na mesma mensagem: interprete a etapa lógica atual pelo histórico e pelo texto do roteiro, responda só a essa etapa e aguarde o cliente. **Faça no máximo uma pergunta principal** e, se fizer pergunta, termine a resposta nessa pergunta — não acrescente frases que pressuponham que ele já respondeu."
+    : "Responda de forma natural em frases curtas. Priorize Regras gerais, FAQ e base de conhecimento. Evite textões; o runtime separa mensagens grandes em blocos sem cortar frases.";
+  const promptSystemUnexpanded = `${scopePreamble}${consultiveDirective}Nas respostas utilize o nome ${sanitizeName(
     contact.name || "Amigo(a)"
   )} para identificar o cliente.\nSua resposta deve usar no máximo ${prompt.maxTokens
     } tokens e cuide para não truncar o final.\nSempre que possível, mencione o nome dele para ser mais personalizado o atendimento e mais educado. Quando a resposta requer transferência real para humano, comece sua resposta com a linha exata: 'Ação: Transferir para o setor de atendimento' (o sistema executa a transferência). Se você disser que vai transferir ou encaminhar a um atendente, não acrescente na mesma mensagem informações de etapas posteriores do roteiro (ex.: cardápio, localização) — isso fica para depois que o humano assumir.\n${blockFormatRule}\n${WHATSAPP_AGENT_CONVERSATION_POLICY}${attendanceFlowAnchor ? `\n${attendanceFlowAnchor}\n` : "\n"}${roleBlock}

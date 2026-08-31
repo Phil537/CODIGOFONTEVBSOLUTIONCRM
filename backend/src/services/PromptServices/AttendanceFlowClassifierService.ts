@@ -37,8 +37,13 @@ import { parseDateTimeFromText } from "../../helpers/parseDateTimeFromText";
 import {
   isTrivialFlowInboundNoise,
   bodyLooksLikeDateOrPeriodReply,
-  looksLikePricingOrOffTopicVersusDateQuestion
+  looksLikePricingOrOffTopicVersusDateQuestion,
+  classifyScriptInboundTurn,
+  looksLikeCustomerQuestion,
+  looksLikeCustomerInterruption,
+  shouldCannedAdvanceOnFreeReply
 } from "../../helpers/agentAttendanceFlowMemory";
+import { stripAgentFlowScriptTrainingMarkers } from "../../helpers/stripAgentFlowScriptTrainingMarkers";
 import type {
   CompiledStepIR,
   ExpectedReplyKind,
@@ -500,8 +505,8 @@ function classifyByActiveQuestion(
 
 /** Pergunta no fim da etapa, mas o cliente fez pergunta dele → off_topic. */
 function userAsksOwnQuestion(userText: string, askedQuestion: string | null): boolean {
+  if (!looksLikeCustomerQuestion(userText)) return false;
   const t = String(userText || "").trim();
-  if (!t.endsWith("?")) return false;
   if (!askedQuestion) return true;
   const aq = askedQuestion.toLowerCase();
   const ut = t.toLowerCase();
@@ -582,6 +587,24 @@ function applyHeuristic(
       correctionTarget: targetId,
       confidence: 0.75,
       reasoning: `Linguagem de correção detectada; alvo provável: ${targetId}.`,
+      source: "fallback"
+    };
+  }
+
+  const visibleText = stripAgentFlowScriptTrainingMarkers(
+    String(step.customerVisibleText || step.agentPrompt || "")
+  );
+  const inboundTurn = classifyScriptInboundTurn(visibleText, text);
+  if (inboundTurn.deferToLlm) {
+    return {
+      schemaVersion: FLOW_CLASSIFIER_SCHEMA_VERSION,
+      intent: "off_topic",
+      targetStepId: step.stepId,
+      matchedBranch: null,
+      filledSlot: null,
+      correctionTarget: null,
+      confidence: 0.85,
+      reasoning: inboundTurn.reason,
       source: "fallback"
     };
   }
@@ -728,16 +751,16 @@ function applyHeuristic(
           source: "fallback"
         };
       }
-      /** Texto que não parece data → low confidence advance (vai pro LLM em auto). */
+      /** Texto que não parece data → delegar à LLM (evasão, hesitação, outro assunto). */
       return {
         schemaVersion: FLOW_CLASSIFIER_SCHEMA_VERSION,
-        intent: "advance",
+        intent: "off_topic",
         targetStepId: step.stepId,
         matchedBranch: null,
         filledSlot: null,
         correctionTarget: null,
-        confidence: 0.45,
-        reasoning: "Texto não casa com data/período típico. Possível advance ambíguo.",
+        confidence: 0.55,
+        reasoning: "Texto não casa com data/período típico — delegar à LLM.",
         source: "fallback"
       };
     }
@@ -806,6 +829,19 @@ function applyHeuristic(
   }
 
   /** Fallback final genérico (ex.: yes_no que não bateu). */
+  if (looksLikeCustomerQuestion(text) || looksLikeCustomerInterruption(text)) {
+    return {
+      schemaVersion: FLOW_CLASSIFIER_SCHEMA_VERSION,
+      intent: "off_topic",
+      targetStepId: step.stepId,
+      matchedBranch: null,
+      filledSlot: null,
+      correctionTarget: null,
+      confidence: 0.65,
+      reasoning: "Pergunta ou interrupção detectada — delegar à LLM.",
+      source: "fallback"
+    };
+  }
   return {
     schemaVersion: FLOW_CLASSIFIER_SCHEMA_VERSION,
     intent: "advance",

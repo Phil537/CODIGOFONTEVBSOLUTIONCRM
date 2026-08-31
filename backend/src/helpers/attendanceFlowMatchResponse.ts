@@ -4,7 +4,7 @@
  * Uso conforme LICENSE na raiz do repositório.
  */
 
-import { isTrivialFlowInboundNoise } from "./agentAttendanceFlowMemory";
+import { isTrivialFlowInboundNoise, looksLikeCustomerInterruption } from "./agentAttendanceFlowMemory";
 
 /** Normaliza texto do cliente para comparação com opções do fluxo visual. */
 export function normAttendanceFlowText(s: string): string {
@@ -51,14 +51,24 @@ export function matchAttendanceFlowResponseOption(body: string, options: any[]):
     }
 
     if (mode === "any") {
-      /** Evita avançar etapa com cumprimento/ruído — só mensagens do cliente reais devem ramificar. */
-      if (b.length > 0 && !isTrivialFlowInboundNoise(body)) return o;
+      /** Evita avançar etapa com cumprimento/ruído ou interrupção FAQ — só mensagens do cliente reais devem ramificar. */
+      if (
+        b.length > 0 &&
+        !isTrivialFlowInboundNoise(body) &&
+        !looksLikeCustomerInterruption(body)
+      )
+        return o;
       continue;
     }
 
     /** Resposta livre (configure no fluxo visual para aceitar "4 adultos", datas, etc.) */
     if (mode === "open") {
-      if (isSubstantiveCustomerReply(body) && !isTrivialFlowInboundNoise(body)) return o;
+      if (
+        isSubstantiveCustomerReply(body) &&
+        !isTrivialFlowInboundNoise(body) &&
+        !looksLikeCustomerInterruption(body)
+      )
+        return o;
       continue;
     }
 

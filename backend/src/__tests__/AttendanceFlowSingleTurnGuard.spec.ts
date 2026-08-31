@@ -76,6 +76,11 @@ describe("buildSingleStepSystemPrompt", () => {
     expect(prompt).toMatch(/Conduzir o cliente|Objetivo global/);
     expect(prompt).toMatch(/Coletar data/);
   });
+
+  it("instrui responder FAQ antes de reancorar etapa", () => {
+    const prompt = buildSingleStepSystemPrompt({ step: makeStep(), understanding: makeUnderstanding() });
+    expect(prompt).toMatch(/FAQ|fora de escopo/i);
+  });
 });
 
 describe("postGenerationGuard — truncations", () => {

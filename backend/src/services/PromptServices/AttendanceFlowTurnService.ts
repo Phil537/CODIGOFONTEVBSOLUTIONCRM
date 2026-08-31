@@ -44,10 +44,13 @@ import {
   plausibleFreeReplyAdvancesStep,
   isTrivialFlowInboundNoise,
   looksLikePricingOrOffTopicVersusDateQuestion,
+  classifyScriptInboundTurn,
+  shouldCannedAdvanceOnFreeReply,
   type AttendanceFlowMemory,
   type AttendanceFlowPhase,
   type DeferredScriptAction
 } from "../../helpers/agentAttendanceFlowMemory";
+import { isAgentRoteiroRuntimeActive } from "../../helpers/agentRoteiroRuntime";
 import { parseDateTimeFromText } from "../../helpers/parseDateTimeFromText";
 import { sanitizeAgentCustomerVisibleText } from "../../helpers/sanitizeAgentCustomerVisibleText";
 import {
@@ -293,8 +296,7 @@ async function tryHandlePromptAttendanceFlowTurnLegacy(params: {
             }
           })()
         : {};
-  const sectionFlags = (cargo as any).sectionFlags || {};
-  if (sectionFlags.fluxoEnabled === false) {
+  if (!isAgentRoteiroRuntimeActive(fullPrompt)) {
     return false;
   }
 
@@ -316,6 +318,9 @@ async function tryHandlePromptAttendanceFlowTurnLegacy(params: {
         bodyMessage
       });
       if (v2.source === "v2") {
+        if (v2.reason === "defer_to_llm") {
+          return false;
+        }
         if (v2.handled || (v2.consumedReply && !v2.allowLlmFallback)) {
           (ticket as any)[FLOW_LAST_OUTCOME_KEY] = v2;
           return v2.handled;
@@ -633,7 +638,7 @@ async function tryHandlePromptAttendanceFlowTurnLegacy(params: {
     const curGreet = getStepByNumber(rawSteps, lastPresented);
     const visibleGreet = stripAgentFlowScriptTrainingMarkers(String(curGreet?.agentPrompt || ""));
     if (!isGreetingStyleStep(visibleGreet)) return false;
-    if (!isGreetingStepAcceptableReply(bodyMessage)) return false;
+    if (!shouldCannedAdvanceOnFreeReply(visibleGreet, bodyMessage)) return false;
 
     const stepKeyGreet = String(lastPresented);
     let dGreet = [...(af.deferredScriptActions?.[stepKeyGreet] || [])];
@@ -805,10 +810,8 @@ async function tryHandlePromptAttendanceFlowTurnLegacy(params: {
     const current = getStepByNumber(rawSteps, lastPresented);
     if (!current) return false;
     const visible = stripAgentFlowScriptTrainingMarkers(String(current.agentPrompt || ""));
-    const acceptsReply = isGreetingStyleStep(visible)
-      ? isGreetingStepAcceptableReply(answer)
-      : shouldAdvanceOnFreeReply(answer) && !isTrivialFlowInboundNoise(answer);
-    if (!acceptsReply) return false;
+    const inbound = classifyScriptInboundTurn(visible, answer);
+    if (!inbound.shouldCannedAdvance) return false;
 
     const nextStep = getStepByNumber(rawSteps, lastPresented + 1);
     if (!nextStep) return false;
@@ -841,8 +844,12 @@ async function tryHandlePromptAttendanceFlowTurnLegacy(params: {
   if (lastPresented > 0) {
     const stepKey = String(lastPresented);
     const current = getStepByNumber(rawSteps, lastPresented);
+    const visibleNow = stripAgentFlowScriptTrainingMarkers(String(current?.agentPrompt || ""));
+    const inboundDecision = classifyScriptInboundTurn(visibleNow, bodyMessage);
     const options = current?.responseOptions || [];
-    const opt = matchAttendanceFlowResponseOption(bodyMessage, options);
+    const opt = inboundDecision.deferToLlm
+      ? null
+      : matchAttendanceFlowResponseOption(bodyMessage, options);
 
     const continueAfterOptionSelected = async (selected: any, answerLabel: string) => {
       const skDrain = String(lastPresented);
@@ -1228,10 +1235,8 @@ async function tryHandlePromptAttendanceFlowTurnLegacy(params: {
       (!options || options.length === 0) &&
       shouldAdvanceOnFreeReply(bodyMessage) &&
       customerVisibleStepEndsWithQuestionOrCommand(String(current?.agentPrompt || "")) &&
-      plausibleFreeReplyAdvancesStep(
-        stripAgentFlowScriptTrainingMarkers(String(current?.agentPrompt || "")),
-        bodyMessage
-      )
+      shouldCannedAdvanceOnFreeReply(visibleNow, bodyMessage) &&
+      plausibleFreeReplyAdvancesStep(visibleNow, bodyMessage)
     ) {
       {
         let dFree = [...(af.deferredScriptActions?.[stepKey] || [])];
@@ -1281,62 +1286,8 @@ async function tryHandlePromptAttendanceFlowTurnLegacy(params: {
         consumedReply = true;
         await markInboundHandled();
       }
-    } else if (
-      String(bodyMessage || "").trim().length > 0 &&
-      af.awaitingUserReply === true &&
-      shouldAdvanceOnFreeReply(bodyMessage) &&
-      !isTrivialFlowInboundNoise(bodyMessage)
-    ) {
-      let dLoose = [...(af.deferredScriptActions?.[stepKey] || [])];
-      const dLooseLen = dLoose.length;
-      dLoose = await drainDeferredTransfers(stepKey, dLoose);
-      if (dLoose.length !== dLooseLen) {
-        const ndLoose = { ...(af.deferredScriptActions || {}) };
-        if (dLoose.length) ndLoose[stepKey] = dLoose;
-        else delete ndLoose[stepKey];
-        await persistAf({ deferredScriptActions: ndLoose });
-      }
-      if (findDeferredAgendamentoIndex(dLoose) >= 0) {
-        await sendStepTextBlocks(
-          verifyMessage,
-          wbot,
-          msg,
-          ticket,
-          contact,
-          ticketTraking,
-          "Para registrar no calendário, envie o **dia** (e horário, se quiser), ex.: 15/05 às 14h30 ou amanhã às 10h."
-        );
-        await markInboundHandled();
-        return true;
-      }
-      const answer = String(bodyMessage || "").trim();
-      const nextSeq = lastPresented + 1;
-      const nextStep = getStepByNumber(rawSteps, nextSeq);
-      if (nextStep) {
-        await persistAf({
-          awaitingUserReply: false,
-          completedSteps: mergeCompleted(lastPresented),
-          answersByStep: {
-            ...(af.answersByStep || {}),
-            [String(lastPresented)]: answer
-          }
-        });
-        await presentStep(nextSeq);
-        await markInboundHandled();
-      } else {
-        await persistAf({
-          flowPhase: "completed",
-          awaitingUserReply: false,
-          lastHandledUserWid: inboundWid || af.lastHandledUserWid || "",
-          completedSteps: mergeCompleted(lastPresented),
-          answersByStep: {
-            ...(af.answersByStep || {}),
-            [String(lastPresented)]: answer
-          }
-        });
-        consumedReply = true;
-        await markInboundHandled();
-      }
+    } else if (inboundDecision.deferToLlm) {
+      /* Interrupção humana — não avança etapa canned; LLM/orquestrador assume. */
     }
     // Se ainda não consumiu, os guardrails abaixo decidem entre dica curta e fallback controlado.
   }
@@ -1353,8 +1304,14 @@ async function tryHandlePromptAttendanceFlowTurnLegacy(params: {
       !bodyLooksLikeDateOrPeriodReply(bodyMessage)
     ) {
       const t = String(bodyMessage || "").trim();
-      if (isTrivialFlowInboundNoise(t) || looksLikePricingOrOffTopicVersusDateQuestion(t)) {
-        const pricing = looksLikePricingOrOffTopicVersusDateQuestion(t);
+      const curEnd = getStepByNumber(rawSteps, lastPresented);
+      const visEnd = stripAgentFlowScriptTrainingMarkers(String(curEnd?.agentPrompt || ""));
+      const inboundEnd = classifyScriptInboundTurn(visEnd, bodyMessage);
+      if (
+        !inboundEnd.deferToLlm &&
+        !looksLikePricingOrOffTopicVersusDateQuestion(t) &&
+        isTrivialFlowInboundNoise(t)
+      ) {
         await sendStepTextBlocks(
           verifyMessage,
           wbot,
@@ -1362,9 +1319,7 @@ async function tryHandlePromptAttendanceFlowTurnLegacy(params: {
           ticket,
           contact,
           ticketTraking,
-          pricing
-            ? "Para verificar disponibilidade, preciso de **qual data ou período** você imagina para a viagem; depois seguimos com valores ou encaminho ao time."
-            : "Qual **data ou período** você pensa em viajar? (ex.: 21/05, final de julho ou próximo feriado.) Assim registro sua preferência."
+          "Qual **data ou período** você pensa em viajar? (ex.: 21/05, final de julho ou próximo feriado.) Assim registro sua preferência."
         );
         await markInboundHandled();
         return true;

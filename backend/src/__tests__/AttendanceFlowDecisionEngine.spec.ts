@@ -234,10 +234,11 @@ describe("decideAttendanceFlowTurn — guard intents", () => {
     expect(d.consumedReply).toBe(true);
   });
 
-  it("off_topic → send_hint com mensagem de ancoragem", () => {
+  it("off_topic → defer_to_llm sem consumir turno", () => {
     const d = decideAttendanceFlowTurn(makeInput("off_topic"));
-    expect(d.action).toBe("send_hint");
-    expect(d.hintText).toMatch(/não perder o fio|confirma primeiro/i);
+    expect(d.action).toBe("defer_to_llm");
+    expect(d.hintText).toBeNull();
+    expect(d.consumedReply).toBe(false);
   });
 
   it("terminate → complete_flow com on_exit + on_flow_complete", () => {

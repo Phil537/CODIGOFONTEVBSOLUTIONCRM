@@ -8,7 +8,11 @@ import {
   isTrivialFlowInboundNoise,
   isGreetingStyleStep,
   isReciprocalGreetingReply,
-  isGreetingStepAcceptableReply
+  isGreetingStepAcceptableReply,
+  looksLikeCustomerQuestion,
+  classifyScriptInboundTurn,
+  shouldCannedAdvanceOnFreeReply,
+  stripLeadingGreeting
 } from "../helpers/agentAttendanceFlowMemory";
 import { stripAgentFlowScriptTrainingMarkers } from "../helpers/stripAgentFlowScriptTrainingMarkers";
 import { matchAttendanceFlowResponseOption } from "../helpers/attendanceFlowMatchResponse";
@@ -168,6 +172,41 @@ describe("agentAttendanceFlowMemory", () => {
     expect(plausibleFreeReplyAdvancesStep(vis, "4 pessoas")).toBe(true);
     expect(plausibleFreeReplyAdvancesStep(vis, "casal")).toBe(true);
     expect(plausibleFreeReplyAdvancesStep(vis, "Oi")).toBe(false);
+  });
+
+  it("looksLikeCustomerQuestion detecta FAQ com e sem ?", () => {
+    expect(looksLikeCustomerQuestion("quanto custa?")).toBe(true);
+    expect(looksLikeCustomerQuestion("quero saber valores")).toBe(true);
+    expect(looksLikeCustomerQuestion("21/05")).toBe(false);
+  });
+
+  it("stripLeadingGreeting separa cumprimento de pergunta", () => {
+    expect(stripLeadingGreeting("tudo bem, quanto custa?")).toMatch(/quanto custa/i);
+  });
+
+  it("classifyScriptInboundTurn: abertura+FAQ deferToLlm", () => {
+    const vis = "Fala, tudo bem?";
+    const d = classifyScriptInboundTurn(vis, "vocês atendem no domingo?");
+    expect(d.deferToLlm).toBe(true);
+    expect(d.shouldCannedAdvance).toBe(false);
+  });
+
+  it("classifyScriptInboundTurn: agendamento+preço deferToLlm", () => {
+    const vis = "Para qual data você quer agendar?";
+    const d = classifyScriptInboundTurn(vis, "quero saber valores");
+    expect(d.deferToLlm).toBe(true);
+    expect(shouldCannedAdvanceOnFreeReply(vis, "quero saber valores")).toBe(false);
+  });
+
+  it("buildAttendanceFlowLlmAnchor inclui bloco INTERRUPÇÃO", () => {
+    const t = {
+      getDataValue: (k: string) =>
+        k === "dataWebhook"
+          ? { attendanceFlow: { promptId: 9, lastPresentedStep: 2, awaitingUserReply: true } }
+          : null
+    } as unknown as Ticket;
+    const s = buildAttendanceFlowLlmAnchor(t, 9);
+    expect(s).toMatch(/INTERRUPÇÃO|INTERRUPCAO/i);
   });
 });
 

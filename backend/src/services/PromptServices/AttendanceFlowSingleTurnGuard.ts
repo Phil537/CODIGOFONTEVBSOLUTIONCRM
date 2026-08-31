@@ -77,7 +77,7 @@ export function buildSingleStepSystemPrompt(opts: SingleTurnGuardOptions): strin
     "REGRAS RÍGIDAS:",
     "- Responda APENAS o necessário para esta etapa. Não diga \"a próxima etapa é…\".",
     "- NÃO repita a pergunta se o cliente acabou de responder; apenas confirme e finalize esta etapa.",
-    "- Se o cliente perguntou algo fora de escopo, responda em 1 frase e reancore esta etapa.",
+    "- Se o cliente perguntou algo fora de escopo (FAQ, preço, horário): responda com FAQ/regras/conhecimento em 1–2 frases e só então reancore esta etapa com UMA pergunta curta.",
     "- NÃO inclua marcadores tipo \"# ETAPA\", \"Etapa 2:\", \"---\".",
     "- Limite a saída a 1 parágrafo curto (até ~3 frases). Sem listas longas.",
     "- Use o tom e o vocabulário do texto canônico acima."

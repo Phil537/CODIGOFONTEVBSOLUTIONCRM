@@ -49,6 +49,7 @@ import type {
 export type FlowDecisionAction =
   | "present_step"
   | "send_hint"
+  | "defer_to_llm"
   | "complete_flow"
   | "noop";
 
@@ -315,10 +316,9 @@ export function decideAttendanceFlowTurn(input: FlowDecisionInput): FlowDecision
 
     case "off_topic":
       return {
-        action: "send_hint",
+        action: "defer_to_llm",
         presentStep: null,
-        hintText:
-          "Te respondo isso também. Só para eu não perder o fio: me confirma primeiro a informação que pedi na mensagem anterior?",
+        hintText: null,
         memoryPatch: {},
         hookFires: [],
         audit: {
@@ -329,7 +329,7 @@ export function decideAttendanceFlowTurn(input: FlowDecisionInput): FlowDecision
           reasoning: classifier.reasoning,
           source: classifier.source
         },
-        consumedReply: true
+        consumedReply: false
       };
 
     case "terminate":
