@@ -5,6 +5,7 @@
  */
 
 import React, { useState, useRef, useEffect, useContext, useCallback } from "react";
+import { useTheme } from "@material-ui/core/styles";
 import { APP_BRAND_NAME } from "../../constants/brand";
 
 import { useHistory } from "react-router-dom";
