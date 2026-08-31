@@ -113,10 +113,13 @@ const useStyles = makeStyles(() => ({
         fontFamily: '-apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Segoe UI", sans-serif',
     },
     heroLogo: {
-        width: 120,
+        width: "100%",
+        maxWidth: 280,
         height: "auto",
-        marginBottom: 8,
+        marginBottom: 10,
         opacity: 1,
+        objectFit: "contain",
+        display: "block",
     },
     welcome: {
         fontFamily: '"Plus Jakarta Sans", "Inter", sans-serif',
