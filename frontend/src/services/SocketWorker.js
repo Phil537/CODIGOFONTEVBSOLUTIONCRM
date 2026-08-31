@@ -7,6 +7,7 @@
 import io from "socket.io-client";
 import api from "../services/api";
 import { getBackendUrl } from "../config";
+import { isOfflineMode } from "./offlineMode";
 
 
 class SocketWorker {
@@ -44,11 +45,14 @@ class SocketWorker {
     if (!Number.isFinite(cid) || cid <= 0) {
       return;
     }
+    const isLocalDev =
+      process.env.NODE_ENV !== "production" || isOfflineMode();
     this.socket = io(`${backendUrl}/${cid}`, {
       autoConnect: true,
       reconnection: true,
       reconnectionDelay: 1000,
-      reconnectionAttempts: Infinity,
+      reconnectionAttempts: isLocalDev ? 8 : Infinity,
+      timeout: isLocalDev ? 8000 : 20000,
       // transports: ["websocket", "polling", "flashsocket"],
       // pingTimeout: 18000,
       // pingInterval: 18000,

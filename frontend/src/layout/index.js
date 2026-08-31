@@ -78,14 +78,22 @@ import { logInfo, logError } from "../utils/logger";
 import SubscriptionAlertBanner from "../components/SubscriptionAlertBanner";
 import FreemiumTrialBar from "../components/FreemiumTrialBar";
 import { topbarSvgIconStyle } from "../constants/topbarIcons";
+import {
+  TOPBAR_SEARCH_BG,
+  TOPBAR_SEARCH_BORDER,
+  TOPBAR_ICON,
+  TOPBAR_STATUS_GREEN,
+} from "../constants/visualIdentity";
 
 const backendUrl = getBackendUrl();
 const drawerWidth = 210;
 const appBarHeight = 32;
 
 const useStyles = makeStyles((theme) => {
-  const navIcon =
-    theme.navbarAccent != null && theme.navbarAccent !== ""
+  const topbarLight = theme.topbarIsLight === true;
+  const navIcon = topbarLight
+    ? TOPBAR_ICON
+    : theme.navbarAccent != null && theme.navbarAccent !== ""
       ? theme.navbarAccent
       : "rgba(255, 255, 255, 0.9)";
   return {
@@ -168,12 +176,14 @@ const useStyles = makeStyles((theme) => {
     position: "relative",
     paddingRight: 16,
     paddingLeft: 8,
-    color: theme.palette.dark.main,
+    color: topbarLight ? TOPBAR_ICON : theme.palette.dark.main,
     background: theme.palette.barraSuperior,
     backdropFilter: "saturate(180%) blur(8px)",
     WebkitBackdropFilter: "saturate(180%) blur(8px)",
     boxShadow: "none",
-    borderBottom: "1px solid rgba(255, 255, 255, 0.08)",
+    borderBottom: topbarLight
+      ? `1px solid ${TOPBAR_SEARCH_BORDER}`
+      : "1px solid rgba(255, 255, 255, 0.08)",
     transition: "width 0.2s ease, margin 0.2s ease",
     minHeight: `${appBarHeight}px`,
     height: `${appBarHeight}px`,
@@ -184,7 +194,9 @@ const useStyles = makeStyles((theme) => {
       color: navIcon,
       transition: "background-color 0.15s ease",
       "&:hover": {
-        backgroundColor: "rgba(255, 255, 255, 0.1)",
+        backgroundColor: topbarLight
+          ? "rgba(0, 0, 0, 0.06)"
+          : "rgba(255, 255, 255, 0.1)",
       },
     },
   },
@@ -199,6 +211,7 @@ const useStyles = makeStyles((theme) => {
     alignItems: "center",
     justifyContent: "center",
     boxSizing: "border-box",
+    color: `${navIcon} !important`,
     "& .MuiSvgIcon-root": {
       fontSize: "14px !important",
       width: "14px !important",
@@ -225,9 +238,9 @@ const useStyles = makeStyles((theme) => {
     display: "flex",
     alignItems: "center",
     justifyContent: "center",
-    padding: "4px 6px",
-    height: "52px",
-    minHeight: "52px",
+    padding: "8px 10px",
+    height: "68px",
+    minHeight: "68px",
     backgroundColor:
       theme.palette.sidebarMenuBackground || theme.palette.background.paper,
     transition: "all 0.3s ease",
@@ -252,14 +265,24 @@ const useStyles = makeStyles((theme) => {
   search: {
     position: "relative",
     borderRadius: 6,
-    backgroundColor: "rgba(255, 255, 255, 0.12)",
-    border: "1px solid rgba(255, 255, 255, 0.1)",
+    backgroundColor: topbarLight
+      ? TOPBAR_SEARCH_BG
+      : "rgba(255, 255, 255, 0.12)",
+    border: topbarLight
+      ? `1px solid ${TOPBAR_SEARCH_BORDER}`
+      : "1px solid rgba(255, 255, 255, 0.1)",
     "&:hover": {
-      backgroundColor: "rgba(255, 255, 255, 0.18)",
+      backgroundColor: topbarLight
+        ? "#ECEEF1"
+        : "rgba(255, 255, 255, 0.18)",
     },
     "&:focus-within": {
-      backgroundColor: "rgba(255, 255, 255, 0.2)",
-      borderColor: "rgba(255, 255, 255, 0.2)",
+      backgroundColor: topbarLight
+        ? TOPBAR_SEARCH_BG
+        : "rgba(255, 255, 255, 0.2)",
+      borderColor: topbarLight
+        ? "#D1D5DB"
+        : "rgba(255, 255, 255, 0.2)",
     },
     marginRight: theme.spacing(1.5),
     marginLeft: 0,
@@ -312,10 +335,10 @@ const useStyles = makeStyles((theme) => {
     paddingLeft: `calc(1em + ${theme.spacing(2)}px)`, // Ajustado padding
     transition: theme.transitions.create('width'),
     width: '100%',
-    color: navIcon,
+    color: topbarLight ? TOPBAR_ICON : navIcon,
     "&::placeholder": {
-        color: navIcon,
-        opacity: 0.75,
+        color: topbarLight ? "#9CA3AF" : navIcon,
+        opacity: topbarLight ? 1 : 0.75,
         fontSize: "0.8rem", // Placeholder menor
     }
   },
@@ -411,7 +434,9 @@ const useStyles = makeStyles((theme) => {
     flexDirection: "column",
     backgroundColor:
       theme.palette.sidebarMenuBackground || theme.palette.background.paper,
-    borderRight: `1px solid ${theme.palette.divider}`,
+    borderRight: theme.palette.sidebarMenuIsDarkLogo
+      ? "1px solid rgba(255, 255, 255, 0.08)"
+      : `1px solid ${theme.palette.divider}`,
     boxShadow: "none",
     top: `${appBarHeight}px`,
     height: `calc(100% - ${appBarHeight}px)`,
@@ -502,8 +527,8 @@ const useStyles = makeStyles((theme) => {
   logo: {
     width: "auto",
     height: "auto",
-    maxHeight: "56px",
-    maxWidth: "min(100%, 150px)",
+    maxHeight: "72px",
+    maxWidth: "min(100%, 200px)",
     objectFit: "contain",
     objectPosition: "center",
     transition: "opacity 0.15s ease",
@@ -515,8 +540,9 @@ const useStyles = makeStyles((theme) => {
 
 
   hideLogo: {
-    width: "28px",
-    maxWidth: "28px",
+    width: "36px",
+    maxWidth: "36px",
+    maxHeight: "36px",
     margin: "0 auto",
   },
 
@@ -621,8 +647,8 @@ const useStyles = makeStyles((theme) => {
 
 const StyledBadge = withStyles((theme) => ({
   badge: {
-    backgroundColor: "#44b700",
-    color: "#44b700",
+    backgroundColor: TOPBAR_STATUS_GREEN,
+    color: TOPBAR_STATUS_GREEN,
     boxShadow: `0 0 0 2px ${theme.palette.background.paper}`,
     "&::after": {
       position: "absolute",
@@ -677,9 +703,11 @@ const LoggedInLayout = ({ children, themeToggle, hideMenu = false }) => {
   const colorMode = useContext(ColorModeContext);
   const greaterThenSm = useMediaQuery(theme.breakpoints.up("sm"));
   const topbarIconColor =
-    theme.navbarAccent != null && theme.navbarAccent !== ""
-      ? theme.navbarAccent
-      : "rgba(255, 255, 255, 0.92)";
+    theme.topbarIsLight === true
+      ? TOPBAR_ICON
+      : theme.navbarAccent != null && theme.navbarAccent !== ""
+        ? theme.navbarAccent
+        : "rgba(255, 255, 255, 0.92)";
   const topbarIconSx = topbarSvgIconStyle(topbarIconColor);
 
   const history = useHistory();
@@ -1107,7 +1135,7 @@ const LoggedInLayout = ({ children, themeToggle, hideMenu = false }) => {
     [drawerOpen]
   );
 
-  if (loading || updateInProgress) {
+  if ((loading && !user?.id) || updateInProgress) {
     return <BackdropLoading />;
   }
 
@@ -1299,7 +1327,9 @@ const LoggedInLayout = ({ children, themeToggle, hideMenu = false }) => {
                   variant="topbar"
                   buttonClassName={classes.topbarActionBtn}
                   style={{
-                    borderColor: "rgba(255,255,255,0.25)",
+                    borderColor: theme.topbarIsLight
+                      ? TOPBAR_SEARCH_BORDER
+                      : "rgba(255,255,255,0.25)",
                     color: topbarIconColor,
                   }}
                 />
@@ -1320,10 +1350,16 @@ const LoggedInLayout = ({ children, themeToggle, hideMenu = false }) => {
               {/* <DarkMode themeToggle={themeToggle} /> */}
 
               {user.id && (
-                <NotificationsPopOver buttonClassName={classes.topbarActionBtn} />
+                <NotificationsPopOver
+                  buttonClassName={classes.topbarActionBtn}
+                  iconColor={topbarIconColor}
+                />
               )}
 
-              <AnnouncementsPopover buttonClassName={classes.topbarActionBtn} />
+              <AnnouncementsPopover
+                buttonClassName={classes.topbarActionBtn}
+                iconColor={topbarIconColor}
+              />
 
               <div
                 className={clsx("user-menu-wrapper", classes.topbarActionBtn)}

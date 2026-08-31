@@ -140,9 +140,11 @@ const RoutesContent = () => {
         <Route exact path="/payment" component={Payment} title="Pagamento" allowWhenAuth />
         <Route exact path="/payment/success" component={PaymentSuccess} title="Pagamento confirmado" allowWhenAuth />
         <Route exact path="/payment/cancel" component={PaymentCancel} title="Pagamento cancelado" allowWhenAuth />
-        <WhatsAppsProvider>
-          <CampaignSendingProvider>
-          <LoggedInLayout hideMenu={isCompanyExpired()}>
+        <Route path="/" isPrivate>
+          <WhatsAppsProvider>
+            <CampaignSendingProvider>
+              <LoggedInLayout hideMenu={isCompanyExpired()}>
+                <Switch>
                 <Route
                   exact
                   path="/financeiro"
@@ -372,10 +374,12 @@ const RoutesContent = () => {
                     />
                   </>
                 )}
+                </Switch>
               </LoggedInLayout>
-          </CampaignSendingProvider>
-            </WhatsAppsProvider>
-          </Switch>
+            </CampaignSendingProvider>
+          </WhatsAppsProvider>
+        </Route>
+      </Switch>
           <ToastContainer position="top-center" autoClose={3000} />
         </TicketsContextProvider>
   );

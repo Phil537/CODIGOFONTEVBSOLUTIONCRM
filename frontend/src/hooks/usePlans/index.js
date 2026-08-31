@@ -65,7 +65,7 @@ const usePlans = () => {
         return data;
     }
 
-    const getPlanCompany = async (params, id) => {
+    const getPlanCompany = useCallback(async (params, id) => {
         if (!id) {
             return emptyPlanPayload;
         }
@@ -80,7 +80,7 @@ const usePlans = () => {
             toastError(err);
             return emptyPlanPayload;
         }
-    }
+    }, []);
 
     return {
         getPlanList,

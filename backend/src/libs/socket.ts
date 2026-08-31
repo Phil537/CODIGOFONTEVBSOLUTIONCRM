@@ -42,7 +42,7 @@ export const initIO = (httpServer: Server): SocketIO => {
         ) {
           return callback(null, true);
         }
-        if (/^http:\/\/localhost:(5173|5174|3000|3001|8081|8082)$/.test(origin)) {
+        if (/^http:\/\/localhost:(5173|5174|5181|5182|3000|3001|8081|8082)$/.test(origin)) {
           return callback(null, true);
         }
         callback(null, false);
@@ -78,6 +78,7 @@ export const initIO = (httpServer: Server): SocketIO => {
 
   const workspaces = io.of(/^\/\w+$/);
   workspaces.on("connection", async socket => {
+    const devNoDb = isDevNoDb();
 
     const token_api_oficial = process.env.TOKEN_API_OFICIAL || "";
     const token = Array.isArray(socket?.handshake?.query?.token) ? socket.handshake.query.token[1] : socket?.handshake?.query?.token?.split(" ")[1];
@@ -95,12 +96,19 @@ export const initIO = (httpServer: Server): SocketIO => {
         const companyIdToken = decodedPayload.companyId;
 
         if (+companyIdToken !== +companyId) {
-          const user = await User.findByPk(decodedPayload.id);
-          if (user?.super) {
-             // Super user allowed
+          if (devNoDb) {
+            if (!decodedPayload.super) {
+              logger.error(`CompanyId do token ${companyIdToken} diferente da companyId do socket ${companyId}`);
+              return socket.disconnect();
+            }
           } else {
-             logger.error(`CompanyId do token ${companyIdToken} diferente da companyId do socket ${companyId}`)
-             return socket.disconnect();
+            const user = await User.findByPk(decodedPayload.id);
+            if (user?.super) {
+               // Super user allowed
+            } else {
+               logger.error(`CompanyId do token ${companyIdToken} diferente da companyId do socket ${companyId}`)
+               return socket.disconnect();
+            }
           }
         }
       } catch (error) {
@@ -122,6 +130,14 @@ export const initIO = (httpServer: Server): SocketIO => {
         const decodedPayload = decoded as JwtPayload;
         const userId = decodedPayload.id;
 
+        if (devNoDb) {
+          socket.broadcast.to(`company-${companyId}`).emit("user:online", {
+            userId,
+            lastSeen: new Date()
+          });
+          return;
+        }
+
         await User.update(
           {
             online: true,
@@ -137,17 +153,21 @@ export const initIO = (httpServer: Server): SocketIO => {
 
         clearTimeout(socket.heartbeatTimeout);
         socket.heartbeatTimeout = setTimeout(async () => {
-          await User.update(
-            {
-              online: false,
+          try {
+            await User.update(
+              {
+                online: false,
+                lastSeen: new Date()
+              },
+              { where: { id: userId } }
+            );
+            socket.broadcast.to(`company-${companyId}`).emit("user:offline", {
+              userId,
               lastSeen: new Date()
-            },
-            { where: { id: userId } }
-          );
-          socket.broadcast.to(`company-${companyId}`).emit("user:offline", {
-            userId,
-            lastSeen: new Date()
-          });
+            });
+          } catch (error) {
+            logger.error("Error in heartbeat timeout:", error);
+          }
         }, 30000);
       } catch (error) {
         logger.error("Error in handleHeartbeat:", error);
@@ -156,6 +176,7 @@ export const initIO = (httpServer: Server): SocketIO => {
 
     //  NOVO: Handler para verificar aniversários quando usuário se conecta
     const checkAndEmitBirthdays = async (companyId: number) => {
+      if (devNoDb) return;
       try {
         const birthdayData = await BirthdayService.getTodayBirthdaysForCompany(companyId);
 
@@ -196,6 +217,11 @@ export const initIO = (httpServer: Server): SocketIO => {
           const companyId = parseInt(socket.nsp.name.split("/")[1]);
 
           socket.join(`company-${companyId}`);
+
+          if (devNoDb) {
+            socket.emit("users:online", []);
+            return;
+          }
 
           // Buscar dados do usuário
           const user = await User.findByPk(userId, {
@@ -284,13 +310,15 @@ export const initIO = (httpServer: Server): SocketIO => {
           const decodedPayload = decoded as JwtPayload;
           const userId = decodedPayload.id;
 
-          await User.update(
-            {
-              online: false,
-              lastSeen: new Date()
-            },
-            { where: { id: userId } }
-          );
+          if (!devNoDb) {
+            await User.update(
+              {
+                online: false,
+                lastSeen: new Date()
+              },
+              { where: { id: userId } }
+            );
+          }
 
           socket.broadcast.to(`company-${companyId}`).emit("user:offline", {
             userId,
@@ -316,6 +344,7 @@ export const getIO = (): SocketIO => {
 //  NOVA FUNÇÃO: Emitir eventos de aniversário para uma empresa específica
 export const emitBirthdayEvents = async (companyId: number) => {
   try {
+    if (isDevNoDb()) return;
     if (!io) {
       logger.warn(`[RDS-SOCKET] Socket IO não inicializado ao tentar emitir eventos de aniversário para empresa ${companyId}`);
       return;

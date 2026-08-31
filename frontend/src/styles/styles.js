@@ -2,44 +2,35 @@
  * Copyright (c) Visão Business. Todos os direitos reservados.
  * VB Solution CRM — propriedade intelectual da Visão Business.
  * Uso conforme LICENSE na raiz do repositório.
+ *
+ * Helpers legados — delegam para constants/visualIdentity.js
  */
 
+import {
+  SIDEBAR_BG,
+  TOPBAR_BG_LIGHT,
+  BRAND_BLUE_DARK,
+  TEXT_PRIMARY,
+  TEXT_SECONDARY,
+} from "../constants/visualIdentity";
 
-export const colorBack = () => {
-  return "#065183";
-};
+export const colorBack = () => SIDEBAR_BG;
 
-export const colorPrimary = () => {
-  return "#065183";
-};
+export const colorPrimary = () => BRAND_BLUE_DARK;
 
-export const colorIconesMenu = () => {
-  return "#07074a";
-};
+export const colorIconesMenu = () => "#FFFFFF";
 
-export const colorTitleTable = () => {
-  return "#e5e5e5";
-};
+export const colorTitleTable = () => TEXT_SECONDARY;
 
-export const colorTopTable = () => {
-  return "#ededed";
-};
+export const colorTopTable = () => "#EDEDED";
 
-export const colorBackgroundTable = () => {
-  return "#2a273b";
-};
+export const colorBackgroundTable = () => SIDEBAR_BG;
 
-export const colorLineTable = () => {
-  return "#065183";
-};
+export const colorLineTable = () => BRAND_BLUE_DARK;
 
-export const colorLineTableHover = () => {
-  return '#07074a';
-};
+export const colorLineTableHover = () => SIDEBAR_BG;
 
-export const colorTopbar = () => {
-  return "#141414";
-};
+export const colorTopbar = () => TOPBAR_BG_LIGHT;
 
 export const shadowSmall = () => {
   return "0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06)";
@@ -52,3 +43,5 @@ export const shadowMedium = () => {
 export const shadowLarge = () => {
   return "0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)";
 };
+
+export const colorTextPrimary = () => TEXT_PRIMARY;

@@ -27,6 +27,15 @@ import logoVB from "../../assets/logo-evoluti-crm-dark.png";
 import { formatDocumentTitle } from "../../constants/brand";
 import { openApi } from "../../services/api";
 import { setOfflineMode as enableOfflineFlag } from "../../services/offlineMode";
+import {
+  SIDEBAR_BG,
+  BRAND_BLUE_DARK,
+  BRAND_BLUE_MEDIUM,
+  BUTTON_PRIMARY,
+  BUTTON_PRIMARY_TEXT,
+  LINK_COLOR,
+  TEXT_SECONDARY,
+} from "../../constants/visualIdentity";
 
 const LOGIN_BG_URL = `${process.env.PUBLIC_URL || ""}/login-bg-space.png`;
 
@@ -39,19 +48,19 @@ const useStyles = makeStyles(() => ({
         alignItems: "center",
         justifyContent: "center",
         overflow: "hidden",
-        backgroundColor: "#010a1f",
+        backgroundColor: SIDEBAR_BG,
     },
     bgLayer: {
         position: "absolute",
         inset: 0,
         overflow: "hidden",
         pointerEvents: "none",
-        backgroundColor: "#010a1f",
+        backgroundColor: SIDEBAR_BG,
     },
     bgFallback: {
         position: "absolute",
         inset: 0,
-        background: "linear-gradient(180deg, #010a1f 0%, #061a3d 42%, #0a2a5c 100%)",
+        background: `linear-gradient(180deg, ${SIDEBAR_BG} 0%, ${BRAND_BLUE_DARK} 52%, #0f2b8f 100%)`,
     },
     bgImage: {
         position: "absolute",
@@ -104,10 +113,10 @@ const useStyles = makeStyles(() => ({
         fontFamily: '-apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Segoe UI", sans-serif',
     },
     heroLogo: {
-        width: 100,
+        width: 120,
         height: "auto",
-        marginBottom: 4,
-        opacity: 0.96,
+        marginBottom: 8,
+        opacity: 1,
     },
     welcome: {
         fontFamily: '"Plus Jakarta Sans", "Inter", sans-serif',
@@ -218,7 +227,7 @@ const useStyles = makeStyles(() => ({
         },
     },
     registerLink: {
-        color: "rgba(255, 255, 255, 0.55)",
+        color: "rgba(255, 255, 255, 0.65)",
         textDecoration: "none",
         fontSize: 12,
         fontWeight: 400,
@@ -227,26 +236,27 @@ const useStyles = makeStyles(() => ({
         marginTop: 6,
         transition: "color 0.2s ease",
         "&:hover": {
-            color: "rgba(255, 255, 255, 0.88)",
+            color: LINK_COLOR,
             textDecoration: "none",
         },
     },
     submit: {
         marginTop: 20,
         marginBottom: 4,
-        background: "rgba(255, 255, 255, 0.92)",
-        color: "#09090b !important",
+        background: BUTTON_PRIMARY,
+        color: `${BUTTON_PRIMARY_TEXT} !important`,
         borderRadius: 12,
         padding: "11px 0",
         fontSize: 15,
         fontWeight: 500,
         letterSpacing: "-0.01em",
         textTransform: "none",
-        boxShadow: "0 1px 2px rgba(0, 0, 0, 0.12)",
-        transition: "background 0.2s ease, transform 0.15s ease",
+        boxShadow: "0 4px 14px rgba(30, 58, 138, 0.35)",
+        transition: "background 0.2s ease, transform 0.15s ease, filter 0.2s ease",
         "&:hover": {
-            background: "#ffffff",
-            color: "#09090b !important",
+            background: BRAND_BLUE_DARK,
+            color: `${BUTTON_PRIMARY_TEXT} !important`,
+            filter: "brightness(1.05)",
         },
         "&:active": {
             transform: "scale(0.985)",

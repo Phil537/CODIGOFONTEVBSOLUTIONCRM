@@ -48,7 +48,7 @@ const Route = ({ component: Component, isPrivate = false, title, allowWhenAuth =
 		return hojeInicio.isAfter(vencimentoInicio, 'day');
 	};
 
-	if (loading) {
+	if (loading && isPrivate && !user?.id) {
 		return <BackdropLoading />;
 	}
 
@@ -72,7 +72,11 @@ const Route = ({ component: Component, isPrivate = false, title, allowWhenAuth =
 		}
 	}
 
-	return <RouterRoute {...rest} component={Component} />;
+	return Component ? (
+		<RouterRoute {...rest} component={Component} />
+	) : (
+		<RouterRoute {...rest} />
+	);
 };
 
 export default Route;

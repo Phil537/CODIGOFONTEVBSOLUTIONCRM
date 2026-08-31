@@ -40,7 +40,7 @@ import useCompanySettings from "../../hooks/useSettings/companySettings";
 import Favicon from "react-favicon";
 import defaultLogoFavicon from "../../assets/favicon.ico";
 import { TicketsContext } from "../../context/Tickets/TicketsContext";
-import { topbarSvgIconStyle, topbarActionButtonStyle } from "../../constants/topbarIcons";
+import { topbarSvgIconStyle, topbarActionButtonStyle, resolveTopbarIconColor } from "../../constants/topbarIcons";
 
 const useStyles = makeStyles(theme => ({
 	tabContainer: {
@@ -120,9 +120,10 @@ const scheduleContactLabel = (schedule) => {
 const FLOATING_TOAST_MS = 12000;
 const MAX_FLOATING_TOASTS = 3;
 
-const NotificationsPopOver = ({ volume = 1, hideTriggerButton = false, buttonClassName } = {}) => {
-	const classes = useStyles();
+const NotificationsPopOver = ({ volume = 1, hideTriggerButton = false, buttonClassName, iconColor } = {}) => {
 	const theme = useTheme();
+	const topbarIconColor = iconColor || resolveTopbarIconColor(theme);
+	const classes = useStyles();
 
 	const history = useHistory();
 	const { user, socket } = useContext(AuthContext);
@@ -507,7 +508,7 @@ const NotificationsPopOver = ({ volume = 1, hideTriggerButton = false, buttonCla
 						style={topbarActionButtonStyle}
 					>
 						<Badge overlap="rectangular" badgeContent={badgeCount} color="error">
-							<NotificationsRounded style={topbarSvgIconStyle("#fff")} />
+							<NotificationsRounded style={topbarSvgIconStyle(topbarIconColor)} />
 						</Badge>
 					</IconButton>
 					<Popover

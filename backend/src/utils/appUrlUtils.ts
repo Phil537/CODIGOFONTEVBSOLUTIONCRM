@@ -164,6 +164,8 @@ export function getCorsAllowedOrigins(): string[] {
   add("http://localhost:8081");
   add("http://localhost:5173");
   add("http://localhost:5174");
+  add("http://localhost:5181");
+  add("http://localhost:5182");
 
   return [...set];
 }

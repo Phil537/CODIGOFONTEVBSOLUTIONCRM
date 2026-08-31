@@ -17,6 +17,13 @@ import {
   makeStyles
 } from "@material-ui/core";
 import { useTheme } from "@material-ui/core/styles";
+import {
+  CHAT_AGENT_BUBBLE,
+  CHAT_AGENT_TEXT,
+  CHAT_CLIENT_BUBBLE,
+  CHAT_CLIENT_TEXT,
+  BRAND_BLUE_MEDIUM,
+} from "../../constants/visualIdentity";
 
 import {
   AccessTime,
@@ -252,8 +259,8 @@ const useStyles = makeStyles((theme) => ({
     },
 
     whiteSpace: "pre-wrap",
-    backgroundColor: theme.mode === 'light' ? "#ffffff" : theme.palette.background.paper,
-    color: theme.mode === 'light' ? "#303030" : "#ffffff",
+    backgroundColor: theme.mode === 'light' ? CHAT_CLIENT_BUBBLE : theme.palette.background.paper,
+    color: theme.mode === 'light' ? CHAT_CLIENT_TEXT : "#ffffff",
     alignSelf: "flex-start",
     borderTopLeftRadius: 0,
     borderTopRightRadius: 8,
@@ -317,7 +324,7 @@ const useStyles = makeStyles((theme) => ({
     letterSpacing: "0.02em",
     lineHeight: 1.2,
     color: "#ffffff",
-    backgroundColor: theme.mode === "light" ? "#3b82f6" : "#2563eb",
+    backgroundColor: theme.mode === "light" ? BRAND_BLUE_MEDIUM : "#2563eb",
     border: "none",
     boxShadow:
       theme.mode === "light"
@@ -348,8 +355,8 @@ const useStyles = makeStyles((theme) => ({
       right: 0,
     },
     whiteSpace: "pre-wrap",
-    backgroundColor: theme.mode === "light" ? "#dcf8c6" : "#005c4b",
-    color: theme.mode === "light" ? "#303030" : "#ffffff",
+    backgroundColor: theme.mode === "light" ? CHAT_AGENT_BUBBLE : "#1e40af",
+    color: CHAT_AGENT_TEXT,
     alignSelf: "flex-end",
     borderTopLeftRadius: 8,
     borderTopRightRadius: 8,
@@ -378,8 +385,8 @@ const useStyles = makeStyles((theme) => ({
       right: 0,
     },
     whiteSpace: "pre-wrap",
-    backgroundColor: theme.mode === "light" ? "#3b82f6" : "#2563eb",
-    color: "#ffffff",
+    backgroundColor: theme.mode === "light" ? CHAT_AGENT_BUBBLE : "#2563eb",
+    color: CHAT_AGENT_TEXT,
     "& $timestamp": {
       color: "rgba(255, 255, 255, 0.85)",
     },

@@ -3,12 +3,27 @@
  * Usados pelo Tailwind (@theme) e pelo premium-design-system (MUI).
  */
 :root {
-  /* Marca landing */
+  /* Marca landing / identidade CRM */
   --vb-ink: #0b1b3b;
   --vb-ink-soft: #0f2b8f;
   --vb-crm-blue: #1d4ed8;
+  --vb-crm-blue-medium: #2563eb;
+  --vb-crm-blue-dark: #1e3a8a;
+  --vb-sidebar-bg: #0b1b3b;
+  --vb-sidebar-active-bg: rgba(59, 130, 246, 0.32);
+  --vb-topbar-bg: #ffffff;
+  --vb-topbar-search: #f3f4f6;
+  --vb-topbar-icon: #374151;
+  --vb-status-green: #22c55e;
+  --vb-text-primary: #111827;
+  --vb-text-secondary: #6b7280;
+  --vb-tag-bg: #dbeafe;
+  --vb-tag-text: #2563eb;
+  --vb-button-primary: #1e3a8a;
+  --vb-button-secondary: #64748b;
+  --vb-link: #2563eb;
   --vb-border: #e4e7ec;
-  --vb-muted: #6f7988;
+  --vb-muted: #6b7280;
   --vb-overcast: #8f99a8;
   --vb-ash: #f8fafc;
   --vb-surface: #ffffff;

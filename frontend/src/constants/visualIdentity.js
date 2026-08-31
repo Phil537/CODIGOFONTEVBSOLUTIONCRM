@@ -1,15 +1,69 @@
 /**
- * Copyright (c) Visão Business. Todos os direitos reservados.
- * VB Solution CRM — propriedade intelectual da Visão Business.
- * Uso conforme LICENSE na raiz do repositório.
+ * Identidade visual VB Solution CRM — tokens compartilhados.
+ * Menu lateral, topbar, textos, chat, botões e tags.
  */
 
-/**
- * Espelha backend/src/constants/visualIdentity.ts (apenas allowlist de e-mail para UI).
- * A autorização real continua no backend.
- */
+/** E-mails com acesso à UI de Identidade Visual independente do flag da empresa. */
 export const VISUAL_IDENTITY_EMAIL_ALLOWLIST = [
   "contatopousadadogolfinho@gmail.com",
   "gestaovendas@gmail.com",
   "admin@local.dev",
 ];
+
+/* ── Menu lateral ─────────────────────────────────────────────── */
+/** Fundo: azul-marinho bem escuro */
+export const SIDEBAR_BG = "#0B1B3B";
+/** Ícones e textos inativos */
+export const SIDEBAR_TEXT = "#FFFFFF";
+export const SIDEBAR_ICON = "#FFFFFF";
+/** Item selecionado: azul médio sobre fundo azul mais claro */
+export const SIDEBAR_ACTIVE_BG = "rgba(59, 130, 246, 0.32)";
+export const SIDEBAR_ACTIVE_ACCENT = "#3B82F6";
+/** Texto e ícone do item ativo */
+export const SIDEBAR_ACTIVE_TEXT = "#FFFFFF";
+export const SIDEBAR_ACTIVE_ICON = "#FFFFFF";
+
+/* ── Topbar ───────────────────────────────────────────────────── */
+/** Fundo: branco puro */
+export const TOPBAR_BG_LIGHT = "#FFFFFF";
+/** Barra de pesquisa: cinza bem claro */
+export const TOPBAR_SEARCH_BG = "#F3F4F6";
+export const TOPBAR_SEARCH_BORDER = "#E5E7EB";
+/** Ícones: cinza escuro / preto */
+export const TOPBAR_ICON = "#374151";
+/** Status "Disponível" */
+export const TOPBAR_STATUS_GREEN = "#22C55E";
+
+/* ── Marca / links / destaques ────────────────────────────────── */
+export const BRAND_BLUE = "#1D4ED8";
+export const BRAND_BLUE_MEDIUM = "#2563EB";
+export const BRAND_BLUE_DARK = "#1E3A8A";
+export const LINK_COLOR = BRAND_BLUE_MEDIUM;
+
+/* ── Textos ───────────────────────────────────────────────────── */
+/** Títulos principais: cinza bem escuro / quase preto */
+export const TEXT_PRIMARY = "#111827";
+/** Textos secundários: cinza médio */
+export const TEXT_SECONDARY = "#6B7280";
+
+/* ── Chat ─────────────────────────────────────────────────────── */
+/** Mensagem do cliente (bolha clara) */
+export const CHAT_CLIENT_BUBBLE = "#FFFFFF";
+export const CHAT_CLIENT_TEXT = "#374151";
+/** Mensagem do atendente (bolha azul) */
+export const CHAT_AGENT_BUBBLE = BRAND_BLUE_MEDIUM;
+export const CHAT_AGENT_TEXT = "#FFFFFF";
+
+/* ── Botões ───────────────────────────────────────────────────── */
+/** Botão principal (Enviar) e FAB "+" */
+export const BUTTON_PRIMARY = BRAND_BLUE_DARK;
+export const BUTTON_PRIMARY_TEXT = "#FFFFFF";
+/** Botões secundários / ícones: cinza ou azul suave */
+export const BUTTON_SECONDARY = "#64748B";
+export const BUTTON_SECONDARY_SOFT_BG = "#EFF6FF";
+export const BUTTON_SECONDARY_SOFT_TEXT = BRAND_BLUE_MEDIUM;
+
+/* ── Tags ─────────────────────────────────────────────────────── */
+/** Tags ("Cliente", "Interesse - Planos"): azul claro + texto azul */
+export const TAG_BG = "#DBEAFE";
+export const TAG_TEXT = BRAND_BLUE_MEDIUM;

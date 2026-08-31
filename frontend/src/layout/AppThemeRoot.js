@@ -32,6 +32,19 @@ import {
   DEFAULT_BRAND_LOGO_DARK,
   DEFAULT_BRAND_FAVICON,
 } from "../constants/brand";
+import {
+  SIDEBAR_BG,
+  TOPBAR_BG_LIGHT,
+  BRAND_BLUE,
+  BRAND_BLUE_DARK,
+  BRAND_BLUE_MEDIUM,
+  BUTTON_PRIMARY,
+  BUTTON_SECONDARY,
+  TEXT_PRIMARY,
+  TEXT_SECONDARY,
+  TAG_BG,
+  TAG_TEXT,
+} from "../constants/visualIdentity";
 
 const defaultLogoLight = DEFAULT_BRAND_LOGO_LIGHT;
 const defaultLogoDark = DEFAULT_BRAND_LOGO_DARK;
@@ -41,6 +54,7 @@ import {
   getContrastTextForBackground,
   getSidebarContrast,
   logosLookSameUrl,
+  isDarkBackgroundHex,
 } from "../utils/colorContrast";
 
 import "../styles/animations.css";
@@ -90,8 +104,17 @@ const DARK_BG_PAPER = "#3a3a3a";
 const DARK_BG_ELEVATED = "#454545";
 /** Cards de KPI / quadros no escuro: cinza escuro nítido */
 const DARK_DASHBOARD_CARD = "#48484b";
+/** Topbar padrão modo claro: branco puro */
+const LIGHT_TOPBAR_DEFAULT = TOPBAR_BG_LIGHT;
+/** Menu lateral padrão: azul-marinho bem escuro */
+const LIGHT_SIDEBAR_DEFAULT = SIDEBAR_BG;
+/** Marca / links / destaques */
+const BRAND_PRIMARY_DEFAULT = BRAND_BLUE;
+/** Botão principal (Enviar, FAB +) */
+const BUTTON_PRIMARY_DEFAULT = BUTTON_PRIMARY;
+
 /** Topbar padrão modo escuro: azul escuro forte e nítido */
-const DARK_TOPBAR_DEFAULT = "#1e3a8a";
+const DARK_TOPBAR_DEFAULT = BRAND_BLUE_DARK;
 
 const AppThemeRoot = ({ children }) => {
   const { user, isAuth } = useContext(AuthContext);
@@ -99,7 +122,7 @@ const AppThemeRoot = ({ children }) => {
   
   const getSafeColor = (color) => {
     if (color && isValidHex(color)) return color;
-    return "#3B82F6";
+    return BRAND_PRIMARY_DEFAULT;
   };
 
   const appColorLocalStorage = getSafeColor(
@@ -215,19 +238,25 @@ const AppThemeRoot = ({ children }) => {
     const brandLight = getSafeColor(primaryColorLight);
     const brandDark = getSafeColor(primaryColorDark);
 
-    /** Topbar: whitelabel ou fallback da marca — a primária do sistema DEVE ser a mesma cor. */
+    /** Topbar: whitelabel ou branco (modo claro) / azul escuro (modo escuro) */
     const topbarLightEff =
       topbarColorLight && isValidHex(topbarColorLight)
         ? getSafeColor(topbarColorLight)
-        : brandLight;
+        : LIGHT_TOPBAR_DEFAULT;
     const topbarDarkEff =
       topbarColorDark && isValidHex(topbarColorDark)
         ? getSafeColor(topbarColorDark)
         : DARK_TOPBAR_DEFAULT;
 
-    /** Primária única (botões, links, foco, progresso) = cor efetiva da top bar */
-    const systemPrimaryLight = topbarLightEff;
-    const systemPrimaryDark = topbarDarkEff;
+    /** Primária do sistema (links, abas, foco) — independente da topbar branca */
+    const systemPrimaryLight = brandLight;
+    const systemPrimaryDark =
+      primaryColorDark && isValidHex(primaryColorDark)
+        ? getSafeColor(primaryColorDark)
+        : DARK_TOPBAR_DEFAULT;
+
+    const topbarIsLight =
+      mode === "light" && !isDarkBackgroundHex(topbarLightEff);
 
     const navbarAccentLight = getContrastTextForBackground(topbarLightEff);
     const navbarAccentDark = getContrastTextForBackground(topbarDarkEff);
@@ -240,7 +269,7 @@ const AppThemeRoot = ({ children }) => {
     const sidebarLightEff =
       sidebarColorLight && isValidHex(sidebarColorLight)
         ? getSafeColor(sidebarColorLight)
-        : LIGHT_BG_PAPER;
+        : LIGHT_SIDEBAR_DEFAULT;
     const sidebarDarkEff =
       sidebarColorDark && isValidHex(sidebarColorDark)
         ? getSafeColor(sidebarColorDark)
@@ -253,11 +282,11 @@ const AppThemeRoot = ({ children }) => {
     const primaryButtonBgLight =
       buttonPrimaryColorLight && isValidHex(buttonPrimaryColorLight)
         ? buttonPrimaryColorLight
-        : brandLight;
+        : BUTTON_PRIMARY_DEFAULT;
     const primaryButtonBgDark =
       buttonPrimaryColorDark && isValidHex(buttonPrimaryColorDark)
         ? buttonPrimaryColorDark
-        : "#3B82F6";
+        : BRAND_BLUE_DARK;
 
     const primaryButtonTextLight =
       buttonPrimaryTextColorLight && isValidHex(buttonPrimaryTextColorLight)
@@ -317,8 +346,8 @@ const AppThemeRoot = ({ children }) => {
             text:
               mode === "light"
                 ? {
-                    primary: "rgba(0, 0, 0, 0.87)",
-                    secondary: "rgba(0, 0, 0, 0.6)",
+                    primary: TEXT_PRIMARY,
+                    secondary: TEXT_SECONDARY,
                     disabled: "rgba(0, 0, 0, 0.38)",
                   }
                 : {
@@ -339,7 +368,7 @@ const AppThemeRoot = ({ children }) => {
               contrastText: "#ffffff",
             },
             secondary: {
-              main: mode === "light" ? "#64748b" : "#94a3b8",
+              main: mode === "light" ? BUTTON_SECONDARY : "#94a3b8",
               contrastText: "#ffffff",
             },
             error: {
@@ -385,6 +414,8 @@ const AppThemeRoot = ({ children }) => {
                 : systemPrimaryDark,
             sidebarMenuItemHoverBg: sidebarCx.hoverBg,
             sidebarMenuItemActiveBg: sidebarCx.activeBg,
+            sidebarMenuActiveText: sidebarCx.activeText,
+            sidebarMenuActiveIcon: sidebarCx.activeIcon,
             sidebarMenuHoverAccent:
               sidebarCx.isDark
                 ? "#ffffff"
@@ -487,7 +518,7 @@ const AppThemeRoot = ({ children }) => {
                     mode === "light" ? LIGHT_BG_DEFAULT : DARK_BG_DEFAULT,
                   color:
                     mode === "light"
-                      ? "rgba(0, 0, 0, 0.87)"
+                      ? TEXT_PRIMARY
                       : "#ffffff",
                   overflowX: "hidden",
                   overflowY: "hidden",
@@ -615,6 +646,20 @@ const AppThemeRoot = ({ children }) => {
               },
               textPrimary: {
                 color: mode === "dark" ? "#ffffff" : undefined,
+              },
+              outlinedSecondary: {
+                color: mode === "light" ? BUTTON_SECONDARY : "#94a3b8",
+                borderColor:
+                  mode === "light" ? "rgba(100, 116, 139, 0.5)" : "rgba(148, 163, 184, 0.5)",
+                "&:hover": {
+                  backgroundColor:
+                    mode === "light" ? "rgba(100, 116, 139, 0.06)" : "rgba(148, 163, 184, 0.1)",
+                  borderColor:
+                    mode === "light" ? BUTTON_SECONDARY : "#94a3b8",
+                },
+              },
+              textSecondary: {
+                color: mode === "light" ? BUTTON_SECONDARY : "#94a3b8",
               },
             },
           
@@ -914,7 +959,7 @@ const AppThemeRoot = ({ children }) => {
             },
             MuiLink: {
               root: {
-                color: mode === "dark" ? "#93c5fd" : undefined,
+                color: mode === "dark" ? "#93c5fd" : BRAND_BLUE,
               },
             },
             MuiStepLabel: {
@@ -987,11 +1032,21 @@ const AppThemeRoot = ({ children }) => {
                 width: 52,
                 height: 52,
               },
+              primary: {
+                backgroundColor:
+                  mode === "light" ? primaryButtonBgLight : primaryButtonBgDark,
+                color:
+                  mode === "light" ? primaryButtonTextLight : primaryButtonTextDark,
+                "&:hover": {
+                  filter: "brightness(0.96)",
+                },
+              },
             },
           },
 
           mode,
-          /** Ícones da topbar do sistema: só contraste com a cor da topbar. */
+          topbarIsLight,
+          /** Ícones da topbar do sistema: contraste com a cor da topbar. */
           navbarAccent,
           /** Cor de destaque em abas (ActivitiesStyleLayout) — alinhada à primária / top bar. */
           pageTabsAccent,
@@ -1094,8 +1149,8 @@ const AppThemeRoot = ({ children }) => {
             btnSLight, btnSDark,
             tbLight, tbDark, sbLight, sbDark
           ] = await Promise.all([
-            fb("primaryColorLight", "#3B82F6"),
-            fb("primaryColorDark", "#3B82F6"),
+            fb("primaryColorLight", BRAND_BLUE),
+            fb("primaryColorDark", BRAND_BLUE),
             resolveHex("buttonPrimaryColorLight"),
             resolveHex("buttonPrimaryColorDark"),
             resolveHex("buttonPrimaryTextColorLight"),
@@ -1124,8 +1179,8 @@ const AppThemeRoot = ({ children }) => {
           if (cancelled) return;
 
           batchUpdates(() => {
-            setPrimaryColorLight(pColorLight || "#3B82F6");
-            setPrimaryColorDark(pColorDark || "#3B82F6");
+            setPrimaryColorLight(pColorLight || BRAND_BLUE);
+            setPrimaryColorDark(pColorDark || BRAND_BLUE);
             setButtonPrimaryColorLight(btnPLight);
             setButtonPrimaryColorDark(btnPDark);
             setButtonPrimaryTextColorLight(btnPTxtLight);
@@ -1183,8 +1238,8 @@ const AppThemeRoot = ({ children }) => {
         if (cancelled) return;
 
         batchUpdates(() => {
-          setPrimaryColorLight(pcLight || "#3B82F6");
-          setPrimaryColorDark(pcDark || "#3B82F6");
+          setPrimaryColorLight(pcLight || BRAND_BLUE);
+          setPrimaryColorDark(pcDark || BRAND_BLUE);
           setButtonPrimaryColorLight(bpLight && isValidHex(bpLight) ? bpLight : "");
           setButtonPrimaryColorDark(bpDark && isValidHex(bpDark) ? bpDark : "");
           setButtonPrimaryTextColorLight(bptLight && isValidHex(bptLight) ? bptLight : "");
@@ -1219,19 +1274,23 @@ const AppThemeRoot = ({ children }) => {
     const brandLight = getSafeColor(primaryColorLight);
     const brandDark = getSafeColor(primaryColorDark);
     const topbarL =
-      topbarColorLight && isValidHex(topbarColorLight) ? topbarColorLight : brandLight;
+      topbarColorLight && isValidHex(topbarColorLight)
+        ? topbarColorLight
+        : LIGHT_TOPBAR_DEFAULT;
     const topbarD =
-      topbarColorDark && isValidHex(topbarColorDark) ? topbarColorDark : DARK_BG_DEFAULT;
-    const primaryUi = mode === "light" ? topbarL : topbarD;
+      topbarColorDark && isValidHex(topbarColorDark)
+        ? topbarColorDark
+        : DARK_TOPBAR_DEFAULT;
+    const primaryUi = mode === "light" ? brandLight : brandDark;
     root.style.setProperty("--primaryColor", primaryUi);
     const btnBg =
       mode === "light"
         ? buttonPrimaryColorLight && isValidHex(buttonPrimaryColorLight)
           ? buttonPrimaryColorLight
-          : brandLight
+          : BUTTON_PRIMARY_DEFAULT
         : buttonPrimaryColorDark && isValidHex(buttonPrimaryColorDark)
           ? buttonPrimaryColorDark
-          : "#3B82F6";
+          : BRAND_BLUE_DARK;
     const btnText =
       mode === "light"
         ? buttonPrimaryTextColorLight && isValidHex(buttonPrimaryTextColorLight)
@@ -1242,6 +1301,13 @@ const AppThemeRoot = ({ children }) => {
           : getContrastTextForBackground(btnBg);
     root.style.setProperty("--buttonPrimaryColor", btnBg);
     root.style.setProperty("--buttonPrimaryTextColor", btnText);
+    root.style.setProperty("--vb-button-primary", btnBg);
+    root.style.setProperty("--vb-button-secondary", BUTTON_SECONDARY);
+    root.style.setProperty("--vb-link", BRAND_BLUE_MEDIUM);
+    root.style.setProperty("--vb-tag-bg", TAG_BG);
+    root.style.setProperty("--vb-tag-text", TAG_TEXT);
+    root.style.setProperty("--vb-sidebar-bg", SIDEBAR_BG);
+    root.style.setProperty("--vb-topbar-bg", TOPBAR_BG_LIGHT);
     root.style.colorScheme = mode === "dark" ? "dark" : "light";
     root.setAttribute("data-theme", mode === "dark" ? "dark" : "light");
     root.classList.toggle("dark", mode === "dark");

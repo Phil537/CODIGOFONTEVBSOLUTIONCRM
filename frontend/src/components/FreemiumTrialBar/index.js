@@ -20,6 +20,11 @@ import {
   Tooltip
 } from "@material-ui/core";
 import { makeStyles, useTheme } from "@material-ui/core/styles";
+import {
+  TOPBAR_ICON,
+  TOPBAR_SEARCH_BG,
+  TOPBAR_SEARCH_BORDER,
+} from "../../constants/visualIdentity";
 import { toast } from "react-toastify";
 import moment from "moment";
 import { AuthContext } from "../../context/Auth/AuthContext";
@@ -32,7 +37,9 @@ import {
 } from "../../utils/brasiliaTrial";
 import api, { openApi } from "../../services/api";
 
-const useStyles = makeStyles((theme) => ({
+const useStyles = makeStyles((theme) => {
+  const topbarLight = theme.topbarIsLight === true;
+  return {
   "@keyframes freemiumGlassPulse": {
     "0%, 100%": {
       boxShadow:
@@ -47,7 +54,7 @@ const useStyles = makeStyles((theme) => ({
     flexShrink: 0,
     marginRight: 6,
     marginLeft: 0,
-    border: "none",
+    border: topbarLight ? `1px solid ${TOPBAR_SEARCH_BORDER}` : "none",
     cursor: "pointer",
     borderRadius: 6,
     display: "inline-flex",
@@ -57,21 +64,25 @@ const useStyles = makeStyles((theme) => ({
     minWidth: 0,
     maxWidth: 320,
     lineHeight: 1,
-    background:
-      "linear-gradient(155deg, rgba(255,255,255,0.28) 0%, rgba(255,255,255,0.12) 48%, rgba(255,255,255,0.2) 100%)",
-    backdropFilter: "saturate(200%) blur(14px)",
-    WebkitBackdropFilter: "saturate(200%) blur(14px)",
-    color: "rgba(255, 255, 255, 0.98)",
-    transition: "background 0.15s ease, box-shadow 0.15s ease",
+    background: topbarLight
+      ? TOPBAR_SEARCH_BG
+      : "linear-gradient(155deg, rgba(255,255,255,0.28) 0%, rgba(255,255,255,0.12) 48%, rgba(255,255,255,0.2) 100%)",
+    backdropFilter: topbarLight ? "none" : "saturate(200%) blur(14px)",
+    WebkitBackdropFilter: topbarLight ? "none" : "saturate(200%) blur(14px)",
+    color: topbarLight ? TOPBAR_ICON : "rgba(255, 255, 255, 0.98)",
+    transition: "background 0.15s ease, box-shadow 0.15s ease, border-color 0.15s ease",
     fontFamily:
       '"Inter", "Geist", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif',
     "&:hover": {
-      background:
-        "linear-gradient(155deg, rgba(255,255,255,0.38) 0%, rgba(255,255,255,0.18) 50%, rgba(255,255,255,0.28) 100%)"
+      background: topbarLight
+        ? "#ECEEF1"
+        : "linear-gradient(155deg, rgba(255,255,255,0.38) 0%, rgba(255,255,255,0.18) 50%, rgba(255,255,255,0.28) 100%)",
     },
     "&:focus": {
       outline: "none",
-      boxShadow: "0 0 0 2px rgba(255,255,255,0.65), 0 0 20px rgba(255,255,255,0.25)"
+      boxShadow: topbarLight
+        ? `0 0 0 2px rgba(29, 78, 216, 0.18)`
+        : "0 0 0 2px rgba(255,255,255,0.65), 0 0 20px rgba(255,255,255,0.25)",
     },
     [theme.breakpoints.down("xs")]: {
       minWidth: 0,
@@ -127,7 +138,7 @@ const useStyles = makeStyles((theme) => ({
     margin: 0,
     padding: "1px 0",
     color: "inherit",
-    textShadow: "0 1px 2px rgba(0,0,0,0.12)",
+    textShadow: topbarLight ? "none" : "0 1px 2px rgba(0,0,0,0.12)",
     [theme.breakpoints.down("xs")]: {
       fontSize: "0.7rem",
       letterSpacing: "0.05em"
@@ -281,7 +292,8 @@ const useStyles = makeStyles((theme) => ({
       borderColor: theme.palette.type === "light" ? "rgba(0,0,0,0.12)" : undefined
     }
   }
-}));
+};
+});
 
 /**
  * Freemium: `variant="appBar"` = chip no canto esquerdo da AppBar (após o menu); `banner` = faixa no conteúdo.

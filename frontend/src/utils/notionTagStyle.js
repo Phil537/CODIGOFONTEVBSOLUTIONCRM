@@ -4,6 +4,8 @@
  * Uso conforme LICENSE na raiz do repositório.
  */
 
+import { TAG_BG, TAG_TEXT, BRAND_BLUE_MEDIUM } from "../constants/visualIdentity";
+
 /** Tags opacas estilo Notion — fundo pastel sólido, texto saturado, sem transparência */
 
 const DEFAULT_RGB = { r: 145, g: 145, b: 142 };
@@ -92,8 +94,27 @@ export function getNotionTagAppearance(hexColor, isDark = false) {
   };
 }
 
+
+export function getCrmDefaultTagAppearance(isDark = false) {
+  if (isDark) {
+    return {
+      backgroundColor: "rgba(37, 99, 235, 0.22)",
+      color: "#93C5FD",
+      border: "none",
+    };
+  }
+  return {
+    backgroundColor: TAG_BG,
+    color: TAG_TEXT,
+    border: "none",
+  };
+}
+
+/** Cor base para tags de contato / interesse */
+export const CRM_TAG_BLUE = BRAND_BLUE_MEDIUM;
+
 /** Tags neutras (ex.: Agente IA) — cinza Notion padrão */
-export function getNotionNeutralTagAppearance(isDark, accent = "#0ea5e9") {
+export function getNotionNeutralTagAppearance(isDark, accent = CRM_TAG_BLUE) {
   if (isDark) {
     const { r, g, b } = hexToRgb(accent);
     const bgR = mix(r, 55, 0.28);

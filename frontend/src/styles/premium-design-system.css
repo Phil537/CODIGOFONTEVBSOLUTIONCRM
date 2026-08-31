@@ -55,6 +55,26 @@
   box-shadow: 0 4px 14px rgba(15, 23, 42, 0.14) !important;
 }
 
+.MuiFab-primary,
+.MuiIconButton-root.premium-fab {
+  background-color: var(--vb-button-primary, var(--buttonPrimaryColor, #1e3a8a)) !important;
+  color: var(--buttonPrimaryTextColor, #ffffff) !important;
+}
+
+.MuiButton-outlinedSecondary {
+  color: var(--vb-button-secondary, #64748b) !important;
+  border-color: rgba(100, 116, 139, 0.45) !important;
+}
+
+.MuiButton-textSecondary {
+  color: var(--vb-button-secondary, #64748b) !important;
+}
+
+a,
+.MuiLink-root {
+  color: var(--vb-link, #2563eb);
+}
+
 .MuiIconButton-root.premium-fab:hover {
   transform: none !important;
   filter: brightness(1.04);

@@ -7,7 +7,7 @@
 import React from "react";
 import { makeStyles, useTheme } from "@material-ui/core/styles";
 import clsx from "clsx";
-import { getNotionTagAppearance, getNotionNeutralTagAppearance } from "../../utils/notionTagStyle";
+import { getNotionTagAppearance, getNotionNeutralTagAppearance, CRM_TAG_BLUE } from "../../utils/notionTagStyle";
 
 const useStyles = makeStyles({
   root: {
@@ -50,7 +50,7 @@ const NotionTag = ({ label, color, icon, title, className, neutral, accentColor,
   const isDark = theme.palette.type === "dark";
   const appearance = neutral
     ? getNotionNeutralTagAppearance(isDark, accentColor)
-    : getNotionTagAppearance(color, isDark);
+    : getNotionTagAppearance(color || CRM_TAG_BLUE, isDark);
 
   return (
     <span

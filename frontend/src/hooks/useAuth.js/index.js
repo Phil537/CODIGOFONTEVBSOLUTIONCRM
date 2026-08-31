@@ -219,7 +219,7 @@ const useAuth = () => {
           return false;
         });
       });
-    }, 20000);
+    }, 10000);
 
     (async () => {
       // Sem token: não chama refresh (evita loading eterno)

@@ -8,6 +8,14 @@
  * Contraste para textos sobre fundos hex arbitrários (ex.: menu lateral customizado).
  */
 
+import {
+  SIDEBAR_ACTIVE_BG,
+  SIDEBAR_ACTIVE_TEXT,
+  SIDEBAR_ACTIVE_ICON,
+  SIDEBAR_ICON,
+  SIDEBAR_TEXT,
+} from "../constants/visualIdentity";
+
 export function hexToRgb(hex) {
   if (!hex || typeof hex !== "string") {
     return { r: 128, g: 128, b: 128 };
@@ -62,11 +70,13 @@ export function getSidebarContrast(hexBackground) {
   const dark = isDarkBackgroundHex(hexBackground);
   return {
     isDark: dark,
-    textPrimary: dark ? "#ffffff" : "rgba(0, 0, 0, 0.87)",
+    textPrimary: dark ? SIDEBAR_TEXT : "rgba(0, 0, 0, 0.87)",
     textSecondary: dark ? "rgba(255, 255, 255, 0.78)" : "rgba(0, 0, 0, 0.65)",
-    icon: dark ? "#ffffff" : "rgba(0, 0, 0, 0.87)",
+    icon: dark ? SIDEBAR_ICON : "rgba(0, 0, 0, 0.87)",
     hoverBg: dark ? "rgba(255, 255, 255, 0.08)" : "rgba(0, 0, 0, 0.04)",
-    activeBg: dark ? "rgba(255, 255, 255, 0.14)" : "#f3f4f6",
+    activeBg: dark ? SIDEBAR_ACTIVE_BG : "#dbeafe",
+    activeText: dark ? SIDEBAR_ACTIVE_TEXT : "#1d4ed8",
+    activeIcon: dark ? SIDEBAR_ACTIVE_ICON : "#2563eb",
   };
 }
 

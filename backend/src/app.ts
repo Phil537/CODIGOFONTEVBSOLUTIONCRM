@@ -19,15 +19,35 @@ import bodyParser from 'body-parser';
 import "./database";
 import uploadConfig from "./config/upload";
 import AppError from "./errors/AppError";
-import routes from "./routes";
 import logger from "./utils/logger";
-import { messageQueue, sendScheduledMessages } from "./queues";
-import BullQueue from "./libs/queue"
+import { isDevNoDb } from "./helpers/devNoDbAuth";
 import BullBoard from 'bull-board';
 import basicAuth from 'basic-auth';
-import "./emailQueues";
 import { registerMcpHttpRoutes } from "./routes/mcpHttpRoutes";
 import { registerMcpBrandRoutes } from "./services/McpHttpServices/mcpBrandAssets";
+
+const noopQueue = {
+  process: () => {},
+  add: () => Promise.resolve(null),
+  on: () => {},
+};
+
+const devNoDb = isDevNoDb();
+
+const { messageQueue, sendScheduledMessages } = devNoDb
+  ? { messageQueue: noopQueue, sendScheduledMessages: noopQueue }
+  : require("./queues");
+
+const BullQueue = devNoDb
+  ? { queues: [], process: () => {}, add: () => Promise.resolve(null) }
+  : require("./libs/queue").default;
+
+if (!devNoDb) {
+  require("./emailQueues");
+}
+
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+const routes = require("./routes").default;
 
 // Função de middleware para autenticação básica
 export const isBullAuth = (req, res, next) => {

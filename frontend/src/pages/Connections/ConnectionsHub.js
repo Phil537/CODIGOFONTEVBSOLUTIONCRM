@@ -76,7 +76,7 @@ export default function ConnectionsHub() {
       }
     }
     if (user?.companyId) load();
-  }, [user?.companyId, getPlanCompany]);
+  }, [user?.companyId]);
 
   useEffect(() => {
     async function loadConfigCounts() {

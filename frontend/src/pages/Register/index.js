@@ -45,16 +45,26 @@ import OpenInNewIcon from "@material-ui/icons/OpenInNew";
 import MinimalLanguageSelector from "../../components/MinimalLanguageSelector";
 import logoVBWhite from "../../assets/logo-evoluti-crm-dark.png";
 import { PREMIUM_FONT_FAMILY } from "../../constants/typography";
+import {
+  TOPBAR_BG_LIGHT,
+  TEXT_PRIMARY,
+  TEXT_SECONDARY,
+  BRAND_BLUE_DARK,
+  BRAND_BLUE_MEDIUM,
+  BUTTON_PRIMARY,
+  BUTTON_PRIMARY_TEXT,
+  TOPBAR_SEARCH_BG,
+} from "../../constants/visualIdentity";
 
 const CLICKUP_FONT = PREMIUM_FONT_FAMILY;
 
 const useStyles = makeStyles(theme => {
   const isDark = theme.palette.type === "dark";
-  const inputBg = isDark ? "rgba(255, 255, 255, 0.06)" : "#f5f5f7";
-  const inputBgHover = isDark ? "rgba(255, 255, 255, 0.09)" : "#ebebed";
-  const inputBgFocus = isDark ? "rgba(255, 255, 255, 0.11)" : "#e8e8ed";
-  const labelColor = isDark ? "#abaeb3" : "#86868b";
-  const textColor = isDark ? "#fafbfc" : "#1d1d1f";
+  const inputBg = isDark ? "rgba(255, 255, 255, 0.06)" : TOPBAR_SEARCH_BG;
+  const inputBgHover = isDark ? "rgba(255, 255, 255, 0.09)" : "#EBEBED";
+  const inputBgFocus = isDark ? "rgba(255, 255, 255, 0.11)" : "#E8E8ED";
+  const labelColor = isDark ? "#abaeb3" : TEXT_SECONDARY;
+  const textColor = isDark ? "#fafbfc" : TEXT_PRIMARY;
 
   return {
   root: {
@@ -63,7 +73,7 @@ const useStyles = makeStyles(theme => {
     display: "flex",
     alignItems: "flex-start",
     justifyContent: "center",
-    background: isDark ? theme.palette.background.default : "#f5f5f7",
+    background: isDark ? theme.palette.background.default : TOPBAR_SEARCH_BG,
     padding: theme.spacing(4, 1.5, 5),
     fontFamily: CLICKUP_FONT,
     color: textColor,
@@ -229,7 +239,7 @@ const useStyles = makeStyles(theme => {
     right: 0,
     padding: theme.spacing(1, 2),
     zIndex: 20,
-    background: isDark ? "rgba(45, 45, 45, 0.94)" : "rgba(245, 245, 247, 0.92)",
+    background: isDark ? "rgba(45, 45, 45, 0.94)" : "rgba(255, 255, 255, 0.96)",
     backdropFilter: "blur(12px)",
     WebkitBackdropFilter: "blur(12px)",
     [theme.breakpoints.down("xs")]: {
@@ -282,7 +292,7 @@ const useStyles = makeStyles(theme => {
   flowProgress: {
     height: "100%",
     borderRadius: 999,
-    background: "linear-gradient(90deg, #1e3a8a, #1e40af)",
+    background: `linear-gradient(90deg, ${BRAND_BLUE_DARK}, ${BRAND_BLUE_MEDIUM})`,
     transition: "width 0.75s cubic-bezier(0.25, 0.1, 0.25, 1)",
     boxShadow: isDark
       ? "0 0 8px rgba(30, 58, 138, 0.35)"
@@ -325,14 +335,14 @@ const useStyles = makeStyles(theme => {
     }
   },
   flowDotDone: {
-    background: "#1e3a8a",
+    background: BRAND_BLUE_DARK,
     color: "#fff",
-    borderColor: "#1e3a8a"
+    borderColor: BRAND_BLUE_DARK
   },
   flowDotActive: {
-    background: "#1e40af",
+    background: BRAND_BLUE_MEDIUM,
     color: "#fff",
-    borderColor: "#1e40af",
+    borderColor: BRAND_BLUE_MEDIUM,
     boxShadow: isDark
       ? "0 0 0 3px rgba(30, 58, 138, 0.35)"
       : "0 0 0 3px rgba(30, 64, 175, 0.18)",
@@ -359,8 +369,8 @@ const useStyles = makeStyles(theme => {
     }
   },
   flowLabelActive: {
-    color: isDark ? "#8ba4cf" : "#1e3a8a",
-    fontWeight: 400
+    color: isDark ? "#8ba4cf" : BRAND_BLUE_DARK,
+    fontWeight: 500
   },
   flowLabelDone: {
     color: isDark ? "rgba(255,255,255,0.55)" : "#64748b",
@@ -398,15 +408,27 @@ const useStyles = makeStyles(theme => {
     }
   },
   logo: {
-    height: 52,
+    height: 60,
     width: "auto",
     marginRight: theme.spacing(1),
     filter: "none",
     objectFit: "contain",
     [theme.breakpoints.down("xs")]: {
-      height: 40,
+      height: 48,
       marginRight: 0
     }
+  },
+  primaryActionBtn: {
+    backgroundColor: `${BUTTON_PRIMARY} !important`,
+    color: `${BUTTON_PRIMARY_TEXT} !important`,
+    borderRadius: 10,
+    textTransform: "none",
+    fontWeight: 500,
+    boxShadow: "0 4px 14px rgba(30, 58, 138, 0.25)",
+    "&:hover": {
+      backgroundColor: `${BRAND_BLUE_DARK} !important`,
+      filter: "brightness(1.04)",
+    },
   },
   stepperClear: {
     background: "transparent !important",
@@ -1461,6 +1483,7 @@ const Register = () => {
               <Button
                 color="primary"
                 variant="contained"
+                className={classes.primaryActionBtn}
                 disabled={accessBusy || !valid}
                 onClick={async () => {
                   const p = passRef.current?.value || "";

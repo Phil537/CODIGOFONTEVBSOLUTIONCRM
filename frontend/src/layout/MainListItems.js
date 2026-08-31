@@ -67,6 +67,7 @@ import useAppTranslation from "../hooks/useAppTranslation";
 import { Campaign, ShapeLine } from "@mui/icons-material";
 
 import useCompanySettings from "../hooks/useSettings/companySettings";
+import { SIDEBAR_BG } from "../constants/visualIdentity";
 
 /** Ícones com menu aberto. */
 const SIDEBAR_ICON_SIZE = 15;
@@ -178,14 +179,16 @@ const useStyles = makeStyles((theme) => ({
       alignItems: "center",
     },
     "&:hover $iconSlot": {
-      color:
-        theme.mode === "dark"
+      color: theme.palette.sidebarMenuIsDarkLogo
+        ? "#ffffff"
+        : theme.mode === "dark"
           ? theme.palette.sidebarMenuHoverAccent
           : "rgba(0, 0, 0, 0.72)",
     },
     "&:hover $listItemText": {
-      color:
-        theme.mode === "dark"
+      color: theme.palette.sidebarMenuIsDarkLogo
+        ? "#ffffff"
+        : theme.mode === "dark"
           ? "rgba(245, 245, 250, 0.92)"
           : "rgba(0, 0, 0, 0.72)",
       fontWeight: 300,
@@ -223,24 +226,23 @@ const useStyles = makeStyles((theme) => ({
   },
 
   listItemActive: {
-    backgroundColor:
-      theme.mode === "dark"
-        ? "rgba(255, 255, 255, 0.07)"
-        : "rgba(0, 0, 0, 0.05)",
+    backgroundColor: theme.palette.sidebarMenuItemActiveBg,
     boxShadow: "none",
     borderRadius: 8,
     "& $listItemText": {
       color:
-        theme.mode === "dark"
-          ? "rgba(248, 248, 252, 0.98)"
-          : "rgba(0, 0, 0, 0.78)",
-      fontWeight: theme.mode === "dark" ? 400 : 500,
+        theme.palette.sidebarMenuActiveText ||
+        (theme.palette.sidebarMenuIsDarkLogo
+          ? "#ffffff"
+          : "rgba(0, 0, 0, 0.78)"),
+      fontWeight: 500,
     },
     "& $iconSlot": {
       color:
-        theme.mode === "dark"
-          ? "rgba(248, 248, 252, 0.98)"
-          : "rgba(0, 0, 0, 0.78)",
+        theme.palette.sidebarMenuActiveIcon ||
+        (theme.palette.sidebarMenuIsDarkLogo
+          ? "#ffffff"
+          : "rgba(0, 0, 0, 0.78)"),
     },
   },
 
@@ -347,14 +349,14 @@ const useStyles = makeStyles((theme) => ({
   },
 
   customTooltip: {
-    backgroundColor: theme.mode === "light" ? "#1e293b" : "#374151",
+    backgroundColor: SIDEBAR_BG,
     color: "#fff",
     fontSize: "0.875rem",
     fontWeight: 500,
     borderRadius: "8px",
     boxShadow: "0 4px 12px rgba(0, 0, 0, 0.15)",
     "& .MuiTooltip-arrow": {
-      color: theme.mode === "light" ? "#1e293b" : "#374151",
+      color: SIDEBAR_BG,
     }
   },
 

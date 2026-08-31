@@ -5,7 +5,7 @@
  */
 
 import React, { useEffect, useReducer, useState, useContext } from "react";
-import { makeStyles } from "@material-ui/core/styles";
+import { makeStyles, useTheme } from "@material-ui/core/styles";
 import toastError from "../../errors/toastError";
 import Popover from "@material-ui/core/Popover";
 import AnnouncementIcon from "@material-ui/icons/Announcement";
@@ -32,7 +32,7 @@ import {
 } from "@material-ui/core";
 import api from "../../services/api";
 import { isArray } from "lodash";
-import { topbarSvgIconStyle, topbarActionButtonStyle } from "../../constants/topbarIcons";
+import { topbarSvgIconStyle, topbarActionButtonStyle, resolveTopbarIconColor } from "../../constants/topbarIcons";
 import moment from "moment";
 // import { SocketContext } from "../../context/Socket/SocketContext";
 
@@ -144,7 +144,9 @@ const reducer = (state, action) => {
   }
 };
 
-export default function AnnouncementsPopover({ buttonClassName }) {
+export default function AnnouncementsPopover({ buttonClassName, iconColor }) {
+  const theme = useTheme();
+  const topbarIconColor = iconColor || resolveTopbarIconColor(theme);
   const classes = useStyles();
 
   const [loading, setLoading] = useState(false);
@@ -274,7 +276,7 @@ export default function AnnouncementsPopover({ buttonClassName }) {
           variant="dot"
           invisible={invisible || announcements.length < 1}
         >
-          <AnnouncementIcon style={topbarSvgIconStyle("#fff")} />
+          <AnnouncementIcon style={topbarSvgIconStyle(topbarIconColor)} />
         </Badge>
       </IconButton>
       <Popover

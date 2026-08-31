@@ -27,6 +27,7 @@ import FindAllCompaniesService, {
 import ShowPlanCompanyService from "../services/CompanyService/ShowPlanCompanyService";
 import User from "../models/User";
 import ListCompaniesPlanService from "../services/CompanyService/ListCompaniesPlanService";
+import { isDevNoDb, getDevSerializedUser } from "../helpers/devNoDbAuth";
 
 interface TokenPayload {
   id: string;
@@ -468,6 +469,15 @@ export const remove = async (
 export const listPlan = async (req: Request, res: Response): Promise<Response> => {
   try {
     const { id } = req.params;
+
+    if (isDevNoDb()) {
+      const devUser = getDevSerializedUser();
+      return res.status(200).json({
+        ...devUser.company,
+        plan: devUser.company.plan
+      });
+    }
+
     const { id: requestUserId, companyId } = req.user;
     const requestUser = await User.findByPk(requestUserId);
     const isSuper = !!requestUser?.super;
