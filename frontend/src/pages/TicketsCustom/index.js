@@ -20,7 +20,10 @@ import { AuthContext } from "../../context/Auth/AuthContext";
 import api from "../../services/api";
 import { CircularProgress } from "@material-ui/core";
 import { getBackendUrl } from "../../config";
-import { DEFAULT_BRAND_LOGO } from "../../constants/brand";
+import {
+  DEFAULT_BRAND_LOGO_LIGHT,
+  DEFAULT_BRAND_LOGO_DARK,
+} from "../../constants/brand";
 
 const defaultTicketsManagerWidth = 580;
 const minTicketsManagerWidth = 360;
@@ -129,7 +132,9 @@ const TicketsCustom = () => {
 	const welcomeLogoSrc =
 		theme.appLogoTickets && String(theme.appLogoTickets).trim() !== ""
 			? theme.appLogoTickets
-			: DEFAULT_BRAND_LOGO;
+			: theme.mode === "light"
+				? theme.appLogoLight || DEFAULT_BRAND_LOGO_LIGHT
+				: theme.appLogoDark || DEFAULT_BRAND_LOGO_DARK;
 	
 	// ⚠️ CORREÇÃO PRINCIPAL: Inicializar com largura padrão adequada
 	const [ticketsManagerWidth, setTicketsManagerWidth] = useState(

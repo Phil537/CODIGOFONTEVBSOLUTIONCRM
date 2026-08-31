@@ -23,7 +23,7 @@ import { toast } from "react-toastify";
 import toastError from "../../errors/toastError";
 import useSettings from "../../hooks/useSettings";
 import MinimalLanguageSelector from "../../components/MinimalLanguageSelector";
-import logoVB from "../../assets/logo-evoluti-crm.png";
+import logoVB from "../../assets/logo-evoluti-crm-dark.png";
 import { formatDocumentTitle } from "../../constants/brand";
 import { openApi } from "../../services/api";
 import { setOfflineMode as enableOfflineFlag } from "../../services/offlineMode";

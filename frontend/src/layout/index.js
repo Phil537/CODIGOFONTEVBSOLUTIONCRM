@@ -64,7 +64,10 @@ import { i18n, applyAppLanguage } from "../translate/i18n";
 import toastError from "../errors/toastError";
 import AnnouncementsPopover from "../components/AnnouncementsPopover";
 import BirthdayModal from "../components/BirthdayModal";
-import { DEFAULT_BRAND_LOGO } from "../constants/brand";
+import {
+  DEFAULT_BRAND_LOGO_LIGHT,
+  DEFAULT_BRAND_LOGO_DARK,
+} from "../constants/brand";
 import { useDate } from "../hooks/useDate";
 import ColorModeContext from "../layout/themeContext";
 import { getBackendUrl, resolvePublicUploadUrl } from "../config";
@@ -781,8 +784,8 @@ const LoggedInLayout = ({ children, themeToggle, hideMenu = false }) => {
           gp("appLogoDark", companyId),
         ]);
         if (cancelled) return;
-        colorMode.setAppLogoLight(toLogoSrc(lightFile, DEFAULT_BRAND_LOGO));
-        colorMode.setAppLogoDark(toLogoSrc(darkFile, DEFAULT_BRAND_LOGO));
+        colorMode.setAppLogoLight(toLogoSrc(lightFile, DEFAULT_BRAND_LOGO_LIGHT));
+        colorMode.setAppLogoDark(toLogoSrc(darkFile, DEFAULT_BRAND_LOGO_DARK));
       } catch {
         /* mantém estado do App */
       }

@@ -15,7 +15,10 @@ import TicketsManagerTabs from "../../components/TicketsManagerTabs";
 import Ticket from "../../components/Ticket";
 
 import { i18n } from "../../translate/i18n";
-import { DEFAULT_BRAND_LOGO } from "../../constants/brand";
+import {
+  DEFAULT_BRAND_LOGO_LIGHT,
+  DEFAULT_BRAND_LOGO_DARK,
+} from "../../constants/brand";
 
 /** Cinza painel tickets (escuro): explícito para não cair em preto se token custom faltar no tema) */
 const DARK_TICKETS_PANEL = "#48484b";
@@ -126,7 +129,9 @@ const Chat = () => {
 	const welcomeLogoSrc =
 		theme.appLogoTickets && String(theme.appLogoTickets).trim() !== ""
 			? theme.appLogoTickets
-			: DEFAULT_BRAND_LOGO;
+			: theme.mode === "light"
+				? theme.appLogoLight || DEFAULT_BRAND_LOGO_LIGHT
+				: theme.appLogoDark || DEFAULT_BRAND_LOGO_DARK;
 
 	return (
 		<div className={classes.chatContainer}>

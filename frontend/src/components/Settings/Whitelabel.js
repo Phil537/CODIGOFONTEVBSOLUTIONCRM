@@ -30,8 +30,13 @@ import ColorModeContext from "../../layout/themeContext";
 import api from "../../services/api";
 import { getBackendUrl } from "../../config";
 
-import { DEFAULT_BRAND_LOGO, APP_BRAND_NAME } from "../../constants/brand";
-import defaultLogoFavicon from "../../assets/favicon.ico";
+import {
+  DEFAULT_BRAND_LOGO_LIGHT,
+  DEFAULT_BRAND_LOGO_DARK,
+  DEFAULT_BRAND_FAVICON,
+  APP_BRAND_NAME,
+} from "../../constants/brand";
+import defaultLogoFavicon from "../../assets/favicon-evoluti.png";
 import ColorBoxModal from "../ColorBoxModal/index.js";
 import Checkbox from "@material-ui/core/Checkbox";
 import { i18n } from "../../translate/i18n";
@@ -1952,8 +1957,8 @@ export default function Whitelabel(props) {
                           key={previewLogoSrc}
                           onError={(e) => {
                             const fallback = useDarkLogoInPreview
-                              ? DEFAULT_BRAND_LOGO
-                              : DEFAULT_BRAND_LOGO;
+                              ? DEFAULT_BRAND_LOGO_DARK
+                              : DEFAULT_BRAND_LOGO_LIGHT;
                             if (e.target.src !== fallback) {
                               e.target.onerror = null;
                               e.target.src = fallback;
@@ -2012,7 +2017,7 @@ export default function Whitelabel(props) {
                                 color="default"
                                 onClick={() => {
                                   handleSaveSetting("appLogoLight", "");
-                                  colorMode.setAppLogoLight(DEFAULT_BRAND_LOGO);
+                                  colorMode.setAppLogoLight(DEFAULT_BRAND_LOGO_LIGHT);
                                 }}
                               >
                                 <Delete
@@ -2155,7 +2160,7 @@ export default function Whitelabel(props) {
                                 color="default"
                                 onClick={() => {
                                   handleSaveSetting("appLogoDark", "");
-                                  colorMode.setAppLogoDark(DEFAULT_BRAND_LOGO);
+                                  colorMode.setAppLogoDark(DEFAULT_BRAND_LOGO_DARK);
                                 }}
                               >
                                 <Delete
@@ -2381,11 +2386,11 @@ export default function Whitelabel(props) {
                         className={classes.previewImage}
                         src={settingsLoaded.appLogoLight ?
                           getBackendUrl() + "/public/" + settingsLoaded.appLogoLight :
-                          DEFAULT_BRAND_LOGO
+                          DEFAULT_BRAND_LOGO_LIGHT
                         }
                         alt={i18n.t("whitelabel.preview") + " light-logo"}
                         onError={(e) => {
-                          e.target.src = DEFAULT_BRAND_LOGO;
+                          e.target.src = DEFAULT_BRAND_LOGO_LIGHT;
                         }}
                       />
                       <div className={classes.previewLabel}>
@@ -2400,11 +2405,11 @@ export default function Whitelabel(props) {
                         className={classes.previewImage}
                         src={settingsLoaded.appLogoDark ?
                           getBackendUrl() + "/public/" + settingsLoaded.appLogoDark :
-                          DEFAULT_BRAND_LOGO
+                          DEFAULT_BRAND_LOGO_DARK
                         }
                         alt={i18n.t("whitelabel.preview") + " dark-logo"}
                         onError={(e) => {
-                          e.target.src = DEFAULT_BRAND_LOGO;
+                          e.target.src = DEFAULT_BRAND_LOGO_DARK;
                         }}
                       />
                       <div className={`${classes.previewLabel} ${classes.previewLabelDark}`}>
@@ -2438,11 +2443,11 @@ export default function Whitelabel(props) {
                         className={classes.previewImage}
                         src={settingsLoaded.appLogoTickets ?
                           getBackendUrl() + "/public/" + settingsLoaded.appLogoTickets :
-                          (DEFAULT_BRAND_LOGO)
+                          (DEFAULT_BRAND_LOGO_LIGHT)
                         }
                         alt="preview tickets-logo"
                         onError={(e) => {
-                          e.target.src = DEFAULT_BRAND_LOGO;
+                          e.target.src = DEFAULT_BRAND_LOGO_LIGHT;
                         }}
                       />
                       <div className={classes.previewLabel}>

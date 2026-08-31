@@ -43,7 +43,7 @@ import api from "../../services/api";
 import { buildStripeCrmCheckoutUrl } from "../../utils/stripeCheckout";
 import OpenInNewIcon from "@material-ui/icons/OpenInNew";
 import MinimalLanguageSelector from "../../components/MinimalLanguageSelector";
-import logoVBWhite from "../../assets/logo-evoluti-crm.png";
+import logoVBWhite from "../../assets/logo-evoluti-crm-dark.png";
 import { PREMIUM_FONT_FAMILY } from "../../constants/typography";
 
 const CLICKUP_FONT = PREMIUM_FONT_FAMILY;

@@ -26,11 +26,16 @@ import { PageTitleProvider } from "../context/PageTitleContext";
 import Favicon from "react-favicon";
 import { getBackendUrl, resolvePublicUploadUrl } from "../config";
 import { AuthContext } from "../context/Auth/AuthContext";
-import { APP_BRAND_NAME, DEFAULT_BRAND_LOGO } from "../constants/brand";
+import {
+  APP_BRAND_NAME,
+  DEFAULT_BRAND_LOGO_LIGHT,
+  DEFAULT_BRAND_LOGO_DARK,
+  DEFAULT_BRAND_FAVICON,
+} from "../constants/brand";
 
-const defaultLogoLight = DEFAULT_BRAND_LOGO;
-const defaultLogoDark = DEFAULT_BRAND_LOGO;
-const defaultLogoFavicon = DEFAULT_BRAND_LOGO;
+const defaultLogoLight = DEFAULT_BRAND_LOGO_LIGHT;
+const defaultLogoDark = DEFAULT_BRAND_LOGO_DARK;
+const defaultLogoFavicon = DEFAULT_BRAND_FAVICON;
 import useSettings from "../hooks/useSettings";
 import {
   getContrastTextForBackground,
@@ -150,7 +155,7 @@ const AppThemeRoot = ({ children }) => {
   const [appLogoLight, setAppLogoLight] = useState(defaultLogoLight);
   const [appLogoDark, setAppLogoDark] = useState(defaultLogoDark);
   const [appLogoFavicon, setAppLogoFavicon] = useState(defaultLogoFavicon);
-  const [appLogoTickets, setAppLogoTickets] = useState(DEFAULT_BRAND_LOGO);
+  const [appLogoTickets, setAppLogoTickets] = useState(DEFAULT_BRAND_LOGO_DARK);
   const [appName, setAppName] = useState(appNameLocalStorage);
   const { getPublicSetting } = useSettings();
   const getPublicSettingRef = useRef(getPublicSetting);
@@ -1134,7 +1139,7 @@ const AppThemeRoot = ({ children }) => {
             setAppLogoLight(logoUrl(fL) || defaultLogoLight);
             setAppLogoDark(logoUrl(fD) || defaultLogoDark);
             setAppLogoFavicon(logoUrl(fF) || defaultLogoFavicon);
-            setAppLogoTickets(logoUrl(fT) || DEFAULT_BRAND_LOGO);
+            setAppLogoTickets(logoUrl(fT) || (mode === "light" ? DEFAULT_BRAND_LOGO_LIGHT : DEFAULT_BRAND_LOGO_DARK));
             setAppName(resolvedName);
           });
           return;
@@ -1193,7 +1198,9 @@ const AppThemeRoot = ({ children }) => {
           setAppLogoLight(logoUrl(lLight) || defaultLogoLight);
           setAppLogoDark(logoUrl(lDark) || defaultLogoDark);
           setAppLogoFavicon(logoUrl(lFav) || defaultLogoFavicon);
-          setAppLogoTickets(logoUrl(lTick) || DEFAULT_BRAND_LOGO);
+          setAppLogoTickets(
+            logoUrl(lTick) || (mode === "light" ? DEFAULT_BRAND_LOGO_LIGHT : DEFAULT_BRAND_LOGO_DARK)
+          );
           setAppName(settingText(aName, APP_BRAND_NAME));
         });
       } catch (e) {
