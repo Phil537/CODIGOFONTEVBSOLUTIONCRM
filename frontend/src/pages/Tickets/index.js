@@ -15,8 +15,7 @@ import TicketsManagerTabs from "../../components/TicketsManagerTabs";
 import Ticket from "../../components/Ticket";
 
 import { i18n } from "../../translate/i18n";
-import logo from "../../assets/LOGO VB PRETO.png";
-import logoDark from "../../assets/LOGO VB-PNG.png";
+import { DEFAULT_BRAND_LOGO } from "../../constants/brand";
 
 /** Cinza painel tickets (escuro): explícito para não cair em preto se token custom faltar no tema) */
 const DARK_TICKETS_PANEL = "#48484b";
@@ -127,9 +126,7 @@ const Chat = () => {
 	const welcomeLogoSrc =
 		theme.appLogoTickets && String(theme.appLogoTickets).trim() !== ""
 			? theme.appLogoTickets
-			: theme.mode === "light"
-				? theme.appLogoLight || logo
-				: theme.appLogoDark || logoDark;
+			: DEFAULT_BRAND_LOGO;
 
 	return (
 		<div className={classes.chatContainer}>
@@ -157,7 +154,7 @@ const Chat = () => {
 									<img
 										className={classes.logo}
 										src={welcomeLogoSrc}
-										alt=""
+									alt="Evoluti CRM"
 										loading="lazy"
 										decoding="async"
 									/>

@@ -26,9 +26,11 @@ import { PageTitleProvider } from "../context/PageTitleContext";
 import Favicon from "react-favicon";
 import { getBackendUrl, resolvePublicUploadUrl } from "../config";
 import { AuthContext } from "../context/Auth/AuthContext";
-import defaultLogoLight from "../assets/LOGO VB PRETO.png";
-import defaultLogoDark from "../assets/LOGO VB-PNG.png";
-import defaultLogoFavicon from "../assets/favicon.ico";
+import { APP_BRAND_NAME, DEFAULT_BRAND_LOGO } from "../constants/brand";
+
+const defaultLogoLight = DEFAULT_BRAND_LOGO;
+const defaultLogoDark = DEFAULT_BRAND_LOGO;
+const defaultLogoFavicon = DEFAULT_BRAND_LOGO;
 import useSettings from "../hooks/useSettings";
 import {
   getContrastTextForBackground,
@@ -148,7 +150,7 @@ const AppThemeRoot = ({ children }) => {
   const [appLogoLight, setAppLogoLight] = useState(defaultLogoLight);
   const [appLogoDark, setAppLogoDark] = useState(defaultLogoDark);
   const [appLogoFavicon, setAppLogoFavicon] = useState(defaultLogoFavicon);
-  const [appLogoTickets, setAppLogoTickets] = useState("");
+  const [appLogoTickets, setAppLogoTickets] = useState(DEFAULT_BRAND_LOGO);
   const [appName, setAppName] = useState(appNameLocalStorage);
   const { getPublicSetting } = useSettings();
   const getPublicSettingRef = useRef(getPublicSetting);
@@ -1112,7 +1114,7 @@ const AppThemeRoot = ({ children }) => {
           const name = pickVal(rows, "appName");
           const resolvedName =
             settingText(name) ||
-            settingText(await gp("appName", cid), "Visão Business");
+            settingText(await gp("appName", cid), APP_BRAND_NAME);
 
           if (cancelled) return;
 
@@ -1132,7 +1134,7 @@ const AppThemeRoot = ({ children }) => {
             setAppLogoLight(logoUrl(fL) || defaultLogoLight);
             setAppLogoDark(logoUrl(fD) || defaultLogoDark);
             setAppLogoFavicon(logoUrl(fF) || defaultLogoFavicon);
-            setAppLogoTickets(logoUrl(fT) || "");
+            setAppLogoTickets(logoUrl(fT) || DEFAULT_BRAND_LOGO);
             setAppName(resolvedName);
           });
           return;
@@ -1191,8 +1193,8 @@ const AppThemeRoot = ({ children }) => {
           setAppLogoLight(logoUrl(lLight) || defaultLogoLight);
           setAppLogoDark(logoUrl(lDark) || defaultLogoDark);
           setAppLogoFavicon(logoUrl(lFav) || defaultLogoFavicon);
-          setAppLogoTickets(logoUrl(lTick) || "");
-          setAppName(settingText(aName, "Visão Business"));
+          setAppLogoTickets(logoUrl(lTick) || DEFAULT_BRAND_LOGO);
+          setAppName(settingText(aName, APP_BRAND_NAME));
         });
       } catch (e) {
         console.log("Theme load error", e);

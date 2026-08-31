@@ -23,7 +23,8 @@ import { toast } from "react-toastify";
 import toastError from "../../errors/toastError";
 import useSettings from "../../hooks/useSettings";
 import MinimalLanguageSelector from "../../components/MinimalLanguageSelector";
-import logoVB from "../../assets/LOGO VB-PNG.png";
+import logoVB from "../../assets/logo-evoluti-crm.png";
+import { formatDocumentTitle } from "../../constants/brand";
 import { openApi } from "../../services/api";
 import { setOfflineMode as enableOfflineFlag } from "../../services/offlineMode";
 
@@ -338,7 +339,7 @@ const Login = () => {
     return (
         <>
             <Helmet>
-                <title>Visão Business - Login</title>
+                <title>{formatDocumentTitle("Login")}</title>
                 <link rel="icon" href="/favicon.png" />
             </Helmet>
 
@@ -361,7 +362,7 @@ const Login = () => {
                 <div className={classes.centerWrap}>
                     <CssBaseline />
                     <div className={classes.paper}>
-                        <img src={logoVB} alt="Visão Business" className={classes.heroLogo} />
+                        <img src={logoVB} alt="Evoluti CRM" className={classes.heroLogo} />
                         <Typography component="h1" className={classes.welcome}>
                             {t("login.welcome")}
                         </Typography>

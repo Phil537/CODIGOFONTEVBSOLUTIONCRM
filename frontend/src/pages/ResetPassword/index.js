@@ -12,7 +12,8 @@ import CssBaseline from "@material-ui/core/CssBaseline";
 import TextField from "@material-ui/core/TextField";
 import Button from "@material-ui/core/Button";
 import { makeStyles } from "@material-ui/core/styles";
-import logoVB from "../../assets/LOGO VB-PNG.png";
+import logoVB from "../../assets/logo-evoluti-crm.png";
+import { formatDocumentTitle } from "../../constants/brand";
 import { openApi } from "../../services/api";
 import { toast } from "react-toastify";
 import toastError from "../../errors/toastError";
@@ -116,7 +117,7 @@ const ResetPassword = () => {
   return (
     <>
       <Helmet>
-        <title>Redefinir Senha - Visão Business</title>
+        <title>{formatDocumentTitle("Redefinir Senha")}</title>
       </Helmet>
       <div className={classes.root}>
         <Container component="main" maxWidth={false} style={{ maxWidth: 420 }}>

@@ -5,7 +5,7 @@
  */
 
 import React, { useState, useRef, useEffect, useContext, useCallback } from "react";
-import { useTheme } from "@material-ui/core/styles";
+import { APP_BRAND_NAME } from "../../constants/brand";
 
 import { useHistory } from "react-router-dom";
 import { format, parseISO, isValid } from "date-fns";
@@ -456,12 +456,12 @@ const NotificationsPopOver = ({ volume = 1, hideTriggerButton = false, buttonCla
 		const numbers = "⓿➊➋➌➍➎➏➐➑➒➓⓫⓬⓭⓮⓯⓰⓱⓲⓳⓴";
 		if (badgeCount > 0) {
 			if (badgeCount < 21) {
-				document.title = numbers.substring(badgeCount, badgeCount + 1) + " - " + (String(theme.appName || "Visão Business"));
+				document.title = numbers.substring(badgeCount, badgeCount + 1) + " - " + (String(theme.appName || APP_BRAND_NAME));
 			} else {
-				document.title = "(" + badgeCount + ") " + (String(theme.appName || "Visão Business"));
+				document.title = "(" + badgeCount + ") " + (String(theme.appName || APP_BRAND_NAME));
 			}
 		} else {
-			document.title = String(theme.appName || "Visão Business");
+			document.title = String(theme.appName || APP_BRAND_NAME);
 		}
 		return (
 			<>

@@ -30,6 +30,7 @@ import {FormControl} from "@material-ui/core";
 import {InputLabel, MenuItem, Select} from "@material-ui/core";
 import CircularProgress from "@material-ui/core/CircularProgress";
 import {Helmet} from "react-helmet";
+import { formatDocumentTitle } from "../../constants/brand";
 
 import {openApi} from "../../services/api";
 import toastError from "../../errors/toastError";
@@ -417,7 +418,7 @@ const SignUp = () => {
     return (
         <React.Fragment>
             <Helmet>
-                <title>Visão Business - Cadastre-se</title>
+                <title>{formatDocumentTitle("Cadastre-se")}</title>
                 <link rel="icon" href="/favicon.png" />
             </Helmet>
 

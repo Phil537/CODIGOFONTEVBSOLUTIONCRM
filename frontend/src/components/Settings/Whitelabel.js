@@ -30,8 +30,7 @@ import ColorModeContext from "../../layout/themeContext";
 import api from "../../services/api";
 import { getBackendUrl } from "../../config";
 
-import defaultLogoLight from "../../assets/LOGO VB PRETO.png";
-import defaultLogoDark from "../../assets/LOGO VB-PNG.png";
+import { DEFAULT_BRAND_LOGO, APP_BRAND_NAME } from "../../constants/brand";
 import defaultLogoFavicon from "../../assets/favicon.ico";
 import ColorBoxModal from "../ColorBoxModal/index.js";
 import Checkbox from "@material-ui/core/Checkbox";
@@ -929,7 +928,7 @@ export default function Whitelabel(props) {
         value: appName
       });
       updateSettingsLoaded("appName", appName);
-      colorMode.setAppName(appName || "Visão Business");
+      colorMode.setAppName(appName || APP_BRAND_NAME);
       toast.success("Nome da aplicação salvo com sucesso.");
     } catch (e) {
       toast.error("Não foi possível salvar o nome da aplicação.");
@@ -1953,8 +1952,8 @@ export default function Whitelabel(props) {
                           key={previewLogoSrc}
                           onError={(e) => {
                             const fallback = useDarkLogoInPreview
-                              ? defaultLogoDark
-                              : defaultLogoLight;
+                              ? DEFAULT_BRAND_LOGO
+                              : DEFAULT_BRAND_LOGO;
                             if (e.target.src !== fallback) {
                               e.target.onerror = null;
                               e.target.src = fallback;
@@ -1971,7 +1970,7 @@ export default function Whitelabel(props) {
                             letterSpacing: "-0.02em",
                           }}
                         >
-                          {appName || settingsLoaded.appName || colorMode.appName || "Visão Business"}
+                          {appName || settingsLoaded.appName || colorMode.appName || APP_BRAND_NAME}
                         </Typography>
                       </div>
                     </Box>
@@ -2013,7 +2012,7 @@ export default function Whitelabel(props) {
                                 color="default"
                                 onClick={() => {
                                   handleSaveSetting("appLogoLight", "");
-                                  colorMode.setAppLogoLight(defaultLogoLight);
+                                  colorMode.setAppLogoLight(DEFAULT_BRAND_LOGO);
                                 }}
                               >
                                 <Delete
@@ -2156,7 +2155,7 @@ export default function Whitelabel(props) {
                                 color="default"
                                 onClick={() => {
                                   handleSaveSetting("appLogoDark", "");
-                                  colorMode.setAppLogoDark(defaultLogoDark);
+                                  colorMode.setAppLogoDark(DEFAULT_BRAND_LOGO);
                                 }}
                               >
                                 <Delete
@@ -2382,11 +2381,11 @@ export default function Whitelabel(props) {
                         className={classes.previewImage}
                         src={settingsLoaded.appLogoLight ?
                           getBackendUrl() + "/public/" + settingsLoaded.appLogoLight :
-                          defaultLogoLight
+                          DEFAULT_BRAND_LOGO
                         }
                         alt={i18n.t("whitelabel.preview") + " light-logo"}
                         onError={(e) => {
-                          e.target.src = defaultLogoLight;
+                          e.target.src = DEFAULT_BRAND_LOGO;
                         }}
                       />
                       <div className={classes.previewLabel}>
@@ -2401,11 +2400,11 @@ export default function Whitelabel(props) {
                         className={classes.previewImage}
                         src={settingsLoaded.appLogoDark ?
                           getBackendUrl() + "/public/" + settingsLoaded.appLogoDark :
-                          defaultLogoDark
+                          DEFAULT_BRAND_LOGO
                         }
                         alt={i18n.t("whitelabel.preview") + " dark-logo"}
                         onError={(e) => {
-                          e.target.src = defaultLogoDark;
+                          e.target.src = DEFAULT_BRAND_LOGO;
                         }}
                       />
                       <div className={`${classes.previewLabel} ${classes.previewLabelDark}`}>
@@ -2439,11 +2438,11 @@ export default function Whitelabel(props) {
                         className={classes.previewImage}
                         src={settingsLoaded.appLogoTickets ?
                           getBackendUrl() + "/public/" + settingsLoaded.appLogoTickets :
-                          (defaultLogoLight)
+                          (DEFAULT_BRAND_LOGO)
                         }
                         alt="preview tickets-logo"
                         onError={(e) => {
-                          e.target.src = defaultLogoLight;
+                          e.target.src = DEFAULT_BRAND_LOGO;
                         }}
                       />
                       <div className={classes.previewLabel}>

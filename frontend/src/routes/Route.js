@@ -11,25 +11,20 @@ import moment from "moment";
 import { AuthContext } from "../context/Auth/AuthContext";
 import { PageTitleContext } from "../context/PageTitleContext";
 import BackdropLoading from "../components/BackdropLoading";
+import { APP_BRAND_NAME, formatDocumentTitle } from "../constants/brand";
 
 const Route = ({ component: Component, isPrivate = false, title, allowWhenAuth = false, ...rest }) => {
 	const { isAuth, loading, user } = useContext(AuthContext);
 	const { setPageTitle } = useContext(PageTitleContext);
 
 	useEffect(() => {
-		const baseTitle = "Visão Business";
 		const pageTitle =
 			typeof title === "string" && title.trim() && title !== "[object Object]"
 				? title.trim()
 				: "";
 
-		if (pageTitle) {
-			document.title = `${pageTitle} - ${baseTitle}`;
-			setPageTitle(pageTitle);
-		} else {
-			document.title = baseTitle;
-			setPageTitle(baseTitle);
-		}
+		document.title = formatDocumentTitle(pageTitle);
+		setPageTitle(pageTitle || APP_BRAND_NAME);
 	}, [title, setPageTitle]);
 
 	// Verificar se a empresa está vencida
