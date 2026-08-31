@@ -67,6 +67,7 @@ import BirthdayModal from "../components/BirthdayModal";
 import {
   DEFAULT_BRAND_LOGO_LIGHT,
   DEFAULT_BRAND_LOGO_DARK,
+  DEFAULT_BRAND_LOGO_COLLAPSED,
 } from "../constants/brand";
 import { useDate } from "../hooks/useDate";
 import ColorModeContext from "../layout/themeContext";
@@ -239,14 +240,19 @@ const useStyles = makeStyles((theme) => {
     alignItems: "center",
     justifyContent: "center",
     padding: "10px 12px",
-    height: "80px",
-    minHeight: "80px",
+    height: "92px",
+    minHeight: "92px",
     backgroundColor:
       theme.palette.sidebarMenuBackground || theme.palette.background.paper,
     transition: "all 0.3s ease",
     marginTop: 0,
     marginBottom: 0,
     position: "relative",
+  },
+  toolbarIconCollapsed: {
+    height: "56px",
+    minHeight: "56px",
+    padding: "8px 4px",
   },
   chevronButton: {
     position: "absolute",
@@ -527,8 +533,8 @@ const useStyles = makeStyles((theme) => {
   logo: {
     width: "auto",
     height: "auto",
-    maxHeight: "88px",
-    maxWidth: "min(100%, 220px)",
+    maxHeight: "104px",
+    maxWidth: "min(100%, 280px)",
     objectFit: "contain",
     objectPosition: "center",
     transition: "opacity 0.15s ease",
@@ -538,12 +544,20 @@ const useStyles = makeStyles((theme) => {
     },
   },
 
-
-  hideLogo: {
-    width: "42px",
-    maxWidth: "42px",
-    maxHeight: "42px",
+  logoCollapsed: {
+    width: "44px",
+    height: "44px",
+    maxWidth: "44px",
+    maxHeight: "44px",
+    objectFit: "contain",
+    objectPosition: "center",
     margin: "0 auto",
+    cursor: "pointer",
+    display: "block",
+    transition: "opacity 0.15s ease",
+    "&:hover": {
+      opacity: 0.9,
+    },
   },
 
   avatar2: {
@@ -1154,17 +1168,19 @@ const LoggedInLayout = ({ children, themeToggle, hideMenu = false }) => {
           }}
           open={drawerOpen}
         >
-          <div className={classes.toolbarIcon}>
+          <div className={clsx(classes.toolbarIcon, !drawerOpen && classes.toolbarIconCollapsed)}>
             <img
               src={
-                theme.palette.sidebarMenuIsDarkLogo
-                  ? theme.calculatedLogoDark()
-                  : theme.calculatedLogoLight()
+                drawerOpen
+                  ? theme.palette.sidebarMenuIsDarkLogo
+                    ? theme.calculatedLogoDark()
+                    : theme.calculatedLogoLight()
+                  : DEFAULT_BRAND_LOGO_COLLAPSED
               }
               alt="Evoluti CRM"
-              className={clsx(classes.logo, !drawerOpen && classes.hideLogo)}
+              className={drawerOpen ? classes.logo : classes.logoCollapsed}
               onClick={() => setDrawerOpen(!drawerOpen)}
-              key={`sidebar-logo-${theme.palette.sidebarMenuIsDarkLogo}-${String(colorMode.appLogoLight)}-${String(colorMode.appLogoDark)}`}
+              key={`sidebar-logo-${drawerOpen ? "expanded" : "collapsed"}-${theme.palette.sidebarMenuIsDarkLogo}-${String(colorMode.appLogoLight)}-${String(colorMode.appLogoDark)}`}
             />
             {drawerOpen && (
               <IconButton onClick={() => setDrawerOpen(!drawerOpen)} className={classes.chevronButton}>
