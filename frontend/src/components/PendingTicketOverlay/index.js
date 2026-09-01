@@ -164,14 +164,14 @@ const PendingTicketOverlay = ({
     // ✅ Se tem fila, aceitar diretamente (lógica original)
     setLoading(true);
     try {
-      await api.put(
+      const { data: updatedTicket } = await api.put(
         `/tickets/${ticket.id}`,
         buildAcceptTicketPayload(ticket, user?.id)
       );
-      
-      setLoading(false);
-      setTabOpen(ticket.isGroup ? "group" : "open");
-      history.push(`/tickets/${ticket.uuid}`);
+
+      const nextTab = updatedTicket?.isGroup ? "group" : "open";
+      setTabOpen(nextTab);
+      history.push(`/tickets/${updatedTicket.uuid}`);
     } catch (err) {
       toastError(err);
     } finally {

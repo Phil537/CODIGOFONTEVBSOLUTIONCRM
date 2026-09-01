@@ -247,6 +247,7 @@ const UpdateTicketService = async ({
     }
 
     // Aceitar (pending → open/group): desliga agente e integração neste ticket
+    let manualAcceptStatus: string | undefined;
     if (
       isManualTicketAccept({
         status,
@@ -263,6 +264,8 @@ const UpdateTicketService = async ({
       isBot = acceptFlags.isBot;
       useIntegration = acceptFlags.useIntegration;
       integrationId = acceptFlags.integrationId;
+      manualAcceptStatus = ticket.isGroup ? "group" : "open";
+      status = manualAcceptStatus;
     }
 
     const ticketTraking = await FindOrCreateATicketTrakingService({
@@ -1080,6 +1083,10 @@ const UpdateTicketService = async ({
     }
 
     status = queue && queue.closeTicket ? "closed" : status;
+
+    if (manualAcceptStatus) {
+      status = manualAcceptStatus;
+    }
 
     const prevStatus = ticket.status;
     const prevUserId = ticket.userId;

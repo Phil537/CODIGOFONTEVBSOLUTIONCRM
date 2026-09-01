@@ -218,6 +218,7 @@ const TicketActionButtonsCustom = ({
   ticket,
   contact,
   onQuickMessageSelect,
+  onTicketUpdated,
   // , showSelectMessageCheckbox,
   // selectedMessages,
   // forwardMessageModalOpen,
@@ -587,17 +588,15 @@ const TicketActionButtonsCustom = ({
       });
     } catch (err) {
       toastError(err);
+      return;
     }
-    if (!setting.greetingAcceptedMessage) {
-      toast.warning(
-        i18n.t("messagesList.header.buttons.greetingAcceptedMessage")
-      );
+    if (!setting?.greetingAcceptedMessage?.trim()) {
       return;
     }
     const msg = renderAcceptedTicketGreeting(
       `${setting.greetingAcceptedMessage}`,
       user
-    ); //`{{ms}} *{{name}}*, ${i18n.t("mainDrawer.appBar.user.myName")} *${user?.name}* ${i18n.t("mainDrawer.appBar.user.continuity")}.`;
+    );
     const message = {
       read: 1,
       fromMe: true,
@@ -614,57 +613,52 @@ const TicketActionButtonsCustom = ({
   const handleUpdateTicketStatus = async (e, status, userId, options = {}) => {
     setLoading(true);
     try {
-      const payload =
-        (status === "open" || status === "group") && ticket.status === "pending"
-          ? buildAcceptTicketPayload(ticket, userId)
-          : status === "closed"
-          ? {
-              status,
-              userId: userId || null,
-              sendFarewellMessage: options.sendFarewellMessage === true,
-              amountUsedBotQueues: 0,
-            }
-          : { status, userId: userId || null };
-      const { data } = await api.put(`/tickets/${ticket.id}`, payload);
+      const isAccepting =
+        (status === "open" || status === "group") && ticket.status === "pending";
+      const payload = isAccepting
+        ? buildAcceptTicketPayload(ticket, userId)
+        : status === "closed"
+        ? {
+            status,
+            userId: userId || null,
+            sendFarewellMessage: options.sendFarewellMessage === true,
+            amountUsedBotQueues: 0,
+          }
+        : { status, userId: userId || null };
+      const { data: updatedTicket } = await api.put(`/tickets/${ticket.id}`, payload);
 
-      let setting;
-
-      try {
-        setting = await getSetting({
-          column: "sendGreetingAccepted",
-        });
-      } catch (err) {
-        toastError(err);
+      if (onTicketUpdated && updatedTicket) {
+        onTicketUpdated(updatedTicket);
       }
 
-      if (
-        setting?.sendGreetingAccepted === "enabled" &&
-        (!ticket.isGroup || ticket.whatsapp?.groupAsTicket === "enabled") &&
-        ticket.status === "pending"
-      ) {
-        handleSendMessage(ticket.id);
+      if (isAccepting) {
+        const nextTab = updatedTicket?.isGroup ? "group" : "open";
+        setTabOpen(nextTab);
+        setCurrentTicket({ ...updatedTicket, code: `#${nextTab}` });
+
+        try {
+          const setting = await getSetting({
+            column: "sendGreetingAccepted",
+          });
+          if (
+            setting?.sendGreetingAccepted === "enabled" &&
+            (!ticket.isGroup || ticket.whatsapp?.groupAsTicket === "enabled")
+          ) {
+            await handleSendMessage(ticket.id);
+          }
+        } catch (err) {
+          // Saudação opcional — não bloqueia o aceite
+        }
+      } else {
+        setCurrentTicket({ id: null, code: null });
+        if (updatedTicket?.status === "closed") {
+          setTabOpen("closed");
+        }
+        history.push("/tickets");
       }
 
       if (isMounted.current) {
         setLoading(false);
-      }
-
-      if (status === "open" || status === "group") {
-        setCurrentTicket({ ...ticket, code: "#" + status });
-        setTimeout(() => {
-          history.push("/tickets");
-        }, 0);
-
-        setTimeout(() => {
-          history.push(`/tickets/${ticket.uuid}`);
-          setTabOpen(status);
-        }, 10);
-      } else {
-        setCurrentTicket({ id: null, code: null });
-        if (data?.status === "closed") {
-          setTabOpen("closed");
-        }
-        history.push("/tickets");
       }
     } catch (err) {
       if (isMounted.current) {
@@ -677,34 +671,38 @@ const TicketActionButtonsCustom = ({
   const handleAcepptTicket = async (id) => {
     setLoading(true);
     try {
-      const otherTicket = await api.put(
+      const { data: updatedTicket } = await api.put(
         `/tickets/${id}`,
         buildAcceptTicketPayload(ticket, user?.id)
       );
-      if (otherTicket.data.id !== ticket.id) {
-        if (otherTicket.data.userId !== user?.id) {
+      const nextTab = updatedTicket?.isGroup ? "group" : "open";
+      if (updatedTicket.id !== ticket.id) {
+        if (updatedTicket.userId !== user?.id) {
           if (isMounted.current) {
             setOpenAlert(true);
-            setUserTicketOpen(otherTicket.data.user.name);
-            setQueueTicketOpen(otherTicket.data.queue.name);
-            setTabOpen(otherTicket.isGroup ? "group" : "open");
+            setUserTicketOpen(updatedTicket.user.name);
+            setQueueTicketOpen(updatedTicket.queue.name);
+            setTabOpen(nextTab);
           }
         } else {
+          if (onTicketUpdated) {
+            onTicketUpdated(updatedTicket);
+          }
           if (isMounted.current) {
             setLoading(false);
-            setTabOpen(otherTicket.isGroup ? "group" : "open");
+            setTabOpen(nextTab);
           }
-          history.push(`/tickets/${otherTicket.data.uuid}`);
+          history.push(`/tickets/${updatedTicket.uuid}`);
         }
       } else {
+        if (onTicketUpdated) {
+          onTicketUpdated(updatedTicket);
+        }
         if (isMounted.current) {
           setLoading(false);
+          setTabOpen(nextTab);
         }
-        history.push("/tickets");
-        setTimeout(() => {
-          history.push(`/tickets/${ticket.uuid}`);
-          setTabOpen(ticket.isGroup ? "group" : "open");
-        }, 1000);
+        history.push(`/tickets/${updatedTicket.uuid}`);
       }
     } catch (err) {
       if (isMounted.current) {

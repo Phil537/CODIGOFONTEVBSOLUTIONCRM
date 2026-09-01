@@ -373,35 +373,49 @@ const TicketListItem = ({ ticket }) => {
     const handleAcepptTicket = async (ticket) => {
         setLoading(true);
         try {
-            await api.put(
+            const { data: updatedTicket } = await api.put(
                 `/tickets/${ticket.id}`,
                 buildAcceptTicketPayload(ticket, user?.id)
             );
+            const nextTab = updatedTicket?.isGroup ? "group" : "open";
+            setTabOpen(nextTab);
+            setCurrentTicket({
+                id: updatedTicket.id,
+                uuid: updatedTicket.uuid,
+                code: `#${nextTab}`,
+            });
+            history.push(`/tickets/${updatedTicket.uuid}`);
         } catch (err) {
-            setLoading(false);
             toastError(err);
+        } finally {
+            if (isMounted.current) {
+                setLoading(false);
+            }
         }
-        if (isMounted.current) {
-            setLoading(false);
-        }
-        history.push(`/tickets/${ticket.uuid}`);
     };
 
     const handleAcepptTicketBot = async (ticket) => {
         setLoading(true);
         try {
-            await api.put(
+            const { data: updatedTicket } = await api.put(
                 `/tickets/${ticket.id}`,
                 buildAcceptTicketPayload(ticket, user?.id)
             );
+            const nextTab = updatedTicket?.isGroup ? "group" : "open";
+            setTabOpen(nextTab);
+            setCurrentTicket({
+                id: updatedTicket.id,
+                uuid: updatedTicket.uuid,
+                code: `#${nextTab}`,
+            });
+            history.push(`/tickets/${updatedTicket.uuid}`);
         } catch (err) {
-            setLoading(false);
             toastError(err);
+        } finally {
+            if (isMounted.current) {
+                setLoading(false);
+            }
         }
-        if (isMounted.current) {
-            setLoading(false);
-        }
-        history.push(`/tickets/${ticket.uuid}`);
     };
 
     const handleReopenTicket = async (ticket) => {

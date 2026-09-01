@@ -132,17 +132,14 @@ const AcceptTicketWithouSelectQueue = ({
       (!ticket.isGroup || ticket.whatsapp?.groupAsTicket === "enabled") &&
       ticket.status === "pending"
     ) {
+      if (!settingMessage?.greetingAcceptedMessage?.trim()) {
+        return;
+      }
+
       const msg = renderAcceptedTicketGreeting(
         `${settingMessage.greetingAcceptedMessage}`,
         user
       );
-
-      if (!settingMessage.greetingAcceptedMessage) {
-        toast.warning(
-          i18n.t("messagesList.header.buttons.greetingAcceptedMessage")
-        );
-        return;
-      }
 
       const message = {
         read: 1,
@@ -183,12 +180,12 @@ const AcceptTicketWithouSelectQueue = ({
           history.push(`/tickets/${otherTicket.data.uuid}`);
         }
       } else {
-        handleSendMessage(ticket.id);
+        await handleSendMessage(ticket.id);
         if (isMounted.current) {
           setLoading(false);
-          setTabOpen(ticket.isGroup ? "group" : "open");
+          setTabOpen(otherTicket.data.isGroup ? "group" : "open");
         }
-        history.push(`/tickets/${ticket.uuid}`);
+        history.push(`/tickets/${otherTicket.data.uuid}`);
         handleClose();
       }
     } catch (err) {

@@ -154,6 +154,11 @@ const Ticket = () => {
       const onCompanyTicket = (data) => {
         if (data.action === "update" && data.ticket.id === ticket?.id) {
           setTicket(data.ticket);
+          const nextTab =
+            data.ticket.status === "group" ? "group" : data.ticket.status;
+          if (["pending", "open", "group", "closed"].includes(nextTab)) {
+            setTabOpen(nextTab);
+          }
         }
 
         if (data.action === "delete" && data.ticketId === ticket?.id) {
@@ -195,6 +200,16 @@ const Ticket = () => {
   const handleDrawerClose = useCallback(() => {
     setDrawerOpen(false);
   }, []);
+
+  const handleTicketUpdated = useCallback((updatedTicket) => {
+    if (!updatedTicket) return;
+    setTicket(updatedTicket);
+    const nextTab =
+      updatedTicket.status === "group" ? "group" : updatedTicket.status;
+    if (["pending", "open", "group", "closed"].includes(nextTab)) {
+      setTabOpen(nextTab);
+    }
+  }, [setTabOpen]);
 
   const handleQuickMessageSelect = (quickMessage) => {
     try {
@@ -273,6 +288,7 @@ const Ticket = () => {
                 ticket={ticket}
                 contact={contact}
                 onQuickMessageSelect={handleQuickMessageSelect}
+                onTicketUpdated={handleTicketUpdated}
               />
             </div>
           </div>

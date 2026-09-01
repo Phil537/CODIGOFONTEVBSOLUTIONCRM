@@ -52,7 +52,10 @@ export const TEXT_SECONDARY = "#6B7280";
 /** Mensagem do cliente (bolha clara) */
 export const CHAT_CLIENT_BUBBLE = "#FFFFFF";
 export const CHAT_CLIENT_TEXT = "#374151";
-/** Mensagem do atendente (bolha azul) */
+/** Mensagem do atendente humano (bolha verde estilo WhatsApp) */
+export const CHAT_HUMAN_BUBBLE = "#35cd96";
+export const CHAT_HUMAN_TEXT = "#FFFFFF";
+/** Mensagem do agente IA (bolha azul) */
 export const CHAT_AGENT_BUBBLE = BRAND_BLUE_MEDIUM;
 export const CHAT_AGENT_TEXT = "#FFFFFF";
 
