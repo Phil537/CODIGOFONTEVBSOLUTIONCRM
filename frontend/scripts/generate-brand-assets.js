@@ -15,7 +15,7 @@ async function main() {
 
   const assetsDir = path.join(__dirname, "..", "src", "assets");
   const publicDir = path.join(__dirname, "..", "public");
-  const source = path.join(assetsDir, "logo-evoluti-crm.png");
+  const source = path.join(assetsDir, "logo evoluti crm png.png");
 
   if (!fs.existsSync(source)) {
     console.error("Arquivo fonte não encontrado:", source);
