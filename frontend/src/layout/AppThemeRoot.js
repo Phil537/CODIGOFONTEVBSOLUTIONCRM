@@ -55,8 +55,6 @@ import {
   getSidebarContrast,
   logosLookSameUrl,
   isDarkBackgroundHex,
-  relativeLuminance,
-  hexToRgb,
 } from "../utils/colorContrast";
 
 import "../styles/animations.css";
@@ -265,13 +263,8 @@ const AppThemeRoot = ({ children }) => {
     const navbarAccent =
       mode === "light" ? navbarAccentLight : navbarAccentDark;
 
-    /** Abas e destaques de página: azul legível no claro; branco no escuro. */
-    const pageTabsAccentLight =
-      relativeLuminance(hexToRgb(systemPrimaryLight)) > 0.62
-        ? BRAND_BLUE_DARK
-        : systemPrimaryLight;
-    const pageTabsAccent =
-      mode === "light" ? pageTabsAccentLight : "#ffffff";
+    /** Abas e destaques de página: azul marca fixo no claro (sempre legível no fundo branco). */
+    const pageTabsAccent = mode === "light" ? BRAND_BLUE_DARK : "#ffffff";
     const sidebarLightEff =
       sidebarColorLight && isValidHex(sidebarColorLight)
         ? getSafeColor(sidebarColorLight)

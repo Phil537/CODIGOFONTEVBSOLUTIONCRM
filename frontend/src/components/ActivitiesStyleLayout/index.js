@@ -23,6 +23,8 @@ import {
 import PageHelpButton from '../PageHelpButton';
 import useAppTranslation from '../../hooks/useAppTranslation';
 import { getHelpTopicForPath } from '../../utils/pageHelpMap';
+import AppIcon from "../ui/AppIcon";
+import BrainPreviewMini from "../BrainPreviewMini";
 import {
   BRAND_BLUE_DARK,
   BRAND_BLUE_MEDIUM,
@@ -31,8 +33,6 @@ import {
   TEXT_SECONDARY,
   TOPBAR_ICON,
 } from "../../constants/visualIdentity";
-import { relativeLuminance, hexToRgb } from "../../utils/colorContrast";
-import BrainPreviewMini from "../BrainPreviewMini";
 import {
   Plus,
   Search,
@@ -61,20 +61,8 @@ const useStyles = makeStyles((theme) => {
   const tabActiveBg = isDark ? 'rgba(255, 255, 255, 0.1)' : BUTTON_SECONDARY_SOFT_BG;
   const scrollHoverBg = isDark ? 'rgba(255, 255, 255, 0.08)' : 'rgba(0, 0, 0, 0.04)';
   const filterPillHover = isDark ? 'rgba(96,165,250,0.12)' : 'rgba(59,130,246,0.08)';
-  /** Abas: whitelabel "botões secundários" (pageTabsAccent), com fallback se a cor for clara demais. */
-  const tabBrandRaw =
-    theme.pageTabsAccent != null && theme.pageTabsAccent !== ''
-      ? theme.pageTabsAccent
-      : theme.palette.primary.main;
-  const tabBrandTooLight =
-    !isDark &&
-    typeof tabBrandRaw === 'string' &&
-    relativeLuminance(hexToRgb(tabBrandRaw)) > 0.62;
-  const tabBrandAccent = tabBrandTooLight ? BRAND_BLUE_DARK : tabBrandRaw;
-  /** Modo claro: inativo cinza legível; ativo azul marca. Escuro: branco/cinza claro. */
-  const navTabInactiveColor = isDark ? 'rgba(255, 255, 255, 0.72)' : TEXT_SECONDARY;
-  const navTabActiveColor = isDark ? '#ffffff' : tabBrandAccent;
-  const navTabHoverColor = isDark ? '#ffffff' : TEXT_PRIMARY;
+  /** Abas: azul marca fixo no claro (legível no fundo branco); branco no escuro. */
+  const navTabColor = isDark ? textPrimary : BRAND_BLUE_DARK;
   /** Azul forte da topbar (modo escuro) para filtros ativos */
   const strongBlue = "#1e3a8a";
 
@@ -140,7 +128,7 @@ const useStyles = makeStyles((theme) => {
       textTransform: "none",
       fontSize: "0.875rem",
       "&&": { fontWeight: 500 },
-      color: `${navTabInactiveColor} !important`,
+      color: `${navTabColor} !important`,
       minWidth: "auto",
       padding: theme.spacing(1, 2),
       paddingTop: theme.spacing(0.625),
@@ -155,7 +143,7 @@ const useStyles = makeStyles((theme) => {
       transition: 'all 0.15s ease',
       '&:hover': {
         backgroundColor: tabHoverBg,
-        color: `${navTabHoverColor} !important`,
+        color: `${navTabColor} !important`,
       },
     },
     navTabIcon: {
@@ -168,15 +156,15 @@ const useStyles = makeStyles((theme) => {
     },
     navTabActive: {
       "&&": { fontWeight: 600 },
-      color: `${navTabActiveColor} !important`,
+      color: `${isDark ? '#ffffff' : BRAND_BLUE_DARK} !important`,
       backgroundColor: isDark ? `${strongBlue}30` : tabActiveBg,
       boxShadow: isDark
         ? "0 2px 4px rgba(0, 0, 0, 0.35)"
-        : `inset 0 0 0 1px ${BRAND_BLUE_MEDIUM}33`,
+        : `inset 0 0 0 1px ${BRAND_BLUE_MEDIUM}40`,
       border: "none",
       '&:hover': {
         backgroundColor: isDark ? `${strongBlue}40` : tabActiveBg,
-        color: `${navTabActiveColor} !important`,
+        color: `${isDark ? '#ffffff' : BRAND_BLUE_DARK} !important`,
       },
     },
     createButton: {
@@ -406,7 +394,7 @@ const useStyles = makeStyles((theme) => {
     },
     inputInput: {
       padding: "0px 0",
-      fontSize: "0.58rem",
+      fontSize: "0.75rem",
     },
   };
 });
@@ -561,6 +549,7 @@ const ActivitiesStyleLayout = ({
           {viewModes.length > 0 && (
             <div
               className={classes.navRow}
+              data-page-nav-tabs
               style={{
                 ...(hideNavDivider ? { borderBottom: 'none' } : undefined),
                 ...(compactHeader ? { paddingTop: 4, paddingBottom: 4, paddingLeft: 8, paddingRight: 8 } : undefined)
@@ -601,6 +590,8 @@ const ActivitiesStyleLayout = ({
                   return (
                     <Button
                       key={mode.value}
+                      data-page-nav-tab
+                      data-active={active ? 'true' : 'false'}
                       onClick={() => onViewModeChange && onViewModeChange(mode.value)}
                       className={`${classes.navTab} ${active ? classes.navTabActive : ''}`}
                     >

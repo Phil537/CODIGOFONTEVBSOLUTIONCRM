@@ -75,6 +75,25 @@ a,
   color: var(--vb-link, #2563eb);
 }
 
+/* Abas internas (ActivitiesStyleLayout): sempre legíveis no modo claro */
+:root[data-theme="light"] [data-page-nav-tab],
+:root[style*="color-scheme: light"] [data-page-nav-tab] {
+  color: #1e3a8a !important;
+}
+
+:root[data-theme="light"] [data-page-nav-tab][data-active="true"],
+:root[style*="color-scheme: light"] [data-page-nav-tab][data-active="true"] {
+  color: #1e3a8a !important;
+  background-color: #eff6ff !important;
+}
+
+:root[data-theme="light"] [data-page-nav-tab] span,
+:root[data-theme="light"] [data-page-nav-tab] svg,
+:root[style*="color-scheme: light"] [data-page-nav-tab] span,
+:root[style*="color-scheme: light"] [data-page-nav-tab] svg {
+  color: inherit !important;
+}
+
 .MuiIconButton-root.premium-fab:hover {
   transform: none !important;
   filter: brightness(1.04);
