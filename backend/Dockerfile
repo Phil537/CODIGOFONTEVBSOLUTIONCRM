@@ -15,6 +15,9 @@ FROM node:20-alpine
 
 WORKDIR /app
 
+# ffmpeg necessário para conversão de áudio (PTT WhatsApp Web / API Oficial)
+RUN apk add --no-cache ffmpeg
+
 COPY package.json package-lock.json* .npmrc ./
 RUN npm ci --omit=dev
 

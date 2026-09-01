@@ -81,7 +81,6 @@ import {
 import AddRounded from "@mui/icons-material/AddRounded";
 import { CameraAlt } from "@material-ui/icons";
 import Button from "@material-ui/core/Button";
-import MicRecorder from "mic-recorder-to-mp3";
 import clsx from "clsx";
 import { ReplyMessageContext } from "../../context/ReplyingMessage/ReplyingMessageContext";
 import { AuthContext } from "../../context/Auth/AuthContext";
@@ -120,14 +119,27 @@ import {
 } from "./messageInputComposerUtils";
 import inventoryService from "../../services/inventoryService";
 
+const getBestAudioFormat = () => {
+  const formats = [
+    "audio/ogg; codecs=opus",
+    "audio/webm; codecs=opus",
+    "audio/mp4",
+    "audio/wav"
+  ];
+  for (const format of formats) {
+    if (typeof MediaRecorder !== "undefined" && MediaRecorder.isTypeSupported(format)) {
+      return format;
+    }
+  }
+  return undefined;
+};
 
-const Mp3Recorder = new MicRecorder({
-  bitRate: 128,
-  sampleRate: 44100
-});
-
-const isMobileDevice = () => {
-  return /Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+const audioExtensionFromMime = (mimeType = "") => {
+  if (mimeType.includes("ogg")) return "ogg";
+  if (mimeType.includes("webm")) return "webm";
+  if (mimeType.includes("mp4") || mimeType.includes("m4a")) return "m4a";
+  if (mimeType.includes("wav")) return "wav";
+  return "mp3";
 };
 
 import {
@@ -1213,6 +1225,9 @@ const MessageInput = ({
   const [aiTranslateLang, setAiTranslateLang] = useState("pt-BR");
   const newMessageBoxRef = useRef(null);
   const sendingRef = useRef(false);
+  const mediaRecorderRef = useRef(null);
+  const audioChunksRef = useRef([]);
+  const recordingStreamRef = useRef(null);
   const [variableBar, setVariableBar] = useState(false);
   const [productsAnchor, setProductsAnchor] = useState(null);
   const [inventoryItems, setInventoryItems] = useState([]);
@@ -2489,15 +2504,70 @@ const MessageInput = ({
   const handleStartRecording = async () => {
     setLoading(true);
     try {
-      await navigator.mediaDevices.getUserMedia({ audio: true });
-      await Mp3Recorder.start();
+      const stream = await navigator.mediaDevices.getUserMedia({
+        audio: {
+          echoCancellation: true,
+          noiseSuppression: true,
+          channelCount: 1
+        }
+      });
+      recordingStreamRef.current = stream;
+      const mimeType = getBestAudioFormat();
+      const options = mimeType ? { mimeType } : {};
+      const recorder = new MediaRecorder(stream, options);
+      mediaRecorderRef.current = recorder;
+      audioChunksRef.current = [];
+
+      recorder.ondataavailable = (event) => {
+        if (event.data.size > 0) {
+          audioChunksRef.current.push(event.data);
+        }
+      };
+
+      recorder.start(100);
       setRecording(true);
-      setLoading(false);
     } catch (err) {
       toastError(err);
+    } finally {
       setLoading(false);
     }
   };
+
+  const stopRecordingStream = () => {
+    if (recordingStreamRef.current) {
+      recordingStreamRef.current.getTracks().forEach((track) => track.stop());
+      recordingStreamRef.current = null;
+    }
+  };
+
+  const finalizeRecordedBlob = () =>
+    new Promise((resolve, reject) => {
+      const recorder = mediaRecorderRef.current;
+      if (!recorder) {
+        reject(new Error("Gravador de áudio indisponível."));
+        return;
+      }
+
+      recorder.onstop = () => {
+        const finalMimeType = recorder.mimeType || "audio/ogg";
+        const blob = new Blob(audioChunksRef.current, { type: finalMimeType });
+        stopRecordingStream();
+        mediaRecorderRef.current = null;
+        audioChunksRef.current = [];
+        resolve(blob);
+      };
+
+      if (recorder.state !== "inactive") {
+        recorder.stop();
+      } else {
+        const finalMimeType = recorder.mimeType || "audio/ogg";
+        const blob = new Blob(audioChunksRef.current, { type: finalMimeType });
+        stopRecordingStream();
+        mediaRecorderRef.current = null;
+        audioChunksRef.current = [];
+        resolve(blob);
+      }
+    });
 
   useEffect(() => {
     const companyId = user.companyId;
@@ -2588,36 +2658,23 @@ const MessageInput = ({
     setLoading(false);
   };
 
-  // ✅ CORREÇÃO KISS: Apenas otimizar nome do arquivo para mobile
   const handleUploadAudio = async () => {
     setLoading(true);
     try {
-      const [, blob] = await Mp3Recorder.stop().getMp3();
-      if (blob.size < 10000) {
-        setLoading(false);
+      const blob = await finalizeRecordedBlob();
+      if (!blob || blob.size < 1000) {
         setRecording(false);
         return;
       }
 
       const formData = new FormData();
-
-      // ✅ CORREÇÃO: Nome do arquivo otimizado para mobile
-      let filename;
-      if (["whatsapp", "whatsapp_oficial"].includes(ticketChannel)) {
-        // Para WhatsApp, usar formato mais compatível com mobile
-        filename = isMobileDevice()
-          ? `audio_${new Date().getTime()}.ogg`  // OGG para mobile
-          : `audio_${new Date().getTime()}.mp3`; // MP3 para desktop
-      } else {
-        filename = `${new Date().getTime()}.m4a`;
-      }
+      const extension = audioExtensionFromMime(blob.type);
+      const filename = `audio_${new Date().getTime()}.${extension}`;
 
       formData.append("medias", blob, filename);
-      formData.append("body", "🎵 Mensagem de voz"); // ✅ Body mais claro
+      formData.append("body", "");
       formData.append("fromMe", true);
       formData.append("isPrivate", privateMessage ? "true" : "false");
-
-      console.log(`📤 Enviando áudio: ${filename} (${blob.size} bytes)`);
 
       if (isMounted.current) {
         await api.post(`/messages/${ticketId}`, formData);
@@ -2638,7 +2695,19 @@ const MessageInput = ({
 
   const handleCancelAudio = async () => {
     try {
-      await Mp3Recorder.stop().getMp3();
+      const recorder = mediaRecorderRef.current;
+      if (recorder && recorder.state !== "inactive") {
+        recorder.onstop = () => {
+          stopRecordingStream();
+          mediaRecorderRef.current = null;
+          audioChunksRef.current = [];
+        };
+        recorder.stop();
+      } else {
+        stopRecordingStream();
+        mediaRecorderRef.current = null;
+        audioChunksRef.current = [];
+      }
       setRecording(false);
     } catch (err) {
       toastError(err);

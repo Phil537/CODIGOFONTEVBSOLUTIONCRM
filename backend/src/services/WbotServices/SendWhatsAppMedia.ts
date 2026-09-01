@@ -10,8 +10,6 @@ import fs, { unlinkSync } from "fs";
 
 import path from "path";
 import ffmpeg from "fluent-ffmpeg";
-import ffmpegStatic from "ffmpeg-static";
-
 import AppError from "../../errors/AppError";
 import Ticket from "../../models/Ticket";
 import mime from "mime-types";
@@ -21,46 +19,34 @@ import CreateMessageService from "../MessageServices/CreateMessageService";
 import formatBody from "../../helpers/Mustache";
 import logger from "../../utils/logger";
 import { resolveOutboundJid } from "./getJidOf";
+import { configureFfmpeg } from "../../utils/resolveFfmpegPath";
+import { convertToMobileAudio, isAudio } from "../../utils/AudioUtils";
 
-ffmpeg.setFfmpegPath(ffmpegStatic!);
-
-(() => {
-  try {
-    const resolvedPath: string | undefined =
-      typeof ffmpegStatic === "string"
-        ? (ffmpegStatic as unknown as string)
-        : undefined;
-    if (resolvedPath) {
-      ffmpeg.setFfmpegPath(resolvedPath);
-    } else {
-      logger.warn(
-        "ffmpeg não encontrado via ffmpeg-static; usando PATH do sistema."
-      );
-    }
-  } catch (e) {
-    logger.warn({ e }, "Falha ao configurar ffmpeg; tentando PATH do SO");
-  }
-})();
+configureFfmpeg(ffmpeg);
 
 const convertToOggOpus = async (inputFile: string): Promise<string> => {
   const parsed = path.parse(inputFile);
-  const outputFile = path.join(parsed.dir, `${parsed.name}-${Date.now()}.ogg`);
-
-  await new Promise<void>((resolve, reject) => {
-    ffmpeg(inputFile)
-      .audioChannels(1)
-      .audioFrequency(16000)
-      .audioCodec("libopus")
-      .audioBitrate("18k")
-      .addOption(["-vbr", "off"])
-      .addOption(["-avoid_negative_ts", "make_zero"])
-      .format("ogg")
-      .on("end", () => resolve())
-      .on("error", err => reject(err))
-      .save(outputFile);
-  });
-
-  return outputFile;
+  const outputDir = parsed.dir;
+  try {
+    return await convertToMobileAudio(inputFile, outputDir);
+  } catch (err) {
+    logger.warn({ err, inputFile }, "convertToMobileAudio falhou, tentando conversão local");
+    const outputFile = path.join(parsed.dir, `${parsed.name}-${Date.now()}.ogg`);
+    await new Promise<void>((resolve, reject) => {
+      ffmpeg(inputFile)
+        .audioChannels(1)
+        .audioFrequency(16000)
+        .audioCodec("libopus")
+        .audioBitrate("32k")
+        .addOption(["-vbr", "off"])
+        .addOption(["-avoid_negative_ts", "make_zero"])
+        .format("ogg")
+        .on("end", () => resolve())
+        .on("error", convertErr => reject(convertErr))
+        .save(outputFile);
+    });
+    return outputFile;
+  }
 };
 
 const getMediaTypeFromMimeType = (mimetype: string): string => {
@@ -373,16 +359,40 @@ const SendWhatsAppMedia = async ({
         }
       };
       bodyTicket = "🎥 Arquivo de vídeo";
-    } else if (typeMessage === "audio" || realMimetype.includes("audio")) {
-      // ✅ CORREÇÃO: Tratamento específico para arquivos de áudio
+    } else if (typeMessage === "audio" || isAudio(realMimetype, media.originalname)) {
       let audioPath = pathMedia;
+      let audioMimetype = "audio/ogg; codecs=opus";
+      let audioBuffer: Buffer;
 
-      console.log("🔄 Convertendo áudio para OGG...");
-      audioPath = await convertToOggOpus(pathMedia);
+      const isAlreadyOgg =
+        pathMedia.toLowerCase().endsWith(".ogg") ||
+        realMimetype.includes("ogg") ||
+        realMimetype.includes("opus");
+
+      if (isAlreadyOgg) {
+        console.log("✅ Áudio já em OGG/Opus, enviando diretamente");
+        audioBuffer = fs.readFileSync(audioPath);
+      } else {
+        try {
+          console.log("🔄 Convertendo áudio para OGG/Opus...");
+          audioPath = await convertToOggOpus(pathMedia);
+          audioBuffer = fs.readFileSync(audioPath);
+        } catch (convertErr) {
+          logger.warn({ convertErr, pathMedia }, "Conversão OGG falhou; enviando áudio original");
+          audioBuffer = fs.readFileSync(pathMedia);
+          if (realMimetype.includes("mpeg") || pathMedia.toLowerCase().endsWith(".mp3")) {
+            audioMimetype = "audio/mpeg";
+          } else if (realMimetype.includes("webm")) {
+            audioMimetype = "audio/webm";
+          } else {
+            audioMimetype = realMimetype || "audio/mpeg";
+          }
+        }
+      }
 
       options = {
-        audio: fs.readFileSync(audioPath),
-        mimetype: "audio/ogg; codecs=opus",
+        audio: audioBuffer,
+        mimetype: audioMimetype,
         ptt: true,
         contextInfo: {
           forwardingScore: isForwarded ? 2 : 0,
@@ -390,7 +400,6 @@ const SendWhatsAppMedia = async ({
         }
       };
 
-      // Limpar arquivo convertido se necessário
       if (audioPath !== pathMedia && fs.existsSync(audioPath)) {
         fs.unlinkSync(audioPath);
       }

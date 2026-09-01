@@ -18,6 +18,7 @@ import Whatsapp from "../models/Whatsapp";
 import { verify } from "jsonwebtoken";
 import authConfig from "../config/auth";
 import path from "path";
+import mime from "mime-types";
 import { isNil, isNull } from "lodash";
 import { Mutex } from "async-mutex";
 
@@ -166,6 +167,12 @@ export const showMedia = async (req: Request, res: Response): Promise<Response> 
     throw new AppError("ERR_NO_MEDIA_FOUND", 404);
   }
 
+  const detectedMime = mime.lookup(mediaPath);
+  if (detectedMime) {
+    res.setHeader("Content-Type", detectedMime);
+    res.setHeader("Accept-Ranges", "bytes");
+  }
+
   return res.sendFile(mediaPath);
 };
 
@@ -273,7 +280,7 @@ export const store = async (req: Request, res: Response): Promise<Response> => {
               media,
               body: Array.isArray(body) ? body[index] : body,
               ticket,
-              type: null,
+              type: isAudioFile(media) ? 'audio' : null,
               quotedMsg
             })
           }

@@ -24,6 +24,8 @@ import { sendMessageWhatsAppOficial } from "../../libs/whatsAppOficial/whatsAppO
 import { IMetaMessageTemplate, IMetaMessageinteractive, IReturnMessageMeta, ISendMessageOficial } from "../../libs/whatsAppOficial/IWhatsAppOficial.interfaces";
 import CreateMessageService from "../MessageServices/CreateMessageService";
 import formatBody from "../../helpers/Mustache";
+import { isAudio } from "../../utils/AudioUtils";
+import mime from "mime-types";
 
 interface Request {
   body: string;
@@ -84,7 +86,16 @@ const SendWhatsAppOficialMessage = async ({
 
   const pathMedia = !!media ? media.path : null;
   let options: ISendMessageOficial = {} as ISendMessageOficial;
-  const typeMessage = !!media ? media.mimetype.split("/")[0] : null;
+  let resolvedMime = media?.mimetype || "";
+  if (media && (!resolvedMime || resolvedMime === "application/octet-stream")) {
+    const detected = mime.lookup(media.originalname || media.path || "");
+    if (detected) resolvedMime = detected;
+  }
+  const typeMessage = !!media
+    ? isAudio(resolvedMime, media.originalname || "")
+      ? "audio"
+      : resolvedMime.split("/")[0]
+    : null;
   let bodyTicket = "";
   let mediaType: string;
 
@@ -289,10 +300,14 @@ const SendWhatsAppOficialMessage = async ({
         }
         sendMessage = { idMessageWhatsApp: [messageId] };
       } else if (media && pathMedia && ["image", "video", "audio", "document"].includes(type)) {
+        const uploadMime =
+          resolvedMime && resolvedMime !== "application/octet-stream"
+            ? resolvedMime
+            : mime.lookup(media.originalname || media.path || "") || "audio/mpeg";
         const uploaded = await uploadMetaCloudMedia(
           wapp,
           pathMedia,
-          media.mimetype
+          uploadMime
         );
         const messageId = await sendMetaCloudMessageDirect({
           whatsapp: wapp,

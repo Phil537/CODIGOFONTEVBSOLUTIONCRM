@@ -6,11 +6,11 @@
 
 // src/utils/AudioUtils.ts
 import ffmpeg from "fluent-ffmpeg";
-import ffmpegStatic from "ffmpeg-static";
 import path from "path";
 import fs from "fs";
+import { configureFfmpeg } from "./resolveFfmpegPath";
 
-ffmpeg.setFfmpegPath(ffmpegStatic!);
+configureFfmpeg(ffmpeg);
 
 /**
  * ✅ CORREÇÃO KISS: Utilitário simples para áudio mobile
