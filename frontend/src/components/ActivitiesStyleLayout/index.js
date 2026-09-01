@@ -23,7 +23,15 @@ import {
 import PageHelpButton from '../PageHelpButton';
 import useAppTranslation from '../../hooks/useAppTranslation';
 import { getHelpTopicForPath } from '../../utils/pageHelpMap';
-import AppIcon from "../ui/AppIcon";
+import {
+  BRAND_BLUE_DARK,
+  BRAND_BLUE_MEDIUM,
+  BUTTON_SECONDARY_SOFT_BG,
+  TEXT_PRIMARY,
+  TEXT_SECONDARY,
+  TOPBAR_ICON,
+} from "../../constants/visualIdentity";
+import { relativeLuminance, hexToRgb } from "../../utils/colorContrast";
 import BrainPreviewMini from "../BrainPreviewMini";
 import {
   Plus,
@@ -47,22 +55,28 @@ const useStyles = makeStyles((theme) => {
   const pageBg = theme.palette.background.default;
   const textPrimary = theme.palette.text.primary;
   const textSecondary = theme.palette.text.secondary;
-  const mutedIcon = isDark ? '#a1a1aa' : '#9CA3AF';
-  const filterLabelColor = isDark ? 'rgba(255, 255, 255, 0.55)' : '#64748B';
+  const mutedIcon = isDark ? '#a1a1aa' : TOPBAR_ICON;
+  const filterLabelColor = isDark ? 'rgba(255, 255, 255, 0.72)' : TOPBAR_ICON;
   const tabHoverBg = isDark ? 'rgba(255, 255, 255, 0.06)' : 'rgba(0, 0, 0, 0.04)';
-  const tabActiveBg = isDark ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.04)';
+  const tabActiveBg = isDark ? 'rgba(255, 255, 255, 0.1)' : BUTTON_SECONDARY_SOFT_BG;
   const scrollHoverBg = isDark ? 'rgba(255, 255, 255, 0.08)' : 'rgba(0, 0, 0, 0.04)';
   const filterPillHover = isDark ? 'rgba(96,165,250,0.12)' : 'rgba(59,130,246,0.08)';
-  /** Abas: whitelabel "botões secundários" (pageTabsAccent), não os botões principais. */
-  const tabBrand =
+  /** Abas: whitelabel "botões secundários" (pageTabsAccent), com fallback se a cor for clara demais. */
+  const tabBrandRaw =
     theme.pageTabsAccent != null && theme.pageTabsAccent !== ''
       ? theme.pageTabsAccent
       : theme.palette.primary.main;
-  /** No escuro, azul escuro da marca some no fundo — texto das abas segue cor primária do texto. */
-  const navTabColor = isDark ? textPrimary : tabBrand;
+  const tabBrandTooLight =
+    !isDark &&
+    typeof tabBrandRaw === 'string' &&
+    relativeLuminance(hexToRgb(tabBrandRaw)) > 0.62;
+  const tabBrandAccent = tabBrandTooLight ? BRAND_BLUE_DARK : tabBrandRaw;
+  /** Modo claro: inativo cinza legível; ativo azul marca. Escuro: branco/cinza claro. */
+  const navTabInactiveColor = isDark ? 'rgba(255, 255, 255, 0.72)' : TEXT_SECONDARY;
+  const navTabActiveColor = isDark ? '#ffffff' : tabBrandAccent;
+  const navTabHoverColor = isDark ? '#ffffff' : TEXT_PRIMARY;
   /** Azul forte da topbar (modo escuro) para filtros ativos */
   const strongBlue = "#1e3a8a";
-  const strongBlueLight = "#60a5fa";
 
   return {
     root: {
@@ -125,8 +139,8 @@ const useStyles = makeStyles((theme) => {
     navTab: {
       textTransform: "none",
       fontSize: "0.875rem",
-      "&&": { fontWeight: 400 },
-      color: navTabColor,
+      "&&": { fontWeight: 500 },
+      color: `${navTabInactiveColor} !important`,
       minWidth: "auto",
       padding: theme.spacing(1, 2),
       paddingTop: theme.spacing(0.625),
@@ -141,7 +155,7 @@ const useStyles = makeStyles((theme) => {
       transition: 'all 0.15s ease',
       '&:hover': {
         backgroundColor: tabHoverBg,
-        color: navTabColor,
+        color: `${navTabHoverColor} !important`,
       },
     },
     navTabIcon: {
@@ -153,16 +167,16 @@ const useStyles = makeStyles((theme) => {
       marginRight: theme.spacing(1.25),
     },
     navTabActive: {
-      "&&": { fontWeight: 400 },
-      color: isDark ? "#f4f4f5" : navTabColor,
+      "&&": { fontWeight: 600 },
+      color: `${navTabActiveColor} !important`,
       backgroundColor: isDark ? `${strongBlue}30` : tabActiveBg,
       boxShadow: isDark
         ? "0 2px 4px rgba(0, 0, 0, 0.35)"
-        : "0 2px 4px rgba(15, 23, 42, 0.16)",
+        : `inset 0 0 0 1px ${BRAND_BLUE_MEDIUM}33`,
       border: "none",
       '&:hover': {
         backgroundColor: isDark ? `${strongBlue}40` : tabActiveBg,
-        color: isDark ? '#ffffff' : navTabColor,
+        color: `${navTabActiveColor} !important`,
       },
     },
     createButton: {
@@ -223,22 +237,22 @@ const useStyles = makeStyles((theme) => {
       flexShrink: 0,
     },
     filterInput: {
-      fontSize: "0.56rem",
+      fontSize: "0.75rem",
       color: textPrimary,
       fontWeight: 400,
       width: "100%",
-      lineHeight: 1,
+      lineHeight: 1.2,
       "& input": {
-        fontSize: "0.56rem",
-        lineHeight: 1,
+        fontSize: "0.75rem",
+        lineHeight: 1.2,
         padding: 0,
         minWidth: 0,
       },
       "& input::placeholder": {
         color: mutedIcon,
         opacity: 1,
-        fontSize: "0.56rem",
-        lineHeight: 1,
+        fontSize: "0.75rem",
+        lineHeight: 1.2,
         whiteSpace: "nowrap",
       },
     },
@@ -279,15 +293,15 @@ const useStyles = makeStyles((theme) => {
       },
     },
     filterLabel: {
-      fontSize: "0.5625rem",
+      fontSize: "0.75rem",
       color: filterLabelColor,
-      fontWeight: 400,
-      lineHeight: 1,
+      fontWeight: 500,
+      lineHeight: 1.2,
       opacity: 1,
       whiteSpace: "nowrap",
       letterSpacing: "-0.01em",
       [theme.breakpoints.down("sm")]: {
-        fontSize: "0.53125rem",
+        fontSize: "0.6875rem",
       },
     },
     chevronIcon: {
@@ -586,7 +600,6 @@ const ActivitiesStyleLayout = ({
                   const active = currentViewMode === mode.value;
                   return (
                     <Button
-                      color="inherit"
                       key={mode.value}
                       onClick={() => onViewModeChange && onViewModeChange(mode.value)}
                       className={`${classes.navTab} ${active ? classes.navTabActive : ''}`}
