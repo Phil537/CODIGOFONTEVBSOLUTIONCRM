@@ -37,6 +37,7 @@ import {
   dateInputToStartISO,
   dateInputToEndISO,
   validateDeadlineRange,
+  coerceToDate,
   DEFAULT_START_TIME,
   DEFAULT_END_TIME,
 } from "../../utils/deadlineDates";
@@ -274,7 +275,7 @@ const CreateEventDrawer = ({ open, onClose, onSave, initialDate, initialContactI
           // ignore
         }
       })();
-      const base = initialDate || new Date();
+      const base = coerceToDate(initialDate);
       let timeStart = toTimeInputValue(base, "start");
       let timeEnd = DEFAULT_END_TIME;
       if (base.getHours() !== 0 || base.getMinutes() !== 0) {

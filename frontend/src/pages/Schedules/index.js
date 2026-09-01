@@ -416,7 +416,11 @@ const Schedules = () => {
   };
 
   const handleOpenEventDrawer = (date) => {
-    setDrawerInitialDate(date || new Date());
+    const parsed =
+      date instanceof Date && !Number.isNaN(date.getTime())
+        ? date
+        : new Date();
+    setDrawerInitialDate(parsed);
     setEventDrawerOpen(true);
   };
 
@@ -765,7 +769,7 @@ const Schedules = () => {
           searchPlaceholder={i18n.t("contacts.searchPlaceholder")}
           searchValue={searchParam}
           onSearchChange={(val) => setSearchParam((val || "").toLowerCase())}
-          onCreateClick={handleOpenEventDrawer}
+          onCreateClick={() => handleOpenEventDrawer()}
           navActions={null}
           disableFilterBar
           hideHeaderDivider

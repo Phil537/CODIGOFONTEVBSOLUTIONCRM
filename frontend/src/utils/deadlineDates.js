@@ -7,6 +7,20 @@
 export const DEFAULT_START_TIME = "09:00";
 export const DEFAULT_END_TIME = "18:00";
 
+/** Garante um Date válido a partir de Date, ISO, timestamp ou retorna agora. */
+export const coerceToDate = (value, fallback = new Date()) => {
+  if (value instanceof Date && !Number.isNaN(value.getTime())) {
+    return value;
+  }
+  if (value != null && (typeof value === "string" || typeof value === "number")) {
+    const parsed = new Date(value);
+    if (!Number.isNaN(parsed.getTime())) return parsed;
+  }
+  return fallback instanceof Date && !Number.isNaN(fallback.getTime())
+    ? fallback
+    : new Date();
+};
+
 /** Converte ISO/Date para input type="date" (YYYY-MM-DD). */
 export const toDateInputValue = (value) => {
   if (!value) return "";
