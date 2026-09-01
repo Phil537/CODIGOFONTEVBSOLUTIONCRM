@@ -11,9 +11,9 @@
   --vb-crm-blue-dark: #1e3a8a;
   --vb-sidebar-bg: #0b1b3b;
   --vb-sidebar-active-bg: rgba(59, 130, 246, 0.32);
-  --vb-topbar-bg: #ffffff;
-  --vb-topbar-search: #f3f4f6;
-  --vb-topbar-icon: #374151;
+  --vb-topbar-bg: #0b1b3b;
+  --vb-topbar-search: rgba(255, 255, 255, 0.12);
+  --vb-topbar-icon: #ffffff;
   --vb-status-green: #22c55e;
   --vb-text-primary: #111827;
   --vb-text-secondary: #6b7280;
@@ -52,4 +52,7 @@
   --vb-border: rgba(255, 255, 255, 0.1);
   --vb-ash: #0f172a;
   --vb-surface: #1e293b;
+  --vb-topbar-bg: #2d2d2d;
+  --vb-topbar-search: rgba(255, 255, 255, 0.12);
+  --vb-topbar-icon: #ffffff;
 }

@@ -24,13 +24,15 @@ export const SIDEBAR_ACTIVE_TEXT = "#FFFFFF";
 export const SIDEBAR_ACTIVE_ICON = "#FFFFFF";
 
 /* ── Topbar ───────────────────────────────────────────────────── */
-/** Fundo: branco puro */
-export const TOPBAR_BG_LIGHT = "#FFFFFF";
-/** Barra de pesquisa: cinza bem claro */
-export const TOPBAR_SEARCH_BG = "#F3F4F6";
-export const TOPBAR_SEARCH_BORDER = "#E5E7EB";
-/** Ícones: cinza escuro / preto */
-export const TOPBAR_ICON = "#374151";
+/** Fundo: igual ao menu lateral (azul-marinho) */
+export const TOPBAR_BG_LIGHT = SIDEBAR_BG;
+/** Fundo modo escuro: igual ao menu lateral escuro */
+export const TOPBAR_BG_DARK = "#2D2D2D";
+/** Barra de pesquisa em topbar escura */
+export const TOPBAR_SEARCH_BG = "rgba(255, 255, 255, 0.12)";
+export const TOPBAR_SEARCH_BORDER = "rgba(255, 255, 255, 0.1)";
+/** Ícones em topbar escura */
+export const TOPBAR_ICON = "#FFFFFF";
 /** Status "Disponível" */
 export const TOPBAR_STATUS_GREEN = "#22C55E";
 

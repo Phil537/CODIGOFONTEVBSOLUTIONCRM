@@ -34,7 +34,6 @@ import {
 } from "../constants/brand";
 import {
   SIDEBAR_BG,
-  TOPBAR_BG_LIGHT,
   BRAND_BLUE,
   BRAND_BLUE_DARK,
   BRAND_BLUE_MEDIUM,
@@ -104,17 +103,28 @@ const DARK_BG_PAPER = "#3a3a3a";
 const DARK_BG_ELEVATED = "#454545";
 /** Cards de KPI / quadros no escuro: cinza escuro nítido */
 const DARK_DASHBOARD_CARD = "#48484b";
-/** Topbar padrão modo claro: branco puro */
-const LIGHT_TOPBAR_DEFAULT = TOPBAR_BG_LIGHT;
 /** Menu lateral padrão: azul-marinho bem escuro */
 const LIGHT_SIDEBAR_DEFAULT = SIDEBAR_BG;
+/** Topbar padrão: igual ao menu lateral */
+const LIGHT_TOPBAR_DEFAULT = LIGHT_SIDEBAR_DEFAULT;
 /** Marca / links / destaques */
 const BRAND_PRIMARY_DEFAULT = BRAND_BLUE;
 /** Botão principal (Enviar, FAB +) */
 const BUTTON_PRIMARY_DEFAULT = BUTTON_PRIMARY;
 
-/** Topbar padrão modo escuro: azul escuro forte e nítido */
-const DARK_TOPBAR_DEFAULT = BRAND_BLUE_DARK;
+/** Topbar padrão modo escuro: igual ao sidebar escuro */
+const DARK_TOPBAR_DEFAULT = DARK_BG_DEFAULT;
+
+/** Valores legados de topbar (antes do alinhamento com o sidebar) */
+const LEGACY_TOPBAR_LIGHT = new Set(["#FFFFFF", "#FFF"]);
+const LEGACY_TOPBAR_DARK = new Set(["#1E3A8A", BRAND_BLUE_DARK.toUpperCase()]);
+
+const resolveTopbarHex = (custom, sidebarEff, legacySet) => {
+  if (!custom || !isValidHex(custom)) return sidebarEff;
+  const normalized = custom.trim().toUpperCase();
+  if (legacySet.has(normalized)) return sidebarEff;
+  return custom;
+};
 
 const AppThemeRoot = ({ children }) => {
   const { user, isAuth } = useContext(AuthContext);
@@ -238,15 +248,27 @@ const AppThemeRoot = ({ children }) => {
     const brandLight = getSafeColor(primaryColorLight);
     const brandDark = getSafeColor(primaryColorDark);
 
-    /** Topbar: whitelabel ou branco (modo claro) / azul escuro (modo escuro) */
-    const topbarLightEff =
-      topbarColorLight && isValidHex(topbarColorLight)
-        ? getSafeColor(topbarColorLight)
-        : LIGHT_TOPBAR_DEFAULT;
-    const topbarDarkEff =
-      topbarColorDark && isValidHex(topbarColorDark)
-        ? getSafeColor(topbarColorDark)
-        : DARK_TOPBAR_DEFAULT;
+    /** Sidebar: whitelabel ou azul-marinho (claro) / cinza escuro (escuro) */
+    const sidebarLightEff =
+      sidebarColorLight && isValidHex(sidebarColorLight)
+        ? getSafeColor(sidebarColorLight)
+        : LIGHT_SIDEBAR_DEFAULT;
+    const sidebarDarkEff =
+      sidebarColorDark && isValidHex(sidebarColorDark)
+        ? getSafeColor(sidebarColorDark)
+        : DARK_BG_DEFAULT;
+
+    /** Topbar: whitelabel ou igual ao sidebar (claro e escuro) */
+    const topbarLightEff = resolveTopbarHex(
+      topbarColorLight,
+      sidebarLightEff,
+      LEGACY_TOPBAR_LIGHT
+    );
+    const topbarDarkEff = resolveTopbarHex(
+      topbarColorDark,
+      sidebarDarkEff,
+      LEGACY_TOPBAR_DARK
+    );
 
     /** Primária do sistema (links, abas, foco) — independente da topbar branca */
     const systemPrimaryLight = brandLight;
@@ -265,15 +287,6 @@ const AppThemeRoot = ({ children }) => {
 
     /** Abas e destaques de página: azul marca fixo no claro (sempre legível no fundo branco). */
     const pageTabsAccent = mode === "light" ? BRAND_BLUE_DARK : "#ffffff";
-    const sidebarLightEff =
-      sidebarColorLight && isValidHex(sidebarColorLight)
-        ? getSafeColor(sidebarColorLight)
-        : LIGHT_SIDEBAR_DEFAULT;
-    const sidebarDarkEff =
-      sidebarColorDark && isValidHex(sidebarColorDark)
-        ? getSafeColor(sidebarColorDark)
-        : DARK_BG_DEFAULT;
-
     const currentSidebarBg =
       mode === "light" ? sidebarLightEff : sidebarDarkEff;
     const sidebarCx = getSidebarContrast(currentSidebarBg);
@@ -1272,14 +1285,26 @@ const AppThemeRoot = ({ children }) => {
     const root = document.documentElement;
     const brandLight = getSafeColor(primaryColorLight);
     const brandDark = getSafeColor(primaryColorDark);
-    const topbarL =
-      topbarColorLight && isValidHex(topbarColorLight)
-        ? topbarColorLight
-        : LIGHT_TOPBAR_DEFAULT;
-    const topbarD =
-      topbarColorDark && isValidHex(topbarColorDark)
-        ? topbarColorDark
-        : DARK_TOPBAR_DEFAULT;
+    const sidebarLightEff =
+      sidebarColorLight && isValidHex(sidebarColorLight)
+        ? sidebarColorLight
+        : LIGHT_SIDEBAR_DEFAULT;
+    const sidebarDarkEff =
+      sidebarColorDark && isValidHex(sidebarColorDark)
+        ? sidebarColorDark
+        : DARK_BG_DEFAULT;
+    const topbarL = resolveTopbarHex(
+      topbarColorLight,
+      sidebarLightEff,
+      LEGACY_TOPBAR_LIGHT
+    );
+    const topbarD = resolveTopbarHex(
+      topbarColorDark,
+      sidebarDarkEff,
+      LEGACY_TOPBAR_DARK
+    );
+    const topbarBg = mode === "light" ? topbarL : topbarD;
+    const topbarIconColor = getContrastTextForBackground(topbarBg);
     const primaryUi = mode === "light" ? brandLight : brandDark;
     root.style.setProperty("--primaryColor", primaryUi);
     const btnBg =
@@ -1305,8 +1330,12 @@ const AppThemeRoot = ({ children }) => {
     root.style.setProperty("--vb-link", BRAND_BLUE_MEDIUM);
     root.style.setProperty("--vb-tag-bg", TAG_BG);
     root.style.setProperty("--vb-tag-text", TAG_TEXT);
-    root.style.setProperty("--vb-sidebar-bg", SIDEBAR_BG);
-    root.style.setProperty("--vb-topbar-bg", TOPBAR_BG_LIGHT);
+    root.style.setProperty(
+      "--vb-sidebar-bg",
+      mode === "light" ? sidebarLightEff : sidebarDarkEff
+    );
+    root.style.setProperty("--vb-topbar-bg", topbarBg);
+    root.style.setProperty("--vb-topbar-icon", topbarIconColor);
     root.style.colorScheme = mode === "dark" ? "dark" : "light";
     root.setAttribute("data-theme", mode === "dark" ? "dark" : "light");
     root.classList.toggle("dark", mode === "dark");
@@ -1315,6 +1344,8 @@ const AppThemeRoot = ({ children }) => {
     primaryColorDark,
     topbarColorLight,
     topbarColorDark,
+    sidebarColorLight,
+    sidebarColorDark,
     buttonPrimaryColorLight,
     buttonPrimaryColorDark,
     buttonPrimaryTextColorLight,
