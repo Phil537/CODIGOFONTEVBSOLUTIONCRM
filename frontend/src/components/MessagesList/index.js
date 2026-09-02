@@ -152,6 +152,9 @@ import { i18n } from "../../translate/i18n";
 import SelectMessageCheckbox from "./SelectMessageCheckbox";
 import useCompanySettings from "../../hooks/useSettings/companySettings";
 import { AuthContext } from "../../context/Auth/AuthContext";
+import {
+  TICKET_MESSAGES_REFRESH,
+} from "../../utils/ticketRealtime";
 import { QueueSelectedContext } from "../../context/QueuesSelected/QueuesSelectedContext";
 import AudioModal from "../AudioModal";
 import { CircularProgress } from "@material-ui/core";
@@ -1092,11 +1095,14 @@ const MessagesList = ({
         dispatch({ type: "DELETE_MESSAGE", payload: data.messageId });
       }
     }
-    if (!socket) {
+    if (!socket || typeof socket.on !== "function") {
       return;
     }
     socket.on("connect", connectEventMessagesList);
     socket.on(`company-${companyId}-appMessage`, onAppMessageMessagesList);
+    if (socket.connected) {
+      connectEventMessagesList();
+    }
 
     return () => {
       if (logsRefetchAfterAppMessageTimerRef.current) {
@@ -1115,6 +1121,44 @@ const MessagesList = ({
     };
 
   }, [ticketId, socket, user.companyId, refetchTicketLogs]);
+
+  useEffect(() => {
+    const numericTicketId = Number(ticketInternalIdRef.current || ticketInternalId);
+    const onRefresh = (event) => {
+      const targetId = event?.detail?.ticketId;
+      if (targetId == null) return;
+      if (
+        Number(targetId) !== numericTicketId &&
+        String(targetId) !== String(ticketId)
+      ) {
+        return;
+      }
+      setPageNumber(1);
+      dispatch({ type: "RESET" });
+      const fetchLatest = async () => {
+        if (isNil(ticketId) || ticketId === "undefined") return;
+        try {
+          const { data } = await api.get("/messages/" + ticketId, {
+            params: {
+              pageNumber: 1,
+              selectedQueues: JSON.stringify(selectedQueuesMessage),
+            },
+          });
+          dispatch({ type: "LOAD_MESSAGES", payload: data.messages || [] });
+          setHasMore(Boolean(data.hasMore));
+          currentTicketNumericId.current =
+            data?.ticket?.id ||
+            (data.messages?.[0]?.ticketId ?? currentTicketNumericId.current);
+          scrollToBottom();
+        } catch {
+          /* socket ou refetch posterior */
+        }
+      };
+      fetchLatest();
+    };
+    window.addEventListener(TICKET_MESSAGES_REFRESH, onRefresh);
+    return () => window.removeEventListener(TICKET_MESSAGES_REFRESH, onRefresh);
+  }, [ticketId, ticketInternalId, selectedQueuesMessage]);
 
   useEffect(() => {
     if (!socket || !ticketInternalId || String(ticketInternalId) === String(ticketId)) {

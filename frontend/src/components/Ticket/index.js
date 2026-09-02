@@ -28,6 +28,7 @@ import { TagsContainer } from "../TagsContainer";
 import { isNil } from 'lodash';
 import { EditMessageProvider } from "../../context/EditingMessage/EditingMessageContext";
 import { TicketsContext } from "../../context/Tickets/TicketsContext";
+import { emitTicketUpdated } from "../../utils/ticketRealtime";
 
 const drawerWidth = 320;
 
@@ -137,61 +138,57 @@ const Ticket = () => {
   }, [ticketId, user, history]);
 
   useEffect(() => {
-    if (!socket || !user?.companyId) {
-      return;
-    }
-    if (!ticket && !ticket.id && ticket.uuid !== ticketId && ticketId === "undefined") {
+    if (!socket || !user?.companyId || !ticket?.id) {
       return;
     }
 
-    if (user.companyId) {
-      //    const socket = socketManager.GetSocket();
+    const companyId = user.companyId;
 
-      const onConnectTicket = () => {
-        socket.emit("joinChatBox", `${ticket.id}`);
+    const onConnectTicket = () => {
+      socket.emit("joinChatBox", `${ticket.id}`);
+    };
+
+    const onCompanyTicket = (data) => {
+      if (data.action === "update" && data.ticket.id === ticket?.id) {
+        setTicket(data.ticket);
+        emitTicketUpdated(data.ticket);
+        const nextTab =
+          data.ticket.status === "group" ? "group" : data.ticket.status;
+        if (["pending", "open", "group", "closed"].includes(nextTab)) {
+          setTabOpen(nextTab);
+        }
       }
 
-      const onCompanyTicket = (data) => {
-        if (data.action === "update" && data.ticket.id === ticket?.id) {
-          setTicket(data.ticket);
-          const nextTab =
-            data.ticket.status === "group" ? "group" : data.ticket.status;
-          if (["pending", "open", "group", "closed"].includes(nextTab)) {
-            setTabOpen(nextTab);
+      if (data.action === "delete" && data.ticketId === ticket?.id) {
+        history.push("/tickets");
+      }
+    };
+
+    const onCompanyContactTicket = (data) => {
+      if (data.action === "update") {
+        setContact((prevState) => {
+          if (prevState.id === data.contact?.id) {
+            return { ...prevState, ...data.contact };
           }
-        }
+          return prevState;
+        });
+      }
+    };
 
-        if (data.action === "delete" && data.ticketId === ticket?.id) {
-          history.push("/tickets");
-        }
-      };
-
-      const onCompanyContactTicket = (data) => {
-        if (data.action === "update") {
-          // if (isMounted) {
-          setContact((prevState) => {
-            if (prevState.id === data.contact?.id) {
-              return { ...prevState, ...data.contact };
-            }
-            return prevState;
-          });
-          // }
-        }
-      };
-
-      socket.on("connect", onConnectTicket)
-      socket.on(`company-${companyId}-ticket`, onCompanyTicket);
-      socket.on(`company-${companyId}-contact`, onCompanyContactTicket);
-
-      return () => {
-
-        socket.emit("joinChatBoxLeave", `${ticket.id}`);
-        socket.off("connect", onConnectTicket);
-        socket.off(`company-${companyId}-ticket`, onCompanyTicket);
-        socket.off(`company-${companyId}-contact`, onCompanyContactTicket);
-      };
+    socket.on("connect", onConnectTicket);
+    socket.on(`company-${companyId}-ticket`, onCompanyTicket);
+    socket.on(`company-${companyId}-contact`, onCompanyContactTicket);
+    if (socket.connected) {
+      onConnectTicket();
     }
-  }, [socket, user?.companyId, ticketId, ticket, history]);
+
+    return () => {
+      socket.emit("joinChatBoxLeave", `${ticket.id}`);
+      socket.off("connect", onConnectTicket);
+      socket.off(`company-${companyId}-ticket`, onCompanyTicket);
+      socket.off(`company-${companyId}-contact`, onCompanyContactTicket);
+    };
+  }, [socket, user?.companyId, ticket?.id, ticketId, history, setTabOpen]);
 
   const handleDrawerOpen = useCallback(() => {
     setDrawerOpen(true);
@@ -204,6 +201,7 @@ const Ticket = () => {
   const handleTicketUpdated = useCallback((updatedTicket) => {
     if (!updatedTicket) return;
     setTicket(updatedTicket);
+    emitTicketUpdated(updatedTicket);
     const nextTab =
       updatedTicket.status === "group" ? "group" : updatedTicket.status;
     if (["pending", "open", "group", "closed"].includes(nextTab)) {

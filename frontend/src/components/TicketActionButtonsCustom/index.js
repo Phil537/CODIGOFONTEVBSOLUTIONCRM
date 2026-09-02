@@ -68,6 +68,7 @@ import ContactModal from "../ContactModal";
 import convertedLeadsService from "../../services/convertedLeadsService";
 import { renderAcceptedTicketGreeting } from "../../utils/variableUtils";
 import { buildAcceptTicketPayload } from "../../utils/acceptTicketPayload";
+import { emitTicketUpdated } from "../../utils/ticketRealtime";
 import {
   HELVETICA_NEUE,
   getTopbarMain,
@@ -630,6 +631,7 @@ const TicketActionButtonsCustom = ({
       if (onTicketUpdated && updatedTicket) {
         onTicketUpdated(updatedTicket);
       }
+      emitTicketUpdated(updatedTicket);
 
       if (isAccepting) {
         const nextTab = updatedTicket?.isGroup ? "group" : "open";
@@ -688,6 +690,7 @@ const TicketActionButtonsCustom = ({
           if (onTicketUpdated) {
             onTicketUpdated(updatedTicket);
           }
+          emitTicketUpdated(updatedTicket);
           if (isMounted.current) {
             setLoading(false);
             setTabOpen(nextTab);
@@ -698,6 +701,7 @@ const TicketActionButtonsCustom = ({
         if (onTicketUpdated) {
           onTicketUpdated(updatedTicket);
         }
+        emitTicketUpdated(updatedTicket);
         if (isMounted.current) {
           setLoading(false);
           setTabOpen(nextTab);
@@ -903,6 +907,10 @@ const TicketActionButtonsCustom = ({
       } else if (ticketData?.status === "closed") {
         setCurrentTicket({ id: null, code: null });
         history.push("/tickets");
+      }
+      if (data) {
+        if (onTicketUpdated) onTicketUpdated(data);
+        emitTicketUpdated(data);
       }
     } catch (err) {
       toastError(err);

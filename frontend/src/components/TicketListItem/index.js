@@ -41,6 +41,7 @@ import insatagramIcon from "../../assets/instagram.png";
 import whatsappIcon from "../../assets/whatsapp.png";
 import { TicketsContext } from "../../context/Tickets/TicketsContext";
 import { buildAcceptTicketPayload } from "../../utils/acceptTicketPayload";
+import { emitTicketUpdated } from "../../utils/ticketRealtime";
 import { getBackendUrl } from "../../config";
 import ConnectionIcon from "../ConnectionIcon";
 
@@ -384,6 +385,7 @@ const TicketListItem = ({ ticket }) => {
                 uuid: updatedTicket.uuid,
                 code: `#${nextTab}`,
             });
+            emitTicketUpdated(updatedTicket);
             history.push(`/tickets/${updatedTicket.uuid}`);
         } catch (err) {
             toastError(err);
@@ -408,6 +410,7 @@ const TicketListItem = ({ ticket }) => {
                 uuid: updatedTicket.uuid,
                 code: `#${nextTab}`,
             });
+            emitTicketUpdated(updatedTicket);
             history.push(`/tickets/${updatedTicket.uuid}`);
         } catch (err) {
             toastError(err);

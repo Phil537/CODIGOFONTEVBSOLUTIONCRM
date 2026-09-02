@@ -20,6 +20,33 @@ let io: SocketIO;
 
 import { getCorsAllowedOrigins } from "../utils/appUrlUtils";
 
+function resolveSocketHandshakeToken(raw: unknown): string | undefined {
+  const value = Array.isArray(raw) ? raw[0] : raw;
+  if (value == null) return undefined;
+  const str = String(value).trim();
+  if (!str) return undefined;
+  if (/^bearer\s+/i.test(str)) {
+    const jwt = str.replace(/^bearer\s+/i, "").trim();
+    return jwt || undefined;
+  }
+  return str;
+}
+
+function isAllowedSocketOrigin(origin: string): boolean {
+  const allowedEnv = getCorsAllowedOrigins();
+  if (allowedEnv.includes(origin)) return true;
+  if (/\.vercel\.app$/i.test(origin)) return true;
+  if (/\.railway\.app$/i.test(origin)) return true;
+  try {
+    const host = new URL(origin).hostname;
+    if (/\.evoluticrm\.com\.br$/i.test(host)) return true;
+    if (/^localhost$/i.test(host) || /^127\.0\.0\.1$/i.test(host)) return true;
+  } catch {
+    return false;
+  }
+  return false;
+}
+
 export const initIO = (httpServer: Server): SocketIO => {
   const allowedEnv = getCorsAllowedOrigins();
 
@@ -37,8 +64,7 @@ export const initIO = (httpServer: Server): SocketIO => {
         }
         if (
           allowedEnv.includes(origin) ||
-          /\.vercel\.app$/.test(origin) ||
-          /\.railway\.app$/.test(origin)
+          isAllowedSocketOrigin(origin)
         ) {
           return callback(null, true);
         }
@@ -81,7 +107,7 @@ export const initIO = (httpServer: Server): SocketIO => {
     const devNoDb = isDevNoDb();
 
     const token_api_oficial = process.env.TOKEN_API_OFICIAL || "";
-    const token = Array.isArray(socket?.handshake?.query?.token) ? socket.handshake.query.token[1] : socket?.handshake?.query?.token?.split(" ")[1];
+    const token = resolveSocketHandshakeToken(socket?.handshake?.query?.token);
 
     if (!token) {
       return socket.disconnect();

@@ -103,12 +103,7 @@ const useAuth = () => {
   const [isAuth, setIsAuth] = useState(false);
   const [loading, setLoading] = useState(true);
   const [user, setUser] = useState({ queues: [] });
-  const [socket, setSocket] = useState({
-    on: () => {},
-    off: () => {},
-    emit: () => {},
-    disconnect: () => {}
-  });
+  const [socket, setSocket] = useState(null);
   
   const listenersRef = useRef(new Set());
   const setIsAuthRef = useRef(setIsAuth);
@@ -347,7 +342,7 @@ const useAuth = () => {
         listenersRef.current.clear();
       }
     };
-  }, [user.id, user.companyId]); // Dependências específicas
+  }, [user.id, user.companyId, isAuth]); // Dependências específicas
 
   // Effect para buscar dados do usuário atual (skip se init já carregou)
   const userLoadedRef = useRef(false);

@@ -16,6 +16,7 @@ import TicketsListSkeleton from "../TicketsListSkeleton";
 import useTickets from "../../hooks/useTickets";
 import { i18n } from "../../translate/i18n";
 import { AuthContext } from "../../context/Auth/AuthContext";
+import { TICKET_UPDATED } from "../../utils/ticketRealtime";
 
 const useStyles = makeStyles((theme) => ({
     ticketsListWrapper: {
@@ -359,6 +360,10 @@ const TicketsListCustom = React.memo((props) => {
     }, [tickets, companyId, pageNumber, sortTickets]);
 
     useEffect(() => {
+        if (!socket || !companyId) {
+            return;
+        }
+
         const currentUser = userRef.current;
         const shouldUpdateTicket = ticket => {
             const sameUser =
@@ -420,15 +425,20 @@ const TicketsListCustom = React.memo((props) => {
                 });
             }
             // console.log(shouldUpdateTicket(data.ticket))
-            if (data.action === "update") {
-                if (ticketStatusMatchesTab(data.ticket.status, status) && shouldUpdateTicket(data.ticket)) {
+            if (data.action === "update" && data.ticket) {
+                const matchesTab = ticketStatusMatchesTab(
+                    data.ticket.status,
+                    status,
+                    data.ticket
+                );
+                if (matchesTab && shouldUpdateTicket(data.ticket)) {
                     dispatch({
                         type: "UPDATE_TICKET",
                         payload: data.ticket,
                         status: status,
                         sortDir: sortTickets
                     });
-                } else if (!(isMyOpenTicket(data.ticket) || keepOficialOpenTicket(data.ticket))) {
+                } else if (!matchesTab || !shouldUpdateTicket(data.ticket)) {
                     dispatch({
                         type: "DELETE_TICKET",
                         payload: data.ticket?.id,
@@ -532,12 +542,27 @@ const TicketsListCustom = React.memo((props) => {
             setRefreshNonce((n) => n + 1);
         }
 
+        if (!socket || typeof socket.on !== "function") {
+            return;
+        }
+
         socket.on("connect", onConnectTicketsList)
         socket.on(`company-${companyId}-ticket`, onCompanyTicketTicketsList);
         socket.on(`company-${companyId}-appMessage`, onCompanyAppMessageTicketsList);
         socket.on(`company-${companyId}-contact`, onCompanyContactTicketsList);
+        if (socket.connected) {
+            onConnectTicketsList();
+        }
+
+        const onTicketUpdatedLocal = (event) => {
+            const ticket = event?.detail?.ticket;
+            if (!ticket?.id) return;
+            onCompanyTicketTicketsList({ action: "update", ticket });
+        };
+        window.addEventListener(TICKET_UPDATED, onTicketUpdatedLocal);
 
         return () => {
+            window.removeEventListener(TICKET_UPDATED, onTicketUpdatedLocal);
             if (status) {
                 socket.emit("joinTicketsLeave", status);
             } else {

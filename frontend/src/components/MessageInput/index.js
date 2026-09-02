@@ -87,6 +87,7 @@ import { AuthContext } from "../../context/Auth/AuthContext";
 import { i18n } from "../../translate/i18n";
 import { toast } from "react-toastify";
 import toastError from "../../errors/toastError";
+import { emitTicketMessagesRefresh } from "../../utils/ticketRealtime";
 import api, { openApi } from "../../services/api";
 import RecordingTimer from "./RecordingTimer";
 
@@ -2190,6 +2191,7 @@ const MessageInput = ({
       if (isMounted.current) {
         const response = await api.post(`/messages/${ticketId}`, formData);
         console.log("✅ Upload realizado com sucesso:", response.status);
+        emitTicketMessagesRefresh(ticketId);
       }
     } catch (err) {
       console.error("❌ Erro no upload:", err);
@@ -2287,6 +2289,7 @@ const MessageInput = ({
 
     try {
       await api.post(`/messages/${ticketId}`, formData);
+      emitTicketMessagesRefresh(ticketId);
     } catch (err) {
       toastError(err);
     }
@@ -2320,6 +2323,7 @@ const MessageInput = ({
     };
     try {
       await api.post(`/messages/${ticketId}`, message);
+      emitTicketMessagesRefresh(ticketId);
     } catch (err) {
       toastError(err);
     }
@@ -2385,6 +2389,7 @@ const MessageInput = ({
       } else {
         await api.post(`/messages/${ticketId}`, message, sendConfig);
       }
+      emitTicketMessagesRefresh(ticketId);
       if (!isTicketPending()) {
         setPrivateMessage(false);
         setPrivateMessageInputVisible(false);
@@ -2651,6 +2656,7 @@ const MessageInput = ({
       formData.append("fromMe", true);
 
       await api.post(`/messages/${ticketId}`, formData);
+      emitTicketMessagesRefresh(ticketId);
     } catch (err) {
       toastError(err);
       setLoading(false);
@@ -2678,6 +2684,7 @@ const MessageInput = ({
 
       if (isMounted.current) {
         await api.post(`/messages/${ticketId}`, formData);
+        emitTicketMessagesRefresh(ticketId);
       }
     } catch (err) {
       toastError(err);

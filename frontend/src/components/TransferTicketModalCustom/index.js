@@ -34,6 +34,7 @@ import DialogTitle from "@material-ui/core/DialogTitle";
 import CircularProgress from "@material-ui/core/CircularProgress";
 
 import { i18n } from "../../translate/i18n";
+import { emitTicketUpdated } from "../../utils/ticketRealtime";
 import api from "../../services/api";
 import ButtonWithSpinner from "../ButtonWithSpinner";
 import toastError from "../../errors/toastError";
@@ -583,7 +584,10 @@ const TransferTicketModalCustom = ({ modalOpen, onClose, ticketid, ticket }) => 
         data.whatsappId = Number(selectedConnection);
       }
 
-      await api.put(`/tickets/${ticketid}`, data);
+      const { data: updatedTicket } = await api.put(`/tickets/${ticketid}`, data);
+      if (updatedTicket) {
+        emitTicketUpdated(updatedTicket);
+      }
       history.push(`/tickets/`);
       handleClose();
     } catch (err) {
