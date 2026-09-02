@@ -28,6 +28,7 @@ import { v4 as uuidv4 } from "uuid";
 
 import { i18n } from "../../translate/i18n";
 import api from "../../services/api";
+import { fetchTicketHasClosingTags } from "../../utils/ticketTagValidation";
 // import TicketOptionsMenu from "../TicketOptionsMenu";
 import ButtonWithSpinner from "../ButtonWithSpinner";
 import toastError from "../../errors/toastError";
@@ -425,14 +426,12 @@ const TicketActionButtonsCustom = ({
     });
 
     if (setting?.requiredTag === "enabled") {
-      //verificar se tem uma tag
       try {
-        const contactTags = await api.get(`/contactTags/${ticket.contact.id}`);
-        if (!contactTags.data.tags) {
+        const hasTags = await fetchTicketHasClosingTags(api, ticket);
+        if (!hasTags) {
           toast.warning(i18n.t("messagesList.header.buttons.requiredTag"));
         } else {
           setOpen(true);
-          // handleUpdateTicketStatus(e, "closed", user?.id);
         }
       } catch (err) {
         toastError(err);

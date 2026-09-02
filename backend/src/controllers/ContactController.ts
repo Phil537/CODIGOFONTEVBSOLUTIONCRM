@@ -59,6 +59,7 @@ import DeleteAllContactsService from "../services/ContactServices/DeleteAllConta
 import GetDefaultWhatsApp from "../helpers/GetDefaultWhatsApp";
 import Tag from "../models/Tag";
 import ContactTag from "../models/ContactTag";
+import TicketTag from "../models/TicketTag";
 import logger from "../utils/logger";
 import {createWalletContactUser} from "../services/ContactServices/CreateWalletContactUser";
 import User from "../models/User";
@@ -636,17 +637,22 @@ export const getContactTags = async (
   req: Request,
   res: Response
 ): Promise<Response> => {
-  const {contactId} = req.params;
+  const { contactId } = req.params;
+  const { ticketId } = req.query;
 
-  const contactTags = await FindContactTags({contactId});
+  const contactTags = await FindContactTags({ contactId });
 
-  let tags = false;
-
-  if (contactTags.length > 0) {
-    tags = true;
+  let hasTicketTags = false;
+  if (ticketId) {
+    const ticketTags = await TicketTag.findAll({
+      where: { ticketId: Number(ticketId) }
+    });
+    hasTicketTags = ticketTags.length > 0;
   }
 
-  return res.status(200).json({tags: tags});
+  const tags = contactTags.length > 0 || hasTicketTags;
+
+  return res.status(200).json({ tags });
 };
 
 export const toggleDisableBot = async (

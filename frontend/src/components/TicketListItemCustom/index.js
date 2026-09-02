@@ -34,6 +34,7 @@ import { getBackendUrl } from "../../config";
 
 import GroupIcon from "@material-ui/icons/Group";
 import ContactTag from "../ContactTag";
+import { fetchTicketHasClosingTags } from "../../utils/ticketTagValidation";
 import NotionTag from "../ui/NotionTag";
 import ConnectionIcon from "../ConnectionIcon";
 import AcceptTicketWithouSelectQueue from "../AcceptTicketWithoutQueueModal";
@@ -641,12 +642,9 @@ const TicketListItemCustom = ({ setTabOpen, ticket, compact = false }) => {
       };
 
       if (setting.requiredTag === "enabled") {
-        //verificar se tem uma tag
         try {
-          const contactTags = await api.get(
-            `/contactTags/${ticket.contact.id}`
-          );
-          if (!contactTags.data.tags) {
+          const hasTags = await fetchTicketHasClosingTags(api, ticket);
+          if (!hasTags) {
             toast.warning(i18n.t("messagesList.header.buttons.requiredTag"));
           } else {
             const { data } = await api.put(`/tickets/${id}`, closePayload);
