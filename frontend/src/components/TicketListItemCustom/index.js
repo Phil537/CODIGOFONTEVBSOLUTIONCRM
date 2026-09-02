@@ -34,7 +34,6 @@ import { getBackendUrl } from "../../config";
 
 import GroupIcon from "@material-ui/icons/Group";
 import ContactTag from "../ContactTag";
-import { fetchTicketHasClosingTags } from "../../utils/ticketTagValidation";
 import NotionTag from "../ui/NotionTag";
 import ConnectionIcon from "../ConnectionIcon";
 import AcceptTicketWithouSelectQueue from "../AcceptTicketWithoutQueueModal";
@@ -629,11 +628,6 @@ const TicketListItemCustom = ({ setTabOpen, ticket, compact = false }) => {
       handleSelectTicket(ticket);
       history.push(`/tickets/${ticket.uuid}`);
     } else {
-      // Comportamento original
-      const setting = await getSetting({
-        column: "requiredTag",
-      });
-
       const closePayload = {
         status: "closed",
         userId: user?.id || null,
@@ -641,44 +635,20 @@ const TicketListItemCustom = ({ setTabOpen, ticket, compact = false }) => {
         amountUsedBotQueues: 0,
       };
 
-      if (setting.requiredTag === "enabled") {
-        try {
-          const hasTags = await fetchTicketHasClosingTags(api, ticket);
-          if (!hasTags) {
-            toast.warning(i18n.t("messagesList.header.buttons.requiredTag"));
-          } else {
-            const { data } = await api.put(`/tickets/${id}`, closePayload);
-
-            if (isMounted.current) {
-              setLoading(false);
-            }
-
-            if (data?.status === "closed") {
-              setTabOpen("closed");
-            }
-            setCurrentTicket({ id: null, code: null });
-            history.push(`/tickets/`);
-          }
-        } catch (err) {
-          setLoading(false);
-          toastError(err);
+      setLoading(true);
+      try {
+        const { data } = await api.put(`/tickets/${id}`, closePayload);
+        if (data?.status === "closed") {
+          setTabOpen("closed");
         }
-      } else {
-        setLoading(true);
-        try {
-          const { data } = await api.put(`/tickets/${id}`, closePayload);
-          if (data?.status === "closed") {
-            setTabOpen("closed");
-          }
-          setCurrentTicket({ id: null, code: null });
-        } catch (err) {
-          toastError(err);
-        }
+        setCurrentTicket({ id: null, code: null });
+        history.push(`/tickets/`);
+      } catch (err) {
+        toastError(err);
+      } finally {
         if (isMounted.current) {
           setLoading(false);
         }
-
-        history.push(`/tickets/`);
       }
     }
   };
