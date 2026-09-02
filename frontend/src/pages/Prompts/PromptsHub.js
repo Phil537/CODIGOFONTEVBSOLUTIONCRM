@@ -33,11 +33,7 @@ import AnthropicAgentEditor from "./components/AnthropicAgentEditor";
 import ClaudeAgentIcon from "./components/ClaudeAgentIcon";
 import useAnthropicIntegration from "../../hooks/useAnthropicIntegration";
 import { mergeImportedAgentJson } from "./defaultAgentV2";
-import {
-  buildSalesTestAgentExport,
-  SALES_TEST_AGENT_NAME
-} from "./constants/salesTestAgentPreset";
-import { Bot, UserPlus, Braces, ShoppingBag } from "lucide-react";
+import { Bot, UserPlus, Braces } from "lucide-react";
 import useAppTranslation from "../../hooks/useAppTranslation";
 
 const HUB_TAB_AGENTES = "agentes";
@@ -249,7 +245,6 @@ export default function PromptsHub() {
   const anthropicHook = useAnthropicIntegration();
   const [createChoiceOpen, setCreateChoiceOpen] = useState(false);
   const [importJsonOpen, setImportJsonOpen] = useState(false);
-  const [creatingSalesTest, setCreatingSalesTest] = useState(false);
   const [hubTab, setHubTab] = useState(HUB_TAB_AGENTES);
   const importJsonInputRef = useRef(null);
   const companyId = user?.companyId;
@@ -379,52 +374,6 @@ export default function PromptsHub() {
     } catch (err) {
       const msg = err?.message || "Não foi possível ler o JSON.";
       toast.error(msg);
-    }
-  };
-
-  const loadAgentIntegrationDefaults = async () => {
-    let apiKey = "";
-    let model = "gpt-5.5";
-    try {
-      const { data } = await api.get("/settings/agent_integration");
-      if (data?.value) {
-        const v = typeof data.value === "string" ? JSON.parse(data.value) : data.value;
-        apiKey = v.apiKey || "";
-        model = v.model || model;
-      }
-    } catch {
-      /* ignore */
-    }
-    return { apiKey, model };
-  };
-
-  const handleCreateSalesTestAgent = async () => {
-    setCreateChoiceOpen(false);
-    setCreatingSalesTest(true);
-    try {
-      const { apiKey, model } = await loadAgentIntegrationDefaults();
-      const merged = mergeImportedAgentJson(buildSalesTestAgentExport(), { apiKey, model });
-
-      if (!String(merged.integration?.apiKey || "").trim()) {
-        toast.info("Revise o agente e salve após configurar Open IA em Integrações.");
-        history.push({ pathname: "/prompts/create", state: { importedAgent: merged } });
-        return;
-      }
-
-      const payload = { ...merged, schemaVersion: 2 };
-      const { data } = await api.post("/prompt", payload);
-      const newId = data?.id ?? data?.promptId;
-      toast.success(`"${SALES_TEST_AGENT_NAME}" criado com sucesso.`);
-      await refreshAgents();
-      if (newId != null) {
-        history.push(`/prompts/create/${newId}`);
-      } else {
-        history.push({ pathname: "/prompts", state: { tab: HUB_TAB_AGENTES } });
-      }
-    } catch (err) {
-      toastError(err);
-    } finally {
-      setCreatingSalesTest(false);
     }
   };
 
@@ -620,26 +569,6 @@ export default function PromptsHub() {
                   </Typography>
                   <Typography variant="caption" style={{ fontSize: 12, opacity: 0.7, marginTop: 3, lineHeight: 1.45 }}>
                     {t("modules.prompts.createAgentHint")}
-                  </Typography>
-                </Box>
-              </Box>
-            </ListItem>
-            <ListItem
-              button
-              className={classes.modalOption}
-              disabled={creatingSalesTest}
-              onClick={handleCreateSalesTestAgent}
-            >
-              <Box className={classes.modalActionRow}>
-                <Box className={classes.modalActionIconCell}>
-                  <ShoppingBag size={20} strokeWidth={1.55} color="#22c55e" style={{ opacity: 0.92 }} />
-                </Box>
-                <Box className={classes.modalActionTextCell}>
-                  <Typography style={{ fontWeight: 600, fontSize: 14, letterSpacing: "-0.015em", lineHeight: 1.35 }}>
-                    Agente de Vendas (teste)
-                  </Typography>
-                  <Typography variant="caption" style={{ fontSize: 12, opacity: 0.7, marginTop: 3, lineHeight: 1.45 }}>
-                    Cria um agente básico com todas as abas preenchidas para testar em tickets.
                   </Typography>
                 </Box>
               </Box>
