@@ -67,7 +67,7 @@ import useAppTranslation from "../hooks/useAppTranslation";
 import { Campaign, ShapeLine } from "@mui/icons-material";
 
 import useCompanySettings from "../hooks/useSettings/companySettings";
-import { SIDEBAR_BG } from "../constants/visualIdentity";
+import { SIDEBAR_BG, SIDEBAR_ACTIVE_BG } from "../constants/visualIdentity";
 
 /** Ícones com menu aberto. */
 const SIDEBAR_ICON_SIZE = 15;
@@ -166,6 +166,7 @@ const useStyles = makeStyles((theme) => ({
         : `calc(100% - ${SIDEBAR_ITEM_INSET_X * 2}px)`,
     alignItems: "center",
     boxSizing: "border-box",
+    color: "#ffffff !important",
     "& .MuiListItemIcon-root": {
       minWidth: (props) =>
         props.collapsed
@@ -177,27 +178,20 @@ const useStyles = makeStyles((theme) => ({
       marginRight: "0 !important",
       justifyContent: "center",
       alignItems: "center",
+      color: "#ffffff !important",
     },
     "&:hover $iconSlot": {
-      color: theme.palette.sidebarMenuIsDarkLogo
-        ? "#ffffff"
-        : theme.mode === "dark"
-          ? theme.palette.sidebarMenuHoverAccent
-          : "rgba(0, 0, 0, 0.72)",
+      color: "#ffffff !important",
     },
     "&:hover $listItemText": {
-      color: theme.palette.sidebarMenuIsDarkLogo
-        ? "#ffffff"
-        : theme.mode === "dark"
-          ? "rgba(245, 245, 250, 0.92)"
-          : "rgba(0, 0, 0, 0.72)",
+      color: "#ffffff !important",
       fontWeight: 300,
     },
     "&:hover": {
-      backgroundColor: theme.palette.sidebarMenuItemHoverBg,
+      backgroundColor: "rgba(255, 255, 255, 0.08) !important",
     },
     transition: "background-color 0.15s ease, color 0.15s ease",
-    justifyContent: props => props.collapsed ? "center" : "flex-start", // Centraliza o conteúdo se colapsado
+    justifyContent: props => props.collapsed ? "center" : "flex-start",
   },
 
   moreItem: {
@@ -212,6 +206,7 @@ const useStyles = makeStyles((theme) => ({
     "& .MuiListItemText-primary": {
       textAlign: "center",
       width: "100%",
+      color: "#ffffff !important",
     },
   },
 
@@ -226,23 +221,15 @@ const useStyles = makeStyles((theme) => ({
   },
 
   listItemActive: {
-    backgroundColor: theme.palette.sidebarMenuItemActiveBg,
+    backgroundColor: `${SIDEBAR_ACTIVE_BG} !important`,
     boxShadow: "none",
     borderRadius: 8,
     "& $listItemText": {
-      color:
-        theme.palette.sidebarMenuActiveText ||
-        (theme.palette.sidebarMenuIsDarkLogo
-          ? "#ffffff"
-          : "rgba(0, 0, 0, 0.78)"),
+      color: "#ffffff !important",
       fontWeight: 500,
     },
     "& $iconSlot": {
-      color:
-        theme.palette.sidebarMenuActiveIcon ||
-        (theme.palette.sidebarMenuIsDarkLogo
-          ? "#ffffff"
-          : "rgba(0, 0, 0, 0.78)"),
+      color: "#ffffff !important",
     },
   },
 
@@ -257,13 +244,14 @@ const useStyles = makeStyles((theme) => ({
   listItemTextSubmenu: {
     "& .MuiListItemText-primary": {
       paddingLeft: "8px !important",
+      color: "#ffffff !important",
     },
   },
 
   listItemText: {
     fontSize: "10.5px !important",
     lineHeight: `${SIDEBAR_ITEM_H}px !important`,
-    color: theme.palette.sidebarMenuTextPrimary,
+    color: "#ffffff !important",
     transition: "color 0.15s ease",
     fontWeight: 400,
     fontFamily:
@@ -287,7 +275,7 @@ const useStyles = makeStyles((theme) => ({
     alignItems: "center",
     justifyContent: "center",
     flexShrink: 0,
-    color: theme.palette.sidebarMenuIcon,
+    color: "#ffffff !important",
   },
 
   iconSlot: {
@@ -298,7 +286,7 @@ const useStyles = makeStyles((theme) => ({
       props.collapsed ? SIDEBAR_ICON_SIZE_COLLAPSED : SIDEBAR_ICON_SIZE,
     height: (props) =>
       props.collapsed ? SIDEBAR_ICON_SIZE_COLLAPSED : SIDEBAR_ICON_SIZE,
-    color: "inherit",
+    color: "#ffffff !important",
     lineHeight: 0,
     flexShrink: 0,
     "& svg": {
@@ -308,6 +296,7 @@ const useStyles = makeStyles((theme) => ({
         props.collapsed ? SIDEBAR_ICON_SIZE_COLLAPSED : SIDEBAR_ICON_SIZE,
       height: (props) =>
         props.collapsed ? SIDEBAR_ICON_SIZE_COLLAPSED : SIDEBAR_ICON_SIZE,
+      stroke: "currentColor",
     },
     "& svg:not([data-openai])": {
       fill: "none",
@@ -329,7 +318,7 @@ const useStyles = makeStyles((theme) => ({
     minWidth: 12,
     height: SIDEBAR_ITEM_H,
     flexShrink: 0,
-    color: theme.palette.sidebarMenuTextSecondary,
+    color: "rgba(255, 255, 255, 0.78) !important",
   },
 
   badge: {
@@ -344,8 +333,7 @@ const useStyles = makeStyles((theme) => ({
   },
 
   submenuContainer: {
-    backgroundColor:
-      theme.mode === "light" ? "rgba(0, 0, 0, 0.02)" : "transparent",
+    backgroundColor: "transparent !important",
   },
 
   customTooltip: {
@@ -363,16 +351,16 @@ const useStyles = makeStyles((theme) => ({
   versionContainer: {
     textAlign: "center",
     padding: "10px",
-    color: theme.palette.sidebarMenuTextSecondary,
+    color: "rgba(255, 255, 255, 0.78) !important",
     fontSize: "12px",
     fontWeight: 300,
-    borderTop: `1px solid ${theme.palette.divider}`,
+    borderTop: "1px solid rgba(255, 255, 255, 0.12)",
     marginTop: "auto",
   },
 
   adminSection: {
     "& .MuiListSubheader-root": {
-      color: theme.palette.sidebarMenuTextSecondary,
+      color: "rgba(255, 255, 255, 0.78) !important",
       fontSize: "0.875rem",
       fontWeight: 300,
       textTransform: "uppercase",

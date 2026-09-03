@@ -92,24 +92,6 @@ const drawerWidth = 210;
 const appBarHeight = 32;
 
 const useStyles = makeStyles((theme) => {
-  const topbarLight = theme.topbarIsLight === true;
-  const drawerBg =
-    theme.palette &&
-    theme.palette.sidebarMenuBackground &&
-    String(theme.palette.sidebarMenuBackground).length >= 4
-      ? theme.palette.sidebarMenuBackground
-      : SIDEBAR_BG;
-  const sidebarIsDark =
-    typeof theme.palette?.sidebarMenuIsDarkLogo === "boolean"
-      ? theme.palette.sidebarMenuIsDarkLogo
-      : true;
-  const sidebarIcon = theme.palette?.sidebarMenuIcon || "#FFFFFF";
-  const sidebarText = theme.palette?.sidebarMenuTextPrimary || "#FFFFFF";
-  const navIcon = topbarLight
-    ? TOPBAR_ICON
-    : theme.navbarAccent != null && theme.navbarAccent !== ""
-      ? theme.navbarAccent
-      : "rgba(255, 255, 255, 0.9)";
   return {
   root: {
     display: "flex",
@@ -190,14 +172,12 @@ const useStyles = makeStyles((theme) => {
     position: "relative",
     paddingRight: 16,
     paddingLeft: 8,
-    color: topbarLight ? TOPBAR_ICON : theme.palette.dark.main,
-    background: theme.palette.barraSuperior,
+    color: "#ffffff !important",
+    background: `${SIDEBAR_BG} !important`,
     backdropFilter: "saturate(180%) blur(8px)",
     WebkitBackdropFilter: "saturate(180%) blur(8px)",
     boxShadow: "none",
-    borderBottom: topbarLight
-      ? `1px solid ${TOPBAR_SEARCH_BORDER}`
-      : "1px solid rgba(255, 255, 255, 0.08)",
+    borderBottom: "1px solid rgba(255, 255, 255, 0.08)",
     transition: "width 0.2s ease, margin 0.2s ease",
     minHeight: `${appBarHeight}px`,
     height: `${appBarHeight}px`,
@@ -205,12 +185,10 @@ const useStyles = makeStyles((theme) => {
       padding: 6,
       margin: "0 3px",
       borderRadius: 6,
-      color: navIcon,
+      color: "#ffffff !important",
       transition: "background-color 0.15s ease",
       "&:hover": {
-        backgroundColor: topbarLight
-          ? "rgba(0, 0, 0, 0.06)"
-          : "rgba(255, 255, 255, 0.1)",
+        backgroundColor: "rgba(255, 255, 255, 0.1)",
       },
     },
   },
@@ -225,7 +203,7 @@ const useStyles = makeStyles((theme) => {
     alignItems: "center",
     justifyContent: "center",
     boxSizing: "border-box",
-    color: `${navIcon} !important`,
+    color: "#ffffff !important",
     "& .MuiSvgIcon-root": {
       fontSize: "14px !important",
       width: "14px !important",
@@ -257,7 +235,7 @@ const useStyles = makeStyles((theme) => {
     minHeight: "126px",
     boxSizing: "border-box",
     overflow: "hidden",
-    backgroundColor: drawerBg,
+    backgroundColor: `${SIDEBAR_BG} !important`,
     transition: "all 0.3s ease",
     marginTop: 0,
     marginBottom: 0,
@@ -273,36 +251,26 @@ const useStyles = makeStyles((theme) => {
     top: 4,
     right: 8,
     padding: 2,
-    color: sidebarIcon,
+    color: "#ffffff !important",
     "& svg": {
       fontSize: "0.9rem",
     },
     [theme.breakpoints.down("sm")]: {
-      display: "none", // Esconde em mobile
+      display: "none",
     },
   },
 
   search: {
     position: "relative",
     borderRadius: 6,
-    backgroundColor: topbarLight
-      ? TOPBAR_SEARCH_BG
-      : "rgba(255, 255, 255, 0.12)",
-    border: topbarLight
-      ? `1px solid ${TOPBAR_SEARCH_BORDER}`
-      : "1px solid rgba(255, 255, 255, 0.1)",
+    backgroundColor: "rgba(255, 255, 255, 0.12)",
+    border: "1px solid rgba(255, 255, 255, 0.1)",
     "&:hover": {
-      backgroundColor: topbarLight
-        ? "#ECEEF1"
-        : "rgba(255, 255, 255, 0.18)",
+      backgroundColor: "rgba(255, 255, 255, 0.18)",
     },
     "&:focus-within": {
-      backgroundColor: topbarLight
-        ? TOPBAR_SEARCH_BG
-        : "rgba(255, 255, 255, 0.2)",
-      borderColor: topbarLight
-        ? "#D1D5DB"
-        : "rgba(255, 255, 255, 0.2)",
+      backgroundColor: "rgba(255, 255, 255, 0.2)",
+      borderColor: "rgba(255, 255, 255, 0.2)",
     },
     marginRight: theme.spacing(1.5),
     marginLeft: 0,
@@ -317,7 +285,6 @@ const useStyles = makeStyles((theme) => {
     alignItems: "center",
     display: "flex",
   },
-  /** Pesquisa dentro do cluster central (sem flexGrow, largura fixa). */
   searchCentered: {
     flexGrow: 0,
     marginLeft: 0,
@@ -337,7 +304,7 @@ const useStyles = makeStyles((theme) => {
     display: "flex",
     alignItems: "center",
     justifyContent: "center",
-    color: navIcon,
+    color: "#ffffff !important",
     "& .MuiSvgIcon-root": {
       fontSize: 16,
       width: 16,
@@ -351,15 +318,14 @@ const useStyles = makeStyles((theme) => {
   },
   inputInput: {
     padding: theme.spacing(1, 1, 1, 0),
-    // vertical padding + font size from searchIcon
-    paddingLeft: `calc(1em + ${theme.spacing(2)}px)`, // Ajustado padding
+    paddingLeft: `calc(1em + ${theme.spacing(2)}px)`,
     transition: theme.transitions.create('width'),
     width: '100%',
-    color: topbarLight ? TOPBAR_ICON : navIcon,
+    color: "#ffffff !important",
     "&::placeholder": {
-        color: topbarLight ? "#9CA3AF" : navIcon,
-        opacity: topbarLight ? 1 : 0.75,
-        fontSize: "0.8rem", // Placeholder menor
+        color: "rgba(255, 255, 255, 0.75)",
+        opacity: 1,
+        fontSize: "0.8rem",
     }
   },
 
@@ -370,13 +336,11 @@ const useStyles = makeStyles((theme) => {
       duration: theme.transitions.duration.leavingScreen,
     }),
     height: `${appBarHeight}px`,
-    backgroundColor: theme.palette.barraSuperior,
+    backgroundColor: `${SIDEBAR_BG} !important`,
     color: "inherit",
   },
 
   appBarShift: {
-    // marginLeft: drawerWidth, // REMOVIDO PARA OCUPAR LARGURA TOTAL
-    // width: `calc(100% - ${drawerWidth}px)`, // REMOVIDO
     width: "100%",
     transition: theme.transitions.create(["width", "margin"], {
       easing: theme.transitions.easing.sharp,
@@ -393,7 +357,6 @@ const useStyles = makeStyles((theme) => {
     right: 0,
     left: theme.spacing(7),
     backgroundColor: theme.palette.background.paper,
-    // borderBottom: "1px solid rgba(0, 0, 0, 0.12)", // Removed
     zIndex: theme.zIndex.drawer + 1,
     transition: theme.transitions.create(["width", "margin", "left"], {
       easing: theme.transitions.easing.sharp,
@@ -452,27 +415,45 @@ const useStyles = makeStyles((theme) => {
     overflowY: "hidden",
     display: "flex",
     flexDirection: "column",
-    backgroundColor: drawerBg,
-    borderRight: sidebarIsDark
-      ? "1px solid rgba(255, 255, 255, 0.08)"
-      : `1px solid ${theme.palette.divider}`,
+    backgroundColor: `${SIDEBAR_BG} !important`,
+    color: "#ffffff !important",
+    borderRight: "1px solid rgba(255, 255, 255, 0.08)",
     boxShadow: "none",
     top: `${appBarHeight}px`,
     height: `calc(100% - ${appBarHeight}px)`,
     marginTop: 0,
     paddingTop: 0,
-    ...(drawerBg
-      ? {
-          borderRadius: "0 10px 10px 0",
-          borderRight: `1px solid ${theme.palette.divider}`,
-        }
-      : {}),
+    borderRadius: "0 10px 10px 0",
+    /** OVERRIDES GLOBAIS: força fundo escuro no paper e todos os filhos
+     *  relevantes do MENU LATERAL. Usa seletores específicos para não
+     *  impactar outros Drawers (modais) do sistema.
+     */
+    "&, &.MuiDrawer-paper, &.MuiPaper-root": {
+      backgroundColor: `${SIDEBAR_BG} !important`,
+      color: "#ffffff !important",
+    },
     "& .MuiList-root": {
       paddingTop: 4,
       paddingBottom: 4,
+      backgroundColor: "transparent !important",
+      color: "#ffffff !important",
+    },
+    "& .MuiListItem-root": {
+      color: "#ffffff !important",
+    },
+    "& .MuiListItemIcon-root": {
+      color: "#ffffff !important",
+      minWidth: 40,
+    },
+    "& .MuiListItemText-root, & .MuiListItemText-primary, & .MuiTypography-root": {
+      color: "#ffffff !important",
     },
     "& .MuiDivider-root": {
       margin: "6px 8px",
+      backgroundColor: "rgba(255, 255, 255, 0.12) !important",
+    },
+    "& .MuiCollapse-wrapper, & .MuiCollapse-wrapperInner, & .MuiCollapse-root": {
+      backgroundColor: "transparent !important",
     },
   },
 
@@ -484,8 +465,11 @@ const useStyles = makeStyles((theme) => {
       duration: theme.transitions.duration.leavingScreen,
     }),
     width: theme.spacing(6),
-    [theme.breakpoints.up("sm")]: {
-      width: theme.spacing(6),
+    backgroundColor: `${SIDEBAR_BG} !important`,
+    color: "#ffffff !important",
+    "&, &.MuiDrawer-paper, &.MuiPaper-root": {
+      backgroundColor: `${SIDEBAR_BG} !important`,
+      color: "#ffffff !important",
     },
     "& .MuiListItem-root": {
       justifyContent: "center",
@@ -493,6 +477,7 @@ const useStyles = makeStyles((theme) => {
       paddingRight: "0 !important",
       marginLeft: "auto",
       marginRight: "auto",
+      color: "#ffffff !important",
     },
     "& .MuiListItemIcon-root": {
       minWidth: "100% !important",
@@ -501,10 +486,20 @@ const useStyles = makeStyles((theme) => {
       marginLeft: "0 !important",
       justifyContent: "center",
       alignItems: "center",
+      color: "#ffffff !important",
     },
     "& .MuiListItemIcon-root > span": {
       marginLeft: "auto",
       marginRight: "auto",
+    },
+    "& .MuiListItemText-root, & .MuiTypography-root, & .MuiListItemText-primary": {
+      color: "#ffffff !important",
+    },
+    "& .MuiDivider-root": {
+      backgroundColor: "rgba(255, 255, 255, 0.12) !important",
+    },
+    [theme.breakpoints.up("sm")]: {
+      width: theme.spacing(6),
     },
   },
 
