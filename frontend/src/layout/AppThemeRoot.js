@@ -97,8 +97,8 @@ const isValidHex = (color) => {
 /** Fundos neutros (sem tom marrom); primária continua vinda do whitelabel */
 const LIGHT_BG_DEFAULT = "#f5f5f5";
 const LIGHT_BG_PAPER = "#ffffff";
-/** Faixa de filtros / chrome interno (modo claro) — cinza mais escuro para diferenciar do fundo padrão */
-const LIGHT_CHROME_SURFACE = "#e5e7eb";
+/** Faixa de filtros / chrome interno (modo claro) — branco */
+const LIGHT_CHROME_SURFACE = "#ffffff";
 /** Modo escuro: sem preto puro, tudo cinzas escuros (mais escuros, mais nítidos) */
 const DARK_BG_DEFAULT = "#2d2d2d";
 const DARK_BG_PAPER = "#3a3a3a";
@@ -261,16 +261,22 @@ const AppThemeRoot = ({ children }) => {
         : DARK_BG_DEFAULT;
 
     /** Topbar: whitelabel ou igual ao sidebar (claro e escuro) */
-    const topbarLightEff = resolveTopbarHex(
+    let topbarLightEff = resolveTopbarHex(
       topbarColorLight,
       sidebarLightEff,
       LEGACY_TOPBAR_LIGHT
     );
-    const topbarDarkEff = resolveTopbarHex(
+    let topbarDarkEff = resolveTopbarHex(
       topbarColorDark,
       sidebarDarkEff,
       LEGACY_TOPBAR_DARK
     );
+
+    /** Sidebar SEMPRE com a mesma cor da topbar (todo o menu fica com a cor da topbar) */
+    const sidebarLightEffFinal = topbarLightEff;
+    const sidebarDarkEffFinal = topbarDarkEff;
+    topbarLightEff = sidebarLightEffFinal;
+    topbarDarkEff = sidebarDarkEffFinal;
 
     /** Primária do sistema (links, abas, foco) — independente da topbar branca */
     const systemPrimaryLight = brandLight;
@@ -290,7 +296,7 @@ const AppThemeRoot = ({ children }) => {
     /** Abas e destaques de página: azul marca fixo no claro (sempre legível no fundo branco). */
     const pageTabsAccent = mode === "light" ? BRAND_BLUE_DARK : "#ffffff";
     const currentSidebarBg =
-      mode === "light" ? sidebarLightEff : sidebarDarkEff;
+      mode === "light" ? sidebarLightEffFinal : sidebarDarkEffFinal;
     const sidebarCx = getSidebarContrast(currentSidebarBg);
 
     const primaryButtonBgLight =
@@ -409,7 +415,7 @@ const AppThemeRoot = ({ children }) => {
             barraSuperior:
               mode === "light" ? topbarLightEff : topbarDarkEff,
             sidebarMenuBackground:
-              mode === "light" ? sidebarLightEff : sidebarDarkEff,
+              mode === "light" ? sidebarLightEffFinal : sidebarDarkEffFinal,
             /** Menu lateral: textos sempre legíveis; ícones seguem botões. */
             sidebarMenuTextPrimary: sidebarCx.isDark
               ? sidebarCx.textPrimary
@@ -1361,7 +1367,11 @@ const AppThemeRoot = ({ children }) => {
       sidebarDarkEff,
       LEGACY_TOPBAR_DARK
     );
+    /** Sidebar sempre com cor da topbar — alinhamento visual */
+    const sidebarBgLightFinal = topbarL;
+    const sidebarBgDarkFinal = topbarD;
     const topbarBg = mode === "light" ? topbarL : topbarD;
+    const sidebarBgCss = mode === "light" ? sidebarBgLightFinal : sidebarBgDarkFinal;
     const topbarIconColor = getContrastTextForBackground(topbarBg);
     const primaryUi = mode === "light" ? brandLight : brandDark;
     root.style.setProperty("--primaryColor", primaryUi);
@@ -1390,7 +1400,7 @@ const AppThemeRoot = ({ children }) => {
     root.style.setProperty("--vb-tag-text", TAG_TEXT);
     root.style.setProperty(
       "--vb-sidebar-bg",
-      mode === "light" ? sidebarLightEff : sidebarDarkEff
+      sidebarBgCss
     );
     root.style.setProperty("--vb-topbar-bg", topbarBg);
     root.style.setProperty("--vb-topbar-icon", topbarIconColor);

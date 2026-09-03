@@ -54,8 +54,8 @@ const useStyles = makeStyles((theme) => {
   const pageBg = theme.palette.background.default;
   const textPrimary = theme.palette.text.primary;
   const textSecondary = theme.palette.text.secondary;
-  const mutedIcon = isDark ? '#a1a1aa' : TEXT_SECONDARY;
-  const filterLabelColor = isDark ? 'rgba(255, 255, 255, 0.72)' : TEXT_SECONDARY;
+  const mutedIcon = isDark ? '#a1a1aa' : "#000000";
+  const filterLabelColor = isDark ? 'rgba(255, 255, 255, 0.72)' : "#000000";
   const tabHoverBg = isDark ? 'rgba(255, 255, 255, 0.06)' : 'rgba(0, 0, 0, 0.04)';
   const tabActiveBg = isDark ? 'rgba(255, 255, 255, 0.1)' : BUTTON_SECONDARY_SOFT_BG;
   const scrollHoverBg = isDark ? 'rgba(255, 255, 255, 0.08)' : 'rgba(0, 0, 0, 0.04)';
