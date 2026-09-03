@@ -19,8 +19,19 @@ import { makeStyles } from "@material-ui/core/styles";
 import { Close as CloseIcon, Add as AddIcon, DeleteOutline as DeleteOutlineIcon } from "@material-ui/icons";
 import DragIndicatorIcon from "@material-ui/icons/DragIndicator";
 import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
+import { TEXT_SECONDARY } from "../../constants/visualIdentity";
 
-const useStyles = makeStyles((theme) => ({
+const useStyles = makeStyles((theme) => {
+  const isDark = theme.palette.type === "dark";
+  const textPrimary = isDark ? "#ffffff" : "#111827";
+  const textSecondary = isDark ? "rgba(255, 255, 255, 0.82)" : "#374151";
+  const captionColor = isDark ? "rgba(255, 255, 255, 0.78)" : "#1f2937";
+  const borderColor = isDark ? "rgba(255, 255, 255, 0.14)" : "#d1d5db";
+  const handleColor = isDark ? "#d1d5db" : "#4b5563";
+  const paperBg = isDark ? "#3a3a3a" : "#ffffff";
+  const removeBtnColor = isDark ? "#fca5a5" : "#b91c1c";
+
+  return {
   drawerPaper: {
     width: 420,
     maxWidth: "100%",
@@ -32,13 +43,16 @@ const useStyles = makeStyles((theme) => ({
     marginRight: theme.spacing(2),
     overflow: "hidden",
     overflowX: "hidden",
+    backgroundColor: paperBg,
+    color: textPrimary,
+    border: isDark ? "1px solid rgba(255,255,255,0.08)" : "1px solid rgba(15,23,42,0.08)",
   },
   header: {
     display: "flex",
     alignItems: "center",
     justifyContent: "center",
     position: "relative",
-    borderBottom: "1px solid #eee",
+    borderBottom: `1px solid ${borderColor}`,
     paddingBottom: theme.spacing(2),
     marginBottom: theme.spacing(2),
   },
@@ -73,17 +87,55 @@ const useStyles = makeStyles((theme) => ({
     alignItems: "center",
     justifyContent: "center",
     cursor: "grab",
-    color: "#6B7280"
+    color: handleColor,
   },
   colorInput: {
     width: 28,
     height: 28,
     padding: 0,
-    border: "1px solid #E5E7EB",
+    border: `1px solid ${borderColor}`,
     borderRadius: "50%",
     background: "transparent",
   },
-}));
+  caption: {
+    color: captionColor,
+    fontWeight: 600,
+    fontSize: 13,
+  },
+  title: {
+    color: textPrimary,
+    fontWeight: 600,
+  },
+  removeBtn: {
+    color: removeBtnColor,
+    minWidth: 72,
+    fontSize: 12,
+    fontWeight: 600,
+  },
+  stageInput: {
+    '& .MuiOutlinedInput-root .MuiOutlinedInput-notchedOutline': {
+      borderColor: borderColor,
+    },
+    '& .MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline': {
+      borderColor: isDark ? 'rgba(255,255,255,0.3)' : '#2563EB',
+    },
+    '& .MuiInputBase-input': {
+      color: textPrimary,
+      fontSize: 14,
+    },
+    '& .MuiInputLabel-root': {
+      color: textSecondary,
+      fontSize: 13,
+    },
+    '& .MuiInputLabel-root.Mui-focused': {
+      color: textPrimary,
+    },
+  },
+  selectNative: {
+    color: textPrimary,
+  },
+  };
+});
 
 const randomId = () => `${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 7)}`;
 const slug = (txt) =>
@@ -230,13 +282,13 @@ export default function PipelineDrawer({
         <IconButton className={classes.closeButton} onClick={onClose} size="small">
           <CloseIcon />
         </IconButton>
-        <Typography variant="h6">{title}</Typography>
+        <Typography variant="h6" className={classes.title}>{title}</Typography>
         <div style={{ width: 30 }} />
       </Box>
       <Box className={classes.content}>
         <Grid container spacing={1}>
           <Grid item xs={12}>
-            <Typography variant="caption" style={{ color: "#374151" }}>Nova Pipeline</Typography>
+            <Typography variant="caption" className={classes.caption}>Nova Pipeline</Typography>
           </Grid>
           <Grid item xs={8}>
             <TextField
@@ -250,11 +302,12 @@ export default function PipelineDrawer({
                 const v = e.target.value;
                 setCurrentId(/^\d+$/.test(v) ? Number(v) : v);
               }}
+              className={classes.stageInput}
               InputLabelProps={{ style: { fontSize: 13 } }}
-              inputProps={{ style: { fontSize: 14 } }}
+              inputProps={{ style: { fontSize: 14 }, className: classes.selectNative }}
             >
               {localPipes.map(p => (
-                <option key={p.id} value={p.id}>{p.name}</option>
+                <option key={p.id} value={p.id} style={{ color: '#111827', background: '#ffffff' }}>{p.name}</option>
               ))}
             </TextField>
           </Grid>
@@ -287,6 +340,7 @@ export default function PipelineDrawer({
               size="small"
               value={current?.name || ""}
               onChange={(e) => updateCurrent({ name: e.target.value })}
+              className={classes.stageInput}
               InputLabelProps={{ style: { fontSize: 13 } }}
               inputProps={{ style: { fontSize: 14 } }}
             />
@@ -294,7 +348,7 @@ export default function PipelineDrawer({
         </Grid>
         <Divider style={{ marginTop: 8, marginBottom: 8 }} />
         <Box>
-          <Typography variant="caption" style={{ color: "#374151" }}>Escolha suas Etapas</Typography>
+          <Typography variant="caption" className={classes.caption}>Escolha suas Etapas</Typography>
           <Box style={{ display: "flex", flexDirection: "column", gap: 8, marginTop: 8 }}>
             <DragDropContext onDragEnd={handleDragEnd}>
               <Droppable droppableId="pipeline-stages">
@@ -326,10 +380,11 @@ export default function PipelineDrawer({
                               fullWidth
                               value={st.label}
                               onChange={(e) => handleStageChange(idx, "label", e.target.value)}
+                              className={classes.stageInput}
                               InputLabelProps={{ style: { fontSize: 13 } }}
                               inputProps={{ style: { fontSize: 14 } }}
                             />
-                            <Button size="small" onClick={() => handleRemoveStage(st.uid || st.key)}>Remover</Button>
+                            <Button size="small" onClick={() => handleRemoveStage(st.uid || st.key)} className={classes.removeBtn}>Remover</Button>
                           </div>
                         )}
                       </Draggable>

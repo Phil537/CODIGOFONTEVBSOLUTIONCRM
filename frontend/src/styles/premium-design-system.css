@@ -218,6 +218,38 @@ a,
   opacity: 1 !important;
 }
 
+/* Faixa de filtros — cinza visível no modo claro, diferenciado do fundo */
+:root[data-theme="light"] [class*="filterBar"],
+:root:not([data-theme="dark"]):not(.dark) [class*="filterBar"] {
+  background-color: #e5e7eb !important;
+  border-top: 1px solid #d1d5db !important;
+  border-bottom: 1px solid #d1d5db !important;
+}
+
+:root[data-theme="light"] [class*="filterBar"] [class*="filterLabel"],
+:root[data-theme="light"] [class*="filterBar"] [class*="chevronIcon"],
+:root[data-theme="light"] [class*="filterBar"] [class*="calendarIcon"],
+:root[data-theme="light"] [class*="filterBar"] [class*="funnelIcon"],
+:root:not([data-theme="dark"]):not(.dark) [class*="filterBar"] [class*="filterLabel"],
+:root:not([data-theme="dark"]):not(.dark) [class*="filterBar"] [class*="chevronIcon"],
+:root:not([data-theme="dark"]):not(.dark) [class*="filterBar"] [class*="calendarIcon"],
+:root:not([data-theme="dark"]):not(.dark) [class*="filterBar"] [class*="funnelIcon"] {
+  color: #374151 !important;
+  font-weight: 500 !important;
+}
+
+:root[data-theme="light"] [class*="filterBar"] [class*="filterInput"] .MuiInputBase-input,
+:root[data-theme="light"] [class*="filterBar"] [class*="filterInput"] input,
+:root:not([data-theme="dark"]):not(.dark) [class*="filterBar"] [class*="filterInput"] .MuiInputBase-input,
+:root:not([data-theme="dark"]):not(.dark) [class*="filterBar"] [class*="filterInput"] input {
+  color: #111827 !important;
+}
+
+:root[data-theme="light"] [class*="filterBar"] [class*="filterInput"] input::placeholder,
+:root:not([data-theme="dark"]):not(.dark) [class*="filterBar"] [class*="filterInput"] input::placeholder {
+  color: #6b7280 !important;
+}
+
 .MuiListItem-root {
   font-family: var(--premium-font) !important;
 }
@@ -268,9 +300,36 @@ a,
   color: var(--premium-ink);
 }
 
+:root[data-theme="dark"] .MuiTypography-h1,
+:root[data-theme="dark"] .MuiTypography-h2,
+:root[data-theme="dark"] .MuiTypography-h3,
+:root[data-theme="dark"] .MuiTypography-h4,
+:root[data-theme="dark"] .MuiTypography-h5,
+:root[data-theme="dark"] .MuiTypography-h6,
+:root[style*="color-scheme: dark"] .MuiTypography-h1,
+:root[style*="color-scheme: dark"] .MuiTypography-h2,
+:root[style*="color-scheme: dark"] .MuiTypography-h3,
+:root[style*="color-scheme: dark"] .MuiTypography-h4,
+:root[style*="color-scheme: dark"] .MuiTypography-h5,
+:root[style*="color-scheme: dark"] .MuiTypography-h6,
+.dark .MuiTypography-h1,
+.dark .MuiTypography-h2,
+.dark .MuiTypography-h3,
+.dark .MuiTypography-h4,
+.dark .MuiTypography-h5,
+.dark .MuiTypography-h6 {
+  color: #ffffff !important;
+}
+
 .MuiTypography-h6 {
   font-weight: 600 !important;
   font-size: 0.875rem !important;
+}
+
+:root[data-theme="dark"] .MuiTypography-h6,
+:root[style*="color-scheme: dark"] .MuiTypography-h6,
+.dark .MuiTypography-h6 {
+  color: #ffffff !important;
 }
 
 /* Saudação do dashboard Início — fina, Helvetica Neue */
@@ -335,6 +394,55 @@ a,
 .dark *::-webkit-scrollbar-track,
 :root[style*="color-scheme: dark"] *::-webkit-scrollbar-track {
   background: rgba(255,255,255,0.06);
+}
+
+/* ========== Light Mode: Drawers & Modals (painéis laterais / formulários) ========== */
+:root[data-theme="light"] .MuiDrawer-paper:not(.logged-in-layout .MuiDrawer-paper),
+:root:not([data-theme="dark"]):not(.dark) .MuiDrawer-paper {
+  background-color: #ffffff !important;
+  color: #111827 !important;
+}
+
+:root[data-theme="light"] .MuiDialog-paper,
+:root:not([data-theme="dark"]):not(.dark) .MuiDialog-paper {
+  background-color: #ffffff !important;
+  color: #111827 !important;
+}
+
+:root[data-theme="light"] .MuiDrawer-paper .MuiTypography-root,
+:root[data-theme="light"] .MuiDialog-paper .MuiTypography-root,
+:root:not([data-theme="dark"]):not(.dark) .MuiDrawer-paper .MuiTypography-root,
+:root:not([data-theme="dark"]):not(.dark) .MuiDialog-paper .MuiTypography-root {
+  color: inherit;
+}
+
+:root[data-theme="light"] .MuiDrawer-paper .MuiOutlinedInput-root,
+:root[data-theme="light"] .MuiDialog-paper .MuiOutlinedInput-root,
+:root:not([data-theme="dark"]):not(.dark) .MuiDrawer-paper .MuiOutlinedInput-root,
+:root:not([data-theme="dark"]):not(.dark) .MuiDialog-paper .MuiOutlinedInput-root {
+  color: #111827 !important;
+  background-color: #ffffff !important;
+}
+
+:root[data-theme="light"] .MuiDrawer-paper .MuiInputBase-input,
+:root[data-theme="light"] .MuiDialog-paper .MuiInputBase-input,
+:root:not([data-theme="dark"]):not(.dark) .MuiDrawer-paper .MuiInputBase-input,
+:root:not([data-theme="dark"]):not(.dark) .MuiDialog-paper .MuiInputBase-input {
+  color: #111827 !important;
+}
+
+:root[data-theme="light"] .MuiDrawer-paper .MuiInputLabel-root,
+:root[data-theme="light"] .MuiDialog-paper .MuiInputLabel-root,
+:root:not([data-theme="dark"]):not(.dark) .MuiDrawer-paper .MuiInputLabel-root,
+:root:not([data-theme="dark"]):not(.dark) .MuiDialog-paper .MuiInputLabel-root {
+  color: #6b7280 !important;
+}
+
+:root[data-theme="light"] .MuiDrawer-paper .MuiOutlinedInput-notchedOutline,
+:root[data-theme="light"] .MuiDialog-paper .MuiOutlinedInput-notchedOutline,
+:root:not([data-theme="dark"]):not(.dark) .MuiDrawer-paper .MuiOutlinedInput-notchedOutline,
+:root:not([data-theme="dark"]):not(.dark) .MuiDialog-paper .MuiOutlinedInput-notchedOutline {
+  border-color: #e5e7eb !important;
 }
 
 /* ========== Dark Mode: Drawers & Modals ========== */

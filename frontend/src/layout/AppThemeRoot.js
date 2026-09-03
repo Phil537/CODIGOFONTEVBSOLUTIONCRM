@@ -97,6 +97,8 @@ const isValidHex = (color) => {
 /** Fundos neutros (sem tom marrom); primária continua vinda do whitelabel */
 const LIGHT_BG_DEFAULT = "#f5f5f5";
 const LIGHT_BG_PAPER = "#ffffff";
+/** Faixa de filtros / chrome interno (modo claro) — cinza mais escuro para diferenciar do fundo padrão */
+const LIGHT_CHROME_SURFACE = "#e5e7eb";
 /** Modo escuro: sem preto puro, tudo cinzas escuros (mais escuros, mais nítidos) */
 const DARK_BG_DEFAULT = "#2d2d2d";
 const DARK_BG_PAPER = "#3a3a3a";
@@ -438,7 +440,7 @@ const AppThemeRoot = ({ children }) => {
             sidebarMenuIsDarkLogo: sidebarCx.isDark,
             /** Navbar secundária, faixa de filtros e cabeçalho Activities — alinhado ao menu lateral no escuro */
             chromeSurface:
-              mode === "light" ? LIGHT_BG_PAPER : DARK_BG_DEFAULT,
+              mode === "light" ? LIGHT_CHROME_SURFACE : DARK_BG_DEFAULT,
             /** Área dos dashboards no escuro: preto; cards usam dashboardCard */
             dashboardCanvas:
               mode === "light" ? LIGHT_BG_DEFAULT : DARK_BG_PAPER,
@@ -537,33 +539,46 @@ const AppThemeRoot = ({ children }) => {
                   fontFamily: PREMIUM_FONT_FAMILY,
                   fontWeight: 400,
                 },
-                // Labels e bordas em Modais (Drawer/Dialog)
+                // Labels e bordas em Modais (Drawer/Dialog) — sempre contrastantes
                 ".MuiDrawer-paper .MuiFormLabel-root, .MuiDialog-paper .MuiFormLabel-root, .MuiDrawer-paper .MuiInputLabel-root, .MuiDialog-paper .MuiInputLabel-root": {
-                  color: mode === "light" ? "#000" : "#e4e4e7",
-                  fontWeight: 400,
+                  color: mode === "light" ? TEXT_PRIMARY : "#e4e4e7",
+                  fontWeight: 500,
                   textTransform: "none",
                   fontSize: "13px"
                 },
                 ".MuiDrawer-paper .MuiOutlinedInput-root .MuiOutlinedInput-notchedOutline, .MuiDialog-paper .MuiOutlinedInput-root .MuiOutlinedInput-notchedOutline": {
                   borderColor:
-                    mode === "light" ? "#E5E7EB" : "rgba(255, 255, 255, 0.12)",
+                    mode === "light" ? "#d1d5db" : "rgba(255, 255, 255, 0.12)",
                   borderWidth: "1px"
                 },
                 ".MuiDrawer-paper .MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline, .MuiDialog-paper .MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline": {
                   borderColor:
-                    mode === "light" ? "#E5E7EB" : "rgba(255, 255, 255, 0.12)",
+                    mode === "light" ? `${systemPrimaryLight}aa` : "rgba(255, 255, 255, 0.28)",
                   borderWidth: "1px",
                   boxShadow: "none"
                 },
                 ".MuiDrawer-paper .MuiOutlinedInput-root:hover .MuiOutlinedInput-notchedOutline, .MuiDialog-paper .MuiOutlinedInput-root:hover .MuiOutlinedInput-notchedOutline": {
                   borderColor:
-                    mode === "light" ? "#E5E7EB" : "rgba(255, 255, 255, 0.16)"
+                    mode === "light" ? "#9ca3af" : "rgba(255, 255, 255, 0.18)"
                 },
                 ".MuiDrawer-paper .MuiSelect-root, .MuiDialog-paper .MuiSelect-root, .MuiDrawer-paper .MuiInputBase-input, .MuiDialog-paper .MuiInputBase-input": {
-                  color: mode === "light" ? "rgba(0, 0, 0, 0.87)" : "#f4f4f5"
+                  color: mode === "light" ? TEXT_PRIMARY : "#f4f4f5"
+                },
+                ".MuiDrawer-paper .MuiInputBase-input::placeholder, .MuiDialog-paper .MuiInputBase-input::placeholder": {
+                  color: mode === "light" ? "#6b7280" : "rgba(255, 255, 255, 0.5)",
+                  opacity: 1,
+                },
+                ".MuiDrawer-paper, .MuiDialog-paper": {
+                  color: mode === "light" ? TEXT_PRIMARY : "#ffffff",
+                },
+                ".MuiDrawer-paper .MuiTypography-root, .MuiDialog-paper .MuiTypography-root": {
+                  color: mode === "light" ? TEXT_PRIMARY : "#ffffff",
+                },
+                ".MuiDrawer-paper .MuiButton-text, .MuiDialog-paper .MuiButton-text": {
+                  color: mode === "light" ? BRAND_BLUE_DARK : "#93c5fd",
                 },
                 ".MuiDrawer-paper .MuiFormHelperText-root, .MuiDialog-paper .MuiFormHelperText-root": {
-                  color: mode === "light" ? "rgba(0, 0, 0, 0.6)" : "rgba(255, 255, 255, 0.65)"
+                  color: mode === "light" ? TEXT_SECONDARY : "rgba(255, 255, 255, 0.65)"
                 },
                 ".MuiDrawer-root > .MuiBackdrop-root": {
                   backgroundColor: 'rgba(0, 0, 0, 0.5)',
@@ -713,6 +728,9 @@ const AppThemeRoot = ({ children }) => {
                 width: 'auto !important',
                 maxWidth: '300px !important',
                 minWidth: '180px !important',
+                backgroundColor: mode === "dark" ? DARK_BG_PAPER : LIGHT_BG_PAPER,
+                color: mode === "dark" ? "#ffffff" : TEXT_PRIMARY,
+                border: mode === "dark" ? "1px solid rgba(255,255,255,0.08)" : "1px solid rgba(15,23,42,0.08)",
                 scrollbarWidth: "thin",
                 scrollbarColor: mode === "light" ? "#BDBDBD transparent" : "rgba(255,255,255,0.4) rgba(255,255,255,0.04)",
                 "&::-webkit-scrollbar": { width: 6, height: 6 },
@@ -731,6 +749,9 @@ const AppThemeRoot = ({ children }) => {
                 width: 'auto !important',
                 maxWidth: '300px !important',
                 minWidth: 'auto !important',
+                backgroundColor: mode === "dark" ? DARK_BG_PAPER : LIGHT_BG_PAPER,
+                color: mode === "dark" ? "#ffffff" : TEXT_PRIMARY,
+                border: mode === "dark" ? "1px solid rgba(255,255,255,0.08)" : "1px solid rgba(15,23,42,0.08)",
                 scrollbarWidth: "thin",
                 scrollbarColor: mode === "light" ? "#BDBDBD transparent" : "rgba(255,255,255,0.4) rgba(255,255,255,0.04)",
                 "&::-webkit-scrollbar": { width: 6, height: 6 },
@@ -746,20 +767,33 @@ const AppThemeRoot = ({ children }) => {
 
             MuiMenuItem: {
               root: {
-                color: mode === "light" ? "rgba(0, 0, 0, 0.87)" : "#f4f4f5",
+                color: mode === "light" ? TEXT_PRIMARY : "#f4f4f5",
+                backgroundColor: "transparent",
+                "&:hover": {
+                  backgroundColor: mode === "light" ? "rgba(59,130,246,0.08)" : "rgba(255,255,255,0.06)",
+                },
+                "&.Mui-selected": {
+                  backgroundColor: mode === "light" ? "rgba(59,130,246,0.12)" : "rgba(59,130,246,0.25)",
+                  color: mode === "light" ? TEXT_PRIMARY : "#ffffff",
+                  "&:hover": {
+                    backgroundColor: mode === "light" ? "rgba(59,130,246,0.16)" : "rgba(59,130,246,0.3)",
+                  },
+                },
               },
             },
             MuiInputLabel: {
               root: {
-                color: mode === "light" ? "rgba(0, 0, 0, 0.6)" : "rgba(255, 255, 255, 0.7)",
+                color: mode === "light" ? "#374151" : "rgba(255, 255, 255, 0.78)",
+                fontWeight: 500,
                 "&.Mui-focused": {
-                  color: mode === "light" ? "rgba(0, 0, 0, 0.6)" : "rgba(255, 255, 255, 0.85)",
+                  color: mode === "light" ? BRAND_BLUE_DARK : "rgba(255, 255, 255, 0.95)",
                 },
               },
             },
             MuiFormLabel: {
               root: {
-                color: mode === "light" ? "rgba(0, 0, 0, 0.6)" : "rgba(255, 255, 255, 0.7)",
+                color: mode === "light" ? "#374151" : "rgba(255, 255, 255, 0.78)",
+                fontWeight: 500,
               },
             },
 
@@ -768,45 +802,65 @@ const AppThemeRoot = ({ children }) => {
               root: {
                 borderRadius: 6,
                 fontSize: "0.8125rem",
+                color: mode === "dark" ? "#f4f4f5" : TEXT_PRIMARY,
+                backgroundColor: mode === "dark" ? "rgba(255,255,255,0.02)" : "#ffffff",
                 "& .MuiOutlinedInput-notchedOutline": {
                   borderColor:
-                    mode === "light" ? "#e2e8f0" : "rgba(255, 255, 255, 0.12)",
+                    mode === "light" ? "#d1d5db" : "rgba(255, 255, 255, 0.14)",
                   borderWidth: 1,
                 },
                 "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
                   borderColor:
                     mode === "light"
-                      ? `${systemPrimaryLight}55`
-                      : "rgba(255, 255, 255, 0.28)",
+                      ? `${systemPrimaryLight}cc`
+                      : "rgba(255, 255, 255, 0.32)",
                   borderWidth: 1,
                   boxShadow: "none",
                 },
                 "&:hover .MuiOutlinedInput-notchedOutline": {
                   borderColor:
-                    mode === "light" ? "#cbd5e1" : "rgba(255, 255, 255, 0.18)",
+                    mode === "light" ? "#9ca3af" : "rgba(255, 255, 255, 0.22)",
+                },
+                "& input": {
+                  color: mode === "dark" ? "#f4f4f5" : TEXT_PRIMARY,
+                },
+                "& input::placeholder": {
+                  color: mode === "light" ? "#6b7280" : "rgba(255,255,255,0.5)",
+                  opacity: 1,
+                },
+                "& textarea": {
+                  color: mode === "dark" ? "#f4f4f5" : TEXT_PRIMARY,
                 },
                 outline: "none",
               },
             },
             MuiTextField: {
               root: {
+                color: mode === "dark" ? "#f4f4f5" : TEXT_PRIMARY,
                 '& .MuiOutlinedInput-root': {
                   borderRadius: 8,
                   transition: 'all 0.3s ease',
                   outline: 'none',
                   '&:hover': {
                     '& .MuiOutlinedInput-notchedOutline': {
-                      borderColor: mode === "light" ? "#ccc" : "#555",
+                      borderColor: mode === "light" ? "#9ca3af" : "rgba(255,255,255,0.22)",
                     }
                   },
                   '&.Mui-focused': {
                     outline: 'none',
                     '& .MuiOutlinedInput-notchedOutline': {
                       borderColor:
-                        mode === "light" ? "#E5E7EB" : "rgba(255, 255, 255, 0.12)",
+                        mode === "light" ? `${systemPrimaryLight}cc` : "rgba(255, 255, 255, 0.32)",
                       borderWidth: 1,
                       boxShadow: 'none',
                     }
+                  },
+                  '& input': {
+                    color: mode === "dark" ? "#f4f4f5" : TEXT_PRIMARY,
+                  },
+                  '& input::placeholder': {
+                    color: mode === "light" ? "#6b7280" : "rgba(255,255,255,0.5)",
+                    opacity: 1,
                   }
                 }
               }
@@ -842,12 +896,13 @@ const AppThemeRoot = ({ children }) => {
               },
             },
 
-            // Drawer sem bordas
+            // Drawer sem bordas — fundos e textos SEMPRE com contraste explícito
             MuiDrawer: {
               paper: {
                 border: 'none',
                 backgroundColor:
-                  mode === "light" ? sidebarLightEff : sidebarDarkEff,
+                  mode === "light" ? LIGHT_BG_PAPER : DARK_BG_PAPER,
+                color: mode === "light" ? TEXT_PRIMARY : "#ffffff",
                 scrollbarWidth: "thin",
                 scrollbarColor: mode === "light" ? "#BDBDBD transparent" : "rgba(255,255,255,0.4) rgba(255,255,255,0.04)",
                 "&::-webkit-scrollbar": { width: 6, height: 6 },
@@ -890,9 +945,10 @@ const AppThemeRoot = ({ children }) => {
                     : "0 8px 30px rgba(0, 0, 0, 0.35)",
                 border:
                   mode === "light"
-                    ? "1px solid rgba(15, 23, 42, 0.06)"
+                    ? "1px solid rgba(15, 23, 42, 0.08)"
                     : "1px solid rgba(255, 255, 255, 0.08)",
-                backgroundColor: mode === "dark" ? DARK_BG_PAPER : undefined,
+                backgroundColor: mode === "dark" ? DARK_BG_PAPER : LIGHT_BG_PAPER,
+                color: mode === "dark" ? "#ffffff" : TEXT_PRIMARY,
                 scrollbarWidth: "thin",
                 scrollbarColor: mode === "light" ? "#BDBDBD transparent" : "rgba(255,255,255,0.4) rgba(255,255,255,0.04)",
                 "&::-webkit-scrollbar": { width: 6, height: 6 },
@@ -925,14 +981,14 @@ const AppThemeRoot = ({ children }) => {
                 fontSize: "0.9375rem",
                 padding: "16px 20px 8px",
                 letterSpacing: "-0.02em",
-                color: mode === "dark" ? "#ffffff" : undefined,
+                color: mode === "dark" ? "#ffffff" : TEXT_PRIMARY,
                 fontFamily: PREMIUM_FONT_FAMILY,
               },
             },
             MuiDialogContent: {
               root: {
                 padding: "8px 20px 16px",
-                color: mode === "dark" ? "#ffffff" : undefined,
+                color: mode === "dark" ? "#ffffff" : TEXT_PRIMARY,
                 fontFamily: PREMIUM_FONT_FAMILY,
                 scrollbarWidth: "thin",
                 scrollbarColor: mode === "light" ? "#BDBDBD transparent" : "rgba(255,255,255,0.4) rgba(255,255,255,0.04)",
@@ -955,18 +1011,18 @@ const AppThemeRoot = ({ children }) => {
             },
             MuiTypography: {
               root: {
-                color: mode === "dark" ? "#ffffff" : undefined,
+                color: mode === "dark" ? "#ffffff" : TEXT_PRIMARY,
               },
               colorTextSecondary: {
-                color: mode === "dark" ? "#e5e5e5" : undefined,
+                color: mode === "dark" ? "#e5e5e5" : TEXT_SECONDARY,
               },
             },
             MuiListItemText: {
               primary: {
-                color: mode === "dark" ? "#f4f4f5" : undefined,
+                color: mode === "dark" ? "#f4f4f5" : TEXT_PRIMARY,
               },
               secondary: {
-                color: mode === "dark" ? "rgba(255, 255, 255, 0.72)" : undefined,
+                color: mode === "dark" ? "rgba(255, 255, 255, 0.72)" : TEXT_SECONDARY,
               },
             },
             MuiLink: {
@@ -976,39 +1032,41 @@ const AppThemeRoot = ({ children }) => {
             },
             MuiStepLabel: {
               label: {
-                color: mode === "dark" ? "rgba(255, 255, 255, 0.7)" : undefined,
+                color: mode === "dark" ? "rgba(255, 255, 255, 0.7)" : TEXT_SECONDARY,
               },
               active: {
-                color: mode === "dark" ? "#ffffff" : undefined,
+                color: mode === "dark" ? "#ffffff" : TEXT_PRIMARY,
               },
               completed: {
-                color: mode === "dark" ? "rgba(255, 255, 255, 0.85)" : undefined,
+                color: mode === "dark" ? "rgba(255, 255, 255, 0.85)" : TEXT_PRIMARY,
               },
             },
             MuiTableCell: {
               root: {
                 fontSize: "0.8125rem",
                 padding: "8px 12px",
-                color: mode === "dark" ? "#f4f4f5" : undefined,
+                color: mode === "dark" ? "#f4f4f5" : TEXT_PRIMARY,
                 borderBottomColor:
                   mode === "dark"
                     ? "rgba(255, 255, 255, 0.06)"
-                    : "rgba(15, 23, 42, 0.06)",
+                    : "rgba(15, 23, 42, 0.08)",
               },
               head: {
                 fontSize: "0.6875rem",
-                fontWeight: 500,
+                fontWeight: 600,
                 textTransform: "uppercase",
                 letterSpacing: "0.04em",
                 color:
                   mode === "dark"
-                    ? "rgba(255, 255, 255, 0.55)"
-                    : "#71717a",
+                    ? "rgba(255, 255, 255, 0.7)"
+                    : "#374151",
                 borderBottomColor:
                   mode === "dark"
                     ? "rgba(255, 255, 255, 0.08)"
-                    : "rgba(15, 23, 42, 0.08)",
+                    : "rgba(15, 23, 42, 0.1)",
                 padding: "10px 12px",
+                backgroundColor:
+                  mode === "dark" ? "rgba(255, 255, 255, 0.03)" : "#f9fafb",
               },
             },
             MuiTableRow: {

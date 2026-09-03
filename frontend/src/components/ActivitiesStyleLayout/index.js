@@ -31,7 +31,6 @@ import {
   BUTTON_SECONDARY_SOFT_BG,
   TEXT_PRIMARY,
   TEXT_SECONDARY,
-  TOPBAR_ICON,
 } from "../../constants/visualIdentity";
 import {
   Plus,
@@ -55,8 +54,8 @@ const useStyles = makeStyles((theme) => {
   const pageBg = theme.palette.background.default;
   const textPrimary = theme.palette.text.primary;
   const textSecondary = theme.palette.text.secondary;
-  const mutedIcon = isDark ? '#a1a1aa' : TOPBAR_ICON;
-  const filterLabelColor = isDark ? 'rgba(255, 255, 255, 0.72)' : TOPBAR_ICON;
+  const mutedIcon = isDark ? '#a1a1aa' : TEXT_SECONDARY;
+  const filterLabelColor = isDark ? 'rgba(255, 255, 255, 0.72)' : TEXT_SECONDARY;
   const tabHoverBg = isDark ? 'rgba(255, 255, 255, 0.06)' : 'rgba(0, 0, 0, 0.04)';
   const tabActiveBg = isDark ? 'rgba(255, 255, 255, 0.1)' : BUTTON_SECONDARY_SOFT_BG;
   const scrollHoverBg = isDark ? 'rgba(255, 255, 255, 0.08)' : 'rgba(0, 0, 0, 0.04)';
@@ -196,7 +195,8 @@ const useStyles = makeStyles((theme) => {
       boxSizing: "border-box",
       width: "100%",
       marginTop: 2,
-      borderTop: "none",
+      borderTop: `1px solid ${borderSubtle}`,
+      borderBottom: `1px solid ${borderSubtle}`,
       gap: 10,
       [theme.breakpoints.down("sm")]: {
         alignItems: "flex-start",
