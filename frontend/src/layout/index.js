@@ -591,7 +591,7 @@ const useStyles = makeStyles((theme) => {
 
   // Botões da toolbar melhorados
   toolbarButton: {
-    color: navIcon,
+    color: "#ffffff !important",
     borderRadius: "6px",
     padding: "5px",
     margin: "0 1px",
@@ -602,7 +602,7 @@ const useStyles = makeStyles((theme) => {
   },
 
   menuButton: {
-    color: navIcon,
+    color: "#ffffff !important",
     "&:hover": {
       backgroundColor: "rgba(255, 255, 255, 0.1)",
     },
@@ -616,7 +616,7 @@ const useStyles = makeStyles((theme) => {
       background: "rgba(255, 255, 255, 0.1)",
       border: "none",
       borderRadius: "8px",
-      color: navIcon,
+      color: "#ffffff !important",
       fontSize: "18px",
       padding: "8px 12px",
       cursor: "pointer",
