@@ -725,12 +725,7 @@ const LoggedInLayout = ({ children, themeToggle, hideMenu = false }) => {
   const theme = useTheme();
   const colorMode = useContext(ColorModeContext);
   const greaterThenSm = useMediaQuery(theme.breakpoints.up("sm"));
-  const topbarIconColor =
-    theme.topbarIsLight === true
-      ? TOPBAR_ICON
-      : theme.navbarAccent != null && theme.navbarAccent !== ""
-        ? theme.navbarAccent
-        : "rgba(255, 255, 255, 0.92)";
+  const topbarIconColor = "#ffffff";
   const topbarIconSx = topbarSvgIconStyle(topbarIconColor);
 
   const history = useHistory();

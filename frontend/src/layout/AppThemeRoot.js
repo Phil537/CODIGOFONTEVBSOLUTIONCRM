@@ -547,10 +547,10 @@ const AppThemeRoot = ({ children }) => {
                   color: mode === "light" ? "#6b7280" : "rgba(255, 255, 255, 0.5)",
                   opacity: 1,
                 },
-                ".MuiDrawer-paper, .MuiDialog-paper": {
+                ".MuiDrawer-paper:not(.logged-in-layout .MuiDrawer-paper), .MuiDialog-paper": {
                   color: mode === "light" ? TEXT_PRIMARY : "#ffffff",
                 },
-                ".MuiDrawer-paper .MuiTypography-root, .MuiDialog-paper .MuiTypography-root": {
+                ".MuiDrawer-paper:not(.logged-in-layout .MuiDrawer-paper) .MuiTypography-root, .MuiDialog-paper .MuiTypography-root": {
                   color: mode === "light" ? TEXT_PRIMARY : "#ffffff",
                 },
                 ".MuiDrawer-paper .MuiButton-text, .MuiDialog-paper .MuiButton-text": {

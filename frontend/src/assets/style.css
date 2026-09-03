@@ -157,10 +157,10 @@ html body .logged-in-layout .MuiPopover-paper {
 }
 
 /* PROTEGER DRAWER */
-.logged-in-layout .MuiDrawer-paper,
-.MuiDrawer-root .MuiPaper-root {
-  width: 240px !important;
-  max-width: 240px !important;
+.logged-in-layout .MuiDrawer-paper:not([class*="drawerPaperClose"]),
+.MuiDrawer-root:not([class*="drawerPaperClose"]) .MuiPaper-root {
+  width: 210px !important;
+  max-width: 210px !important;
   position: fixed !important;
 }
 

@@ -398,7 +398,7 @@ a,
 
 /* ========== Light Mode: Drawers & Modals (painéis laterais / formulários) ========== */
 :root[data-theme="light"] .MuiDrawer-paper:not(.logged-in-layout .MuiDrawer-paper),
-:root:not([data-theme="dark"]):not(.dark) .MuiDrawer-paper {
+:root:not([data-theme="dark"]):not(.dark) .MuiDrawer-paper:not(.logged-in-layout .MuiDrawer-paper) {
   background-color: #ffffff !important;
   color: #111827 !important;
 }
@@ -409,38 +409,38 @@ a,
   color: #111827 !important;
 }
 
-:root[data-theme="light"] .MuiDrawer-paper .MuiTypography-root,
+:root[data-theme="light"] .MuiDrawer-paper:not(.logged-in-layout .MuiDrawer-paper) .MuiTypography-root,
 :root[data-theme="light"] .MuiDialog-paper .MuiTypography-root,
-:root:not([data-theme="dark"]):not(.dark) .MuiDrawer-paper .MuiTypography-root,
+:root:not([data-theme="dark"]):not(.dark) .MuiDrawer-paper:not(.logged-in-layout .MuiDrawer-paper) .MuiTypography-root,
 :root:not([data-theme="dark"]):not(.dark) .MuiDialog-paper .MuiTypography-root {
   color: inherit;
 }
 
-:root[data-theme="light"] .MuiDrawer-paper .MuiOutlinedInput-root,
+:root[data-theme="light"] .MuiDrawer-paper:not(.logged-in-layout .MuiDrawer-paper) .MuiOutlinedInput-root,
 :root[data-theme="light"] .MuiDialog-paper .MuiOutlinedInput-root,
-:root:not([data-theme="dark"]):not(.dark) .MuiDrawer-paper .MuiOutlinedInput-root,
+:root:not([data-theme="dark"]):not(.dark) .MuiDrawer-paper:not(.logged-in-layout .MuiDrawer-paper) .MuiOutlinedInput-root,
 :root:not([data-theme="dark"]):not(.dark) .MuiDialog-paper .MuiOutlinedInput-root {
   color: #111827 !important;
   background-color: #ffffff !important;
 }
 
-:root[data-theme="light"] .MuiDrawer-paper .MuiInputBase-input,
+:root[data-theme="light"] .MuiDrawer-paper:not(.logged-in-layout .MuiDrawer-paper) .MuiInputBase-input,
 :root[data-theme="light"] .MuiDialog-paper .MuiInputBase-input,
-:root:not([data-theme="dark"]):not(.dark) .MuiDrawer-paper .MuiInputBase-input,
+:root:not([data-theme="dark"]):not(.dark) .MuiDrawer-paper:not(.logged-in-layout .MuiDrawer-paper) .MuiInputBase-input,
 :root:not([data-theme="dark"]):not(.dark) .MuiDialog-paper .MuiInputBase-input {
   color: #111827 !important;
 }
 
-:root[data-theme="light"] .MuiDrawer-paper .MuiInputLabel-root,
+:root[data-theme="light"] .MuiDrawer-paper:not(.logged-in-layout .MuiDrawer-paper) .MuiInputLabel-root,
 :root[data-theme="light"] .MuiDialog-paper .MuiInputLabel-root,
-:root:not([data-theme="dark"]):not(.dark) .MuiDrawer-paper .MuiInputLabel-root,
+:root:not([data-theme="dark"]):not(.dark) .MuiDrawer-paper:not(.logged-in-layout .MuiDrawer-paper) .MuiInputLabel-root,
 :root:not([data-theme="dark"]):not(.dark) .MuiDialog-paper .MuiInputLabel-root {
   color: #6b7280 !important;
 }
 
-:root[data-theme="light"] .MuiDrawer-paper .MuiOutlinedInput-notchedOutline,
+:root[data-theme="light"] .MuiDrawer-paper:not(.logged-in-layout .MuiDrawer-paper) .MuiOutlinedInput-notchedOutline,
 :root[data-theme="light"] .MuiDialog-paper .MuiOutlinedInput-notchedOutline,
-:root:not([data-theme="dark"]):not(.dark) .MuiDrawer-paper .MuiOutlinedInput-notchedOutline,
+:root:not([data-theme="dark"]):not(.dark) .MuiDrawer-paper:not(.logged-in-layout .MuiDrawer-paper) .MuiOutlinedInput-notchedOutline,
 :root:not([data-theme="dark"]):not(.dark) .MuiDialog-paper .MuiOutlinedInput-notchedOutline {
   border-color: #e5e7eb !important;
 }
@@ -675,3 +675,61 @@ a,
 :root[style*="color-scheme: dark"] [data-agenda-event] [class*="agendaTime"] {
   color: #374151 !important;
 }
+
+/* ========== Menu Lateral (Sidebar): Garantir Fundo Escuro (#0B1B3B) e Ícones/Textos Brancos Legíveis no Modo Claro e Escuro ========== */
+.logged-in-layout .MuiDrawer-paper,
+.logged-in-layout .MuiDrawer-paper.MuiPaper-root,
+html body .logged-in-layout .MuiDrawer-paper {
+  background-color: #0B1B3B !important;
+  color: #ffffff !important;
+  border-right: 1px solid rgba(255, 255, 255, 0.08) !important;
+}
+
+.logged-in-layout .MuiDrawer-paper .MuiList-root,
+.logged-in-layout .MuiDrawer-paper .MuiCollapse-container,
+.logged-in-layout .MuiDrawer-paper .MuiCollapse-wrapper,
+.logged-in-layout .MuiDrawer-paper .MuiCollapse-wrapperInner {
+  background-color: transparent !important;
+}
+
+.logged-in-layout .MuiDrawer-paper .MuiListItem-root {
+  color: #ffffff !important;
+}
+
+.logged-in-layout .MuiDrawer-paper .MuiListItemIcon-root {
+  color: #ffffff !important;
+}
+
+.logged-in-layout .MuiDrawer-paper .MuiListItemIcon-root svg,
+.logged-in-layout .MuiDrawer-paper .MuiListItemIcon-root svg *,
+.logged-in-layout .MuiDrawer-paper .MuiListItemIcon-root path {
+  color: #ffffff !important;
+  stroke: #ffffff !important;
+  fill: none;
+}
+
+.logged-in-layout .MuiDrawer-paper .MuiListItemText-root,
+.logged-in-layout .MuiDrawer-paper .MuiListItemText-primary,
+.logged-in-layout .MuiDrawer-paper .MuiListItemText-secondary,
+.logged-in-layout .MuiDrawer-paper .MuiTypography-root {
+  color: #ffffff !important;
+}
+
+.logged-in-layout .MuiDrawer-paper .MuiDivider-root {
+  background-color: rgba(255, 255, 255, 0.12) !important;
+}
+
+.logged-in-layout .MuiDrawer-paper .MuiListItem-root:hover {
+  background-color: rgba(255, 255, 255, 0.08) !important;
+}
+
+.logged-in-layout .MuiDrawer-paper .MuiListItem-root[class*="listItemActive"] {
+  background-color: rgba(59, 130, 246, 0.32) !important;
+}
+
+.logged-in-layout .MuiDrawer-paper .MuiListItem-root[class*="listItemActive"] .MuiListItemText-primary,
+.logged-in-layout .MuiDrawer-paper .MuiListItem-root[class*="listItemActive"] .MuiListItemIcon-root,
+.logged-in-layout .MuiDrawer-paper .MuiListItem-root[class*="listItemActive"] .MuiListItemIcon-root svg {
+  color: #ffffff !important;
+}
+
