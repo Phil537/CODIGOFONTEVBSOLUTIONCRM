@@ -250,29 +250,17 @@ const AppThemeRoot = ({ children }) => {
     const brandLight = getSafeColor(primaryColorLight);
     const brandDark = getSafeColor(primaryColorDark);
 
-    /** Sidebar: whitelabel ou azul-marinho (claro) / cinza escuro (escuro) */
-    const sidebarLightEff =
-      sidebarColorLight && isValidHex(sidebarColorLight)
-        ? getSafeColor(sidebarColorLight)
-        : LIGHT_SIDEBAR_DEFAULT;
-    const sidebarDarkEff =
-      sidebarColorDark && isValidHex(sidebarColorDark)
-        ? getSafeColor(sidebarColorDark)
-        : DARK_BG_DEFAULT;
+    /** Sidebar e Topbar SEMPRE com fundo azul-marinho escuro (Evoluti CRM style).
+     *  Ignora whitelabel / configurações personalizadas para estes dois elementos,
+     *  garantindo consistência visual sem impactar demais componentes do sistema.
+     */
+    const sidebarLightEff = LIGHT_SIDEBAR_DEFAULT;
+    const sidebarDarkEff = LIGHT_SIDEBAR_DEFAULT;
 
-    /** Topbar: whitelabel ou igual ao sidebar DEFAULT (ignora sidebar salvo p/ evitar branco) */
-    let topbarLightEff = resolveTopbarHex(
-      topbarColorLight,
-      LIGHT_SIDEBAR_DEFAULT,
-      LEGACY_TOPBAR_LIGHT
-    );
-    let topbarDarkEff = resolveTopbarHex(
-      topbarColorDark,
-      DARK_BG_DEFAULT,
-      LEGACY_TOPBAR_DARK
-    );
+    let topbarLightEff = LIGHT_SIDEBAR_DEFAULT;
+    let topbarDarkEff = LIGHT_SIDEBAR_DEFAULT;
 
-    /** Sidebar SEMPRE com a mesma cor da topbar (todo o menu fica com a cor da topbar) */
+    /** Sidebar SEMPRE com a mesma cor da topbar (ambos azul-marinho escuro) */
     const sidebarLightEffFinal = topbarLightEff;
     const sidebarDarkEffFinal = topbarDarkEff;
     topbarLightEff = sidebarLightEffFinal;
