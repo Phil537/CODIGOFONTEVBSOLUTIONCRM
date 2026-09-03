@@ -34,6 +34,11 @@ import {
 } from "../constants/brand";
 import {
   SIDEBAR_BG,
+  SIDEBAR_TEXT,
+  SIDEBAR_ICON,
+  SIDEBAR_ACTIVE_BG,
+  SIDEBAR_ACTIVE_TEXT,
+  SIDEBAR_ACTIVE_ICON,
   BRAND_BLUE,
   BRAND_BLUE_DARK,
   BRAND_BLUE_MEDIUM,
@@ -273,13 +278,12 @@ const AppThemeRoot = ({ children }) => {
         ? getSafeColor(primaryColorDark)
         : DARK_TOPBAR_DEFAULT;
 
-    const topbarIsLight =
-      mode === "light" && !isDarkBackgroundHex(topbarLightEff);
+    /** Topbar sempre escura (igual Evoluti CRM), em ambos os modos claro/escuro. */
+    const topbarIsLight = false;
 
-    const navbarAccentLight = getContrastTextForBackground(topbarLightEff);
-    const navbarAccentDark = getContrastTextForBackground(topbarDarkEff);
-    const navbarAccent =
-      mode === "light" ? navbarAccentLight : navbarAccentDark;
+    const navbarAccentLight = "#ffffff";
+    const navbarAccentDark = "#ffffff";
+    const navbarAccent = "#ffffff";
 
     /** Abas e destaques de página: azul marca fixo no claro (sempre legível no fundo branco). */
     const pageTabsAccent = mode === "light" ? BRAND_BLUE_DARK : "#ffffff";
@@ -400,38 +404,19 @@ const AppThemeRoot = ({ children }) => {
             messageIcons: mode === "light" ? "grey" : "#F3F3F3",
             inputBackground:
               mode === "light" ? "#FFFFFF" : DARK_BG_ELEVATED,
-            barraSuperior:
-              mode === "light" ? topbarLightEff : topbarDarkEff,
-            sidebarMenuBackground:
-              mode === "light" ? sidebarLightEffFinal : sidebarDarkEffFinal,
-            /** Menu lateral: textos sempre legíveis; ícones seguem botões. */
-            sidebarMenuTextPrimary: sidebarCx.isDark
-              ? sidebarCx.textPrimary
-              : mode === "light"
-                ? "rgba(0, 0, 0, 0.87)"
-                : "rgba(255, 255, 255, 0.92)",
-            sidebarMenuTextSecondary: sidebarCx.isDark
-              ? sidebarCx.textSecondary
-              : mode === "light"
-                ? "rgba(0, 0, 0, 0.55)"
-                : "rgba(255, 255, 255, 0.65)",
-            sidebarMenuIcon: sidebarCx.isDark
-              ? sidebarCx.icon
-              : mode === "light"
-                ? systemPrimaryLight
-                : systemPrimaryDark,
-            sidebarMenuItemHoverBg: sidebarCx.hoverBg,
-            sidebarMenuItemActiveBg: sidebarCx.activeBg,
-            sidebarMenuActiveText: sidebarCx.activeText,
-            sidebarMenuActiveIcon: sidebarCx.activeIcon,
-            sidebarMenuHoverAccent:
-              sidebarCx.isDark
-                ? "#ffffff"
-                : mode === "light"
-                  ? systemPrimaryLight
-                  : systemPrimaryDark,
-            /** Menu lateral com fundo escuro (cor custom) → logo branca */
-            sidebarMenuIsDarkLogo: sidebarCx.isDark,
+            barraSuperior: SIDEBAR_BG,
+            sidebarMenuBackground: SIDEBAR_BG,
+            /** Menu lateral: valores FIXOS (azul escuro + textos/ícones brancos) — independente de modo claro/escuro. */
+            sidebarMenuTextPrimary: SIDEBAR_TEXT,
+            sidebarMenuTextSecondary: "rgba(255, 255, 255, 0.78)",
+            sidebarMenuIcon: SIDEBAR_ICON,
+            sidebarMenuItemHoverBg: "rgba(255, 255, 255, 0.08)",
+            sidebarMenuItemActiveBg: SIDEBAR_ACTIVE_BG,
+            sidebarMenuActiveText: SIDEBAR_ACTIVE_TEXT,
+            sidebarMenuActiveIcon: SIDEBAR_ACTIVE_ICON,
+            sidebarMenuHoverAccent: "#ffffff",
+            /** Menu lateral sempre com fundo escuro → logo branca. */
+            sidebarMenuIsDarkLogo: true,
             /** Navbar secundária, faixa de filtros e cabeçalho Activities — alinhado ao menu lateral no escuro */
             chromeSurface:
               mode === "light" ? LIGHT_CHROME_SURFACE : DARK_BG_DEFAULT,
