@@ -260,15 +260,15 @@ const AppThemeRoot = ({ children }) => {
         ? getSafeColor(sidebarColorDark)
         : DARK_BG_DEFAULT;
 
-    /** Topbar: whitelabel ou igual ao sidebar (claro e escuro) */
+    /** Topbar: whitelabel ou igual ao sidebar DEFAULT (ignora sidebar salvo p/ evitar branco) */
     let topbarLightEff = resolveTopbarHex(
       topbarColorLight,
-      sidebarLightEff,
+      LIGHT_SIDEBAR_DEFAULT,
       LEGACY_TOPBAR_LIGHT
     );
     let topbarDarkEff = resolveTopbarHex(
       topbarColorDark,
-      sidebarDarkEff,
+      DARK_BG_DEFAULT,
       LEGACY_TOPBAR_DARK
     );
 
@@ -1359,12 +1359,12 @@ const AppThemeRoot = ({ children }) => {
         : DARK_BG_DEFAULT;
     const topbarL = resolveTopbarHex(
       topbarColorLight,
-      sidebarLightEff,
+      LIGHT_SIDEBAR_DEFAULT,
       LEGACY_TOPBAR_LIGHT
     );
     const topbarD = resolveTopbarHex(
       topbarColorDark,
-      sidebarDarkEff,
+      DARK_BG_DEFAULT,
       LEGACY_TOPBAR_DARK
     );
     /** Sidebar sempre com cor da topbar — alinhamento visual */
