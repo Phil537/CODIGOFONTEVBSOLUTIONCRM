@@ -84,6 +84,7 @@ import {
   TOPBAR_SEARCH_BORDER,
   TOPBAR_ICON,
   TOPBAR_STATUS_GREEN,
+  SIDEBAR_BG,
 } from "../constants/visualIdentity";
 
 const backendUrl = getBackendUrl();
@@ -92,6 +93,18 @@ const appBarHeight = 32;
 
 const useStyles = makeStyles((theme) => {
   const topbarLight = theme.topbarIsLight === true;
+  const drawerBg =
+    theme.palette &&
+    theme.palette.sidebarMenuBackground &&
+    String(theme.palette.sidebarMenuBackground).length >= 4
+      ? theme.palette.sidebarMenuBackground
+      : SIDEBAR_BG;
+  const sidebarIsDark =
+    typeof theme.palette?.sidebarMenuIsDarkLogo === "boolean"
+      ? theme.palette.sidebarMenuIsDarkLogo
+      : true;
+  const sidebarIcon = theme.palette?.sidebarMenuIcon || "#FFFFFF";
+  const sidebarText = theme.palette?.sidebarMenuTextPrimary || "#FFFFFF";
   const navIcon = topbarLight
     ? TOPBAR_ICON
     : theme.navbarAccent != null && theme.navbarAccent !== ""
@@ -244,8 +257,7 @@ const useStyles = makeStyles((theme) => {
     minHeight: "126px",
     boxSizing: "border-box",
     overflow: "hidden",
-    backgroundColor:
-      theme.palette.sidebarMenuBackground || theme.palette.background.paper,
+    backgroundColor: drawerBg,
     transition: "all 0.3s ease",
     marginTop: 0,
     marginBottom: 0,
@@ -261,7 +273,7 @@ const useStyles = makeStyles((theme) => {
     top: 4,
     right: 8,
     padding: 2,
-    color: theme.palette.sidebarMenuIcon || theme.palette.text.primary,
+    color: sidebarIcon,
     "& svg": {
       fontSize: "0.9rem",
     },
@@ -440,9 +452,8 @@ const useStyles = makeStyles((theme) => {
     overflowY: "hidden",
     display: "flex",
     flexDirection: "column",
-    backgroundColor:
-      theme.palette.sidebarMenuBackground || theme.palette.background.paper,
-    borderRight: theme.palette.sidebarMenuIsDarkLogo
+    backgroundColor: drawerBg,
+    borderRight: sidebarIsDark
       ? "1px solid rgba(255, 255, 255, 0.08)"
       : `1px solid ${theme.palette.divider}`,
     boxShadow: "none",
@@ -450,7 +461,7 @@ const useStyles = makeStyles((theme) => {
     height: `calc(100% - ${appBarHeight}px)`,
     marginTop: 0,
     paddingTop: 0,
-    ...(theme.palette.sidebarMenuBackground
+    ...(drawerBg
       ? {
           borderRadius: "0 10px 10px 0",
           borderRight: `1px solid ${theme.palette.divider}`,
